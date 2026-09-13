@@ -114,6 +114,9 @@ const roomConfigFloor4 = {
     '2838': { number: '', name: 'туалет', showPanel: true },
     '2840': { number: '', name: 'служебная лестница', showPanel: true },
     '2814': { number: '', name: 'Архив', showPanel: true },
+    '1144': { number: '', name: 'Архив', showPanel: true },
+    '1204': { number: '', name: 'Архив', showPanel: true },
+    '1216': { number: '', name: 'Архив', showPanel: true },
 };
 // какой конфиг использовать для какого этажа
 const floorRoomConfigs = {
