@@ -13,7 +13,8 @@ const INITIAL_ZOOM = isMobile ? INITIAL_ZOOM_MOBILE : INITIAL_ZOOM_DESKTOP;
 // модели этажей, этаж есть в списке — готов показываем его план, нет в списке - заглушка
 const FLOOR_MODELS = {
     2: './glbs/2ndfloor.glb',
-    3: './glbs/3rdfloor.glb'
+    3: './glbs/3rdfloor.glb',
+    4: './glbs/4thfloor.glb',
 };
 const DIAGONAL_MARGIN = 2.0;
 const FRUSTUM_MARGIN = 1.0;
@@ -95,10 +96,14 @@ const roomConfigFloor3 = {
     '3614': { number: 'секретная будка', name: 'no info', showPanel: true },
 };
 
+const roomConfigFloor4 = {
+    
+};
 // какой конфиг использовать для какого этажа
 const floorRoomConfigs = {
     2: roomConfigFloor2,
-    3: roomConfigFloor3
+    3: roomConfigFloor3,
+    4: roomConfigFloor4,
 };
 
 // резервный массив (не используется, если конфиг задан)
