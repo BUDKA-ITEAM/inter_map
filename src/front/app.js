@@ -67,8 +67,7 @@ const roomConfigFloor2 = {
     'ground_1': { number: '', name: 'No info', showPanel: false }
 };
 
-// Кабинеты третьего этажа. id мешей пока неизвестны — их можно подсмотреть
-// режимом отладки (20 нажатий на этаж 2) и дописать сюда так же, как выше.
+
 const roomConfigFloor3 = {
     '3562': { number: '301', name: 'Аудитория (ПК)', showPanel: true },
     '3560': { number: '', name: 'Лестничная площадка', showPanel: true },
@@ -97,7 +96,24 @@ const roomConfigFloor3 = {
 };
 
 const roomConfigFloor4 = {
-    
+    '2832': { number: '401', name: 'УПР/ руководители факультетов', showPanel: true },
+    '2830': { number: '402', name: 'Лаборатория промышленной робототехники', showPanel: true },
+    '2828': { number: '403', name: 'Аудитория', showPanel: true },
+    '2826': { number: '404', name: 'Аудитория (ПК)', showPanel: true },
+    '2822': { number: '405', name: 'Аудитория (ПК)', showPanel: true },
+    '2836': { number: '406', name: 'Аудитория (ПК)', showPanel: true },
+    '2818': { number: '407', name: 'Аудитория (ПК)', showPanel: true },
+    '2816': { number: '408', name: 'Аудитория (ПК)', showPanel: true },
+    '2824': { number: '409', name: 'Аудитория (ПК)', showPanel: true },
+    '2820': { number: '410', name: 'Коворкинг', showPanel: true },
+    '2812': { number: '411', name: 'Аудитория (ПК)', showPanel: true },
+    '2810': { number: '412', name: 'Центр карьеры', showPanel: true },
+    '2808': { number: '413', name: 'Аудитория (ПК)', showPanel: true },
+    '2834': { number: '', name: 'Лестничная площадка', showPanel: true },
+    '2806': { number: '', name: 'туалет', showPanel: true },
+    '2838': { number: '', name: 'туалет', showPanel: true },
+    '2840': { number: '', name: 'служебная лестница', showPanel: true },
+    '2814': { number: '', name: 'Архив', showPanel: true },
 };
 // какой конфиг использовать для какого этажа
 const floorRoomConfigs = {
