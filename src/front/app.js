@@ -45,9 +45,9 @@ const GROUPS_SCAN_LIMIT = 2000;
 // описание кабинетов по идентификаторам в модели
 const roomConfigFloor2 = {
     //2ndfloor
-    '6419': { number: '', name: 'Пожарная лестница', showPanel: true },
-    '6417': { number: 'Ж', name: 'Туалет', showPanel: true },
-    '6415': { number: 'М', name: 'Туалет', showPanel: true },
+    '6419': { number: '', name: 'Служебная лестница', showPanel: true },
+    '6417': { number: '', name: 'туалетик', showPanel: true },
+    '6415': { number: '', name: 'туалетик', showPanel: true },
     '6413': { number: '', name: 'no info', showPanel: true },
     '6435': { number: '', name: 'Подсобное помещение', showPanel: false },
     '6431': { number: '', name: 'Лестничная площадка', showPanel: true },
@@ -91,10 +91,10 @@ const roomConfigFloor3 = {
     '3548': { number: '317', name: 'Бухгалтерия/отдел кадров', showPanel: true },
     '3546': { number: '318', name: 'Директор школы/заместитель', showPanel: true },
     '3544': { number: '319', name: 'Коворкинг начальной школы', showPanel: true },
-    '3542': { number: 'туалетик', name: 'no info', showPanel: true },
-    '3540': { number: 'туалетик', name: 'no info', showPanel: true },
-    '3538': { number: 'служебная лестница(вроде)', name: 'no info', showPanel: true },
-    '3614': { number: 'секретная будка', name: 'no info', showPanel: true },
+    '3542': { number: 'туалетик', name: '', showPanel: true },
+    '3540': { number: 'туалетик', name: '', showPanel: true },
+    '3538': { number: 'Служебная лестница', name: '', showPanel: true },
+    '3614': { number: 'секретная будка', name: '', showPanel: true },
 };
 
 const roomConfigFloor4 = {
@@ -112,8 +112,8 @@ const roomConfigFloor4 = {
     '2810': { number: '412', name: 'Центр карьеры', showPanel: true },
     '2808': { number: '413', name: 'Аудитория (ПК)', showPanel: true },
     '2834': { number: '', name: 'Лестничная площадка', showPanel: true },
-    '2806': { number: '', name: 'туалет', showPanel: true },
-    '2838': { number: '', name: 'туалет', showPanel: true },
+    '2806': { number: '', name: 'туалетик', showPanel: true },
+    '2838': { number: '', name: 'туалетик', showPanel: true },
     '2840': { number: '', name: 'служебная лестница', showPanel: true },
     '2814': { number: '', name: 'Архив', showPanel: true },
     '1210': { number: '', name: 'Архив', showPanel: true },
@@ -122,11 +122,41 @@ const roomConfigFloor4 = {
 };
 
 const roomConfigFloor5 = {
-
+    '2546': { number: '501', name: 'no info', showPanel: true },
+    '2518': { number: '502', name: 'no info', showPanel: true },
+    '2516': { number: '503', name: 'no info', showPanel: true },
+    '2520': { number: '504', name: 'no info', showPanel: true },
+    '2522': { number: '505', name: 'no info', showPanel: true },
+    '2524': { number: '506', name: 'no info', showPanel: true },
+    '2506': { number: '507', name: 'no info', showPanel: true },
+    '2504': { number: '508', name: 'no info', showPanel: true },
+    '2514': { number: '509', name: 'no info', showPanel: true },
+    '2512': { number: '510', name: 'no info', showPanel: true },
+    '2508': { number: '511', name: 'no info', showPanel: true },
+    '2510': { number: '512', name: 'no info', showPanel: true },
+    '2500': { number: '513', name: 'no info', showPanel: true },
+    '2498': { number: 'туалетик', name: 'no info', showPanel: true },
+    '2496': { number: 'туалетик', name: 'no info', showPanel: true },
+    '2526': { number: 'Лестничная площадка', name: '', showPanel: true },
+    '2494': { number: 'Служебная лестница', name: '', showPanel: true },
 };
 
 const roomConfigFloor6 = {
-
+    '2522': { number: '601', name: 'no info', showPanel: true },
+    '2518': { number: '602', name: 'no info', showPanel: true },
+    '2516': { number: '603', name: 'no info', showPanel: true },
+    '2514': { number: '604', name: 'no info', showPanel: true },
+    '2508': { number: '605', name: 'no info', showPanel: true },
+    '2506': { number: '606', name: 'no info', showPanel: true },
+    '2512': { number: '607', name: 'no info', showPanel: true },
+    '2510': { number: '608', name: 'no info', showPanel: true },
+    '2504': { number: '609', name: 'no info', showPanel: true },
+    '2502': { number: '610', name: 'no info', showPanel: true },
+    '2500': { number: '611', name: 'no info', showPanel: true },
+    '2498': { number: 'туалетик', name: 'no info', showPanel: true },
+    '2496': { number: 'туалетик', name: 'no info', showPanel: true },
+    '2526': { number: 'Служебная лестница', name: 'no info', showPanel: true },
+    '2520': { number: 'Лестничная площадка', name: 'no info', showPanel: true },
 };
 // какой конфиг использовать для какого этажа
 const floorRoomConfigs = {
