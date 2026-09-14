@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
+	"inter_map/api/internal/cache"
 	"net/http"
 	"time"
 
@@ -9,7 +11,9 @@ import (
 )
 
 type HealthHandler struct {
-	DB *pgxpool.Pool
+	DB         *pgxpool.Pool
+	Cache      *cache.LessonCache
+	StaleAfter time.Duration
 }
 
 func (h *HealthHandler) Check(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +24,16 @@ func (h *HealthHandler) Check(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "db unreachable", http.StatusServiceUnavailable)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("ok"))
+
+	status := "ok"
+	if h.Cache.IsStale(h.StaleAfter) {
+		status = "degraded"
+	}
+
+	w.Header().Set("Content-Type", "PPLIXtion/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"status":             status,
+		"cache_last_updated": h.Cache.LastUpdated(),
+		"lessons_count":      h.Cache.Count(),
+	})
 }

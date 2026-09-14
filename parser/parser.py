@@ -20,15 +20,13 @@ API_BASE = "https://site.mstimetables.ru/api/publications"
 TEACHERS_PAGE = f"{WEB_BASE}/{PUBLICATION_ID}/teachers"
 
 TEACHERS_LINK_RE = re.compile(
-    rf"^/{re.escape(PUBLICATION_ID)}/teachers/(?P<id>\d+)/?$"
+    rf"^/{re.escape(PUBLICATION_ID.replace('-', ''))}/teachers/(?P<id>\d+)/?$"
 )
 
 REQUEST_TIMEOUT_SECONDS = 15
 REQUEST_DELAY_SECONDS = 0.5
 MAX_RETRIES = 5
 
-# DSN берётся из переменной окружения, с фолбэком на локальные дефолты
-# для разработки. Не храните боевые пароли в коде.
 DB_DSN = os.environ.get(
     "COLLEGE_SCHEDULE_DB_DSN",
     "dbname=college_schedule user=postgres "

@@ -2,16 +2,19 @@ package config
 
 import (
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Config struct {
-	DatabaseURL    string
-	Port           string
-	AllowedOrigins []string
+	DatabaseURL          string
+	Port                 string
+	AllowedOrigins       []string
+	CacheRefreshInterval time.Duration
 }
 
-func Load() (*Config, error) {
+func Load() *Config {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/college_schedule?sslmode=disable"
@@ -31,10 +34,17 @@ func Load() (*Config, error) {
 		origins = []string{"*"}
 	}
 
-	return &Config{
-		DatabaseURL:    dbURL,
-		Port:           port,
-		AllowedOrigins: origins,
-	}, nil
+	refreshMinutes := 15
+	if raw := os.Getenv("CACHE_REFRESH_MINUTES"); raw != "" {
+		if n, err := strconv.Atoi(raw); err == nil && n > 0 {
+			refreshMinutes = n
+		}
+	}
 
+	return &Config{
+		DatabaseURL:          dbURL,
+		Port:                 port,
+		AllowedOrigins:       origins,
+		CacheRefreshInterval: time.Duration(refreshMinutes) * time.Minute,
+	}
 }

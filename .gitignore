@@ -10,7 +10,9 @@ venv/
 Thumbs.db
 .idea/
 .vscode/
-requirments.txt
+requirements.txt
 
 /docker-compose.yml
 /dockerfile
+/Dockerfile
+

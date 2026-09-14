@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"inter_map/api/internal/cache"
 	"inter_map/api/internal/config"
 	"inter_map/api/internal/db"
 	"inter_map/api/internal/handlers"
 	"log"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -18,24 +21,26 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("config error: %v", err)
-	}
+	cfg := config.Load()
 
-	if len(cfg.AllowedOrigins) == 1 && cfg.AllowedOrigins[0] == "*" {
-		log.Println("warning: ALLOWED_ORIGINS not set, allowing all origins")
-	}
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	ctx := context.Background()
 	pool, err := db.NewPool(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("db error: %v", err)
 	}
 	defer pool.Close()
 
-	scheduleH := &handlers.ScheduleHandler{DB: pool}
-	healthH := &handlers.HealthHandler{DB: pool}
+	lessonCache := cache.NewLessonCache(pool)
+	lessonCache.StartRefreshLoop(ctx, cfg.CacheRefreshInterval)
+
+	sceduleH := &handlers.ScheduleHandler{Cache: lessonCache}
+	healthH := &handlers.HealthHandler{
+		DB:         pool,
+		Cache:      lessonCache,
+		StaleAfter: cfg.CacheRefreshInterval * 3,
+	}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -47,9 +52,26 @@ func main() {
 	}))
 
 	r.Get("/healthz", healthH.Check)
-	r.Get("/api/lessons", scheduleH.List)
-	r.Get("/api/debug/count", scheduleH.Debug)
+	r.Get("/api/lessons", sceduleH.List)
 
-	log.Printf("listening on :%s", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
+	srv := &http.Server{
+		Addr:    ":" + cfg.Port,
+		Handler: r,
+	}
+
+	go func() {
+		log.Printf("listening on : %s", cfg.Port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("server error: %v", err)
+		}
+	}()
+
+	<-ctx.Done()
+	log.Printf("shutting down...")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Printf("shutdown error: %v", err)
+	}
 }
