@@ -63,7 +63,7 @@ const roomConfigFloor2 = {
     '6400': { number: '203', name: 'Раздевалка', showPanel: true },
     '6433': { number: '202', name: 'Гардеробная', showPanel: true },
     '6429': { number: '201', name: 'Коворкинг', showPanel: true },
-    // комната ground_1 не показывает панель
+    // комната ground_1 не показывает панель obj2gltf -i 6thfloor.obj -o 6thfloor.glb
     'ground_1': { number: '', name: 'No info', showPanel: false }
 };
 
