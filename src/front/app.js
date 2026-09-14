@@ -15,6 +15,8 @@ const FLOOR_MODELS = {
     2: './glbs/2ndfloor.glb',
     3: './glbs/3rdfloor.glb',
     4: './glbs/4thfloor.glb',
+    5: './glbs/5thfloor.glb',
+    6: './glbs/6thfloor.glb',
 };
 const DIAGONAL_MARGIN = 2.0;
 const FRUSTUM_MARGIN = 1.0;
@@ -63,7 +65,7 @@ const roomConfigFloor2 = {
     '6400': { number: '203', name: 'Раздевалка', showPanel: true },
     '6433': { number: '202', name: 'Гардеробная', showPanel: true },
     '6429': { number: '201', name: 'Коворкинг', showPanel: true },
-    // комната ground_1 не показывает панель obj2gltf -i 6thfloor.obj -o 6thfloor.glb
+    // комната ground_1 не показывает панель
     'ground_1': { number: '', name: 'No info', showPanel: false }
 };
 
@@ -118,11 +120,21 @@ const roomConfigFloor4 = {
     '1204': { number: '', name: 'Архив', showPanel: true },
     '1216': { number: '', name: 'Архив', showPanel: true },
 };
+
+const roomConfigFloor5 = {
+
+};
+
+const roomConfigFloor6 = {
+
+};
 // какой конфиг использовать для какого этажа
 const floorRoomConfigs = {
     2: roomConfigFloor2,
     3: roomConfigFloor3,
     4: roomConfigFloor4,
+    5: roomConfigFloor5,
+    6: roomConfigFloor6,
 };
 
 // резервный массив (не используется, если конфиг задан)
