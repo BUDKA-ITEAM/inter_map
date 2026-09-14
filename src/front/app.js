@@ -48,7 +48,7 @@ const roomConfigFloor2 = {
     '6419': { number: '', name: 'Служебная лестница', showPanel: true },
     '6417': { number: '', name: 'туалетик', showPanel: true },
     '6415': { number: '', name: 'туалетик', showPanel: true },
-    '6413': { number: '', name: 'no info', showPanel: true },
+    '6413': { number: '', name: '', showPanel: true },
     '6435': { number: '', name: 'Подсобное помещение', showPanel: false },
     '6431': { number: '', name: 'Лестничная площадка', showPanel: true },
     '6411': { number: '214', name: 'АХО', showPanel: true },
@@ -66,7 +66,7 @@ const roomConfigFloor2 = {
     '6433': { number: '202', name: 'Гардеробная', showPanel: true },
     '6429': { number: '201', name: 'Коворкинг', showPanel: true },
     // комната ground_1 не показывает панель
-    'ground_1': { number: '', name: 'No info', showPanel: false }
+    'ground_1': { number: '', name: '', showPanel: false }
 };
 
 
@@ -91,10 +91,10 @@ const roomConfigFloor3 = {
     '3548': { number: '317', name: 'Бухгалтерия/отдел кадров', showPanel: true },
     '3546': { number: '318', name: 'Директор школы/заместитель', showPanel: true },
     '3544': { number: '319', name: 'Коворкинг начальной школы', showPanel: true },
-    '3542': { number: 'туалетик', name: '', showPanel: true },
-    '3540': { number: 'туалетик', name: '', showPanel: true },
-    '3538': { number: 'Служебная лестница', name: '', showPanel: true },
-    '3614': { number: 'секретная будка', name: '', showPanel: true },
+    '3542': { number: '', name: 'туалетик', showPanel: true },
+    '3540': { number: '', name: 'туалетик', showPanel: true },
+    '3538': { number: '', name: 'Служебная лестница', showPanel: true },
+    '3614': { number: '', name: 'секретная будка', showPanel: true },
 };
 
 const roomConfigFloor4 = {
@@ -122,41 +122,41 @@ const roomConfigFloor4 = {
 };
 
 const roomConfigFloor5 = {
-    '2546': { number: '501', name: 'no info', showPanel: true },
-    '2518': { number: '502', name: 'no info', showPanel: true },
-    '2516': { number: '503', name: 'no info', showPanel: true },
-    '2520': { number: '504', name: 'no info', showPanel: true },
-    '2522': { number: '505', name: 'no info', showPanel: true },
-    '2524': { number: '506', name: 'no info', showPanel: true },
-    '2506': { number: '507', name: 'no info', showPanel: true },
-    '2504': { number: '508', name: 'no info', showPanel: true },
-    '2514': { number: '509', name: 'no info', showPanel: true },
-    '2512': { number: '510', name: 'no info', showPanel: true },
-    '2508': { number: '511', name: 'no info', showPanel: true },
-    '2510': { number: '512', name: 'no info', showPanel: true },
-    '2500': { number: '513', name: 'no info', showPanel: true },
-    '2498': { number: 'туалетик', name: 'no info', showPanel: true },
-    '2496': { number: 'туалетик', name: 'no info', showPanel: true },
-    '2526': { number: 'Лестничная площадка', name: '', showPanel: true },
-    '2494': { number: 'Служебная лестница', name: '', showPanel: true },
+    '2546': { number: '501', name: 'Аудитория (ПК)', showPanel: true },
+    '2518': { number: '502', name: 'Кабинет кураторов', showPanel: true },
+    '2516': { number: '503', name: 'Аудитория (ПК)', showPanel: true },
+    '2520': { number: '504', name: 'Аудитория (ПК)', showPanel: true },
+    '2522': { number: '505', name: 'Аудитория (ПК)', showPanel: true },
+    '2524': { number: '506', name: 'Аудитория (ПК)', showPanel: true },
+    '2506': { number: '507', name: 'Аудитория (ПК)', showPanel: true },
+    '2504': { number: '508', name: 'Аудитория (ПК)', showPanel: true },
+    '2514': { number: '509', name: 'Аудитория (ПК)', showPanel: true },
+    '2512': { number: '510', name: 'Зам. директора по цифровому развитию', showPanel: true },
+    '2508': { number: '511', name: 'Аудитория (ПК)', showPanel: true },
+    '2510': { number: '512', name: 'Преподавательская', showPanel: true },
+    '2500': { number: '513', name: 'Аудитория (ПК)', showPanel: true },
+    '2498': { number: '', name: 'туалетик', showPanel: true },
+    '2496': { number: '', name: 'туалетик', showPanel: true },
+    '2526': { number: '', name: 'Лестничная площадка', showPanel: true },
+    '2494': { number: '', name: 'Служебная лестница', showPanel: true },
 };
 
 const roomConfigFloor6 = {
-    '2522': { number: '601', name: 'no info', showPanel: true },
-    '2518': { number: '602', name: 'no info', showPanel: true },
-    '2516': { number: '603', name: 'no info', showPanel: true },
-    '2514': { number: '604', name: 'no info', showPanel: true },
-    '2508': { number: '605', name: 'no info', showPanel: true },
-    '2506': { number: '606', name: 'no info', showPanel: true },
-    '2512': { number: '607', name: 'no info', showPanel: true },
-    '2510': { number: '608', name: 'no info', showPanel: true },
-    '2504': { number: '609', name: 'no info', showPanel: true },
-    '2502': { number: '610', name: 'no info', showPanel: true },
-    '2500': { number: '611', name: 'no info', showPanel: true },
-    '2498': { number: 'туалетик', name: 'no info', showPanel: true },
-    '2496': { number: 'туалетик', name: 'no info', showPanel: true },
-    '2526': { number: 'Служебная лестница', name: 'no info', showPanel: true },
-    '2520': { number: 'Лестничная площадка', name: 'no info', showPanel: true },
+    '2522': { number: '601', name: 'Аудитория дизайнерского рисования', showPanel: true },
+    '2518': { number: '602', name: 'Кабинет кураторов', showPanel: true },
+    '2516': { number: '603', name: 'Аудитория (ПК)', showPanel: true },
+    '2514': { number: '604', name: 'Аудитория', showPanel: true },
+    '2508': { number: '605', name: 'Аудитория', showPanel: true },
+    '2506': { number: '606', name: 'Аудитория (ПК)', showPanel: true },
+    '2512': { number: '607', name: 'Аудитория (ПК)', showPanel: true },
+    '2510': { number: '608', name: 'Кабинет организаторов', showPanel: true },
+    '2504': { number: '609', name: 'Аудитория (ПК)', showPanel: true },
+    '2502': { number: '610', name: 'Аудитория', showPanel: true },
+    '2500': { number: '611', name: 'Кабинет УПР', showPanel: true },
+    '2498': { number: '', name: 'туалетик', showPanel: true },
+    '2496': { number: '', name: 'туалетик', showPanel: true },
+    '2526': { number: '', name: 'Служебная лестница', showPanel: true },
+    '2520': { number: '', name: 'Лестничная площадка', showPanel: true },
 };
 // какой конфиг использовать для какого этажа
 const floorRoomConfigs = {
