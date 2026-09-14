@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -18,6 +19,7 @@ func Load() *Config {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/college_schedule?sslmode=disable"
+		log.Println("warning: DATABASE_URL not set, using local default")
 	}
 
 	port := os.Getenv("PORT")
@@ -28,10 +30,16 @@ func Load() *Config {
 	var origins []string
 	if raw := os.Getenv("ALLOWED_ORIGINS"); raw != "" {
 		for _, o := range strings.Split(raw, ",") {
-			origins = append(origins, strings.TrimSpace(o))
+			if trimmed := strings.TrimSpace(o); trimmed != "" {
+				origins = append(origins, trimmed)
+			}
 		}
+		// Локальную разработку добавляем всегда: иначе страница, открытая
+		// через Live Server, не проходит cors, когда список задан боевым доменом.
+		origins = append(origins, "http://localhost:*", "http://127.0.0.1:*")
 	} else {
 		origins = []string{"*"}
+		log.Println("warning: ALLOWED_ORIGINS not set, allowing all origins")
 	}
 
 	refreshMinutes := 15

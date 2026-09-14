@@ -33,7 +33,7 @@ func TestFilter_WithLimitCapsResult(t *testing.T) {
 	result := c.Filter("", "", "", "", 50)
 
 	if len(result) != 50 {
-		t.Fatalf("ожидалось 50 записе с limit=50, полученно %d", len(result))
+		t.Fatalf("ожидалось 50 записей с limit=50, получено %d", len(result))
 	}
 }
 

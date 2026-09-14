@@ -35,7 +35,7 @@ func main() {
 	lessonCache := cache.NewLessonCache(pool)
 	lessonCache.StartRefreshLoop(ctx, cfg.CacheRefreshInterval)
 
-	sceduleH := &handlers.ScheduleHandler{Cache: lessonCache}
+	scheduleH := &handlers.ScheduleHandler{Cache: lessonCache}
 	healthH := &handlers.HealthHandler{
 		DB:         pool,
 		Cache:      lessonCache,
@@ -52,7 +52,7 @@ func main() {
 	}))
 
 	r.Get("/healthz", healthH.Check)
-	r.Get("/api/lessons", sceduleH.List)
+	r.Get("/api/lessons", scheduleH.List)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("listening on : %s", cfg.Port)
+		log.Printf("listening on :%s", cfg.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server error: %v", err)
 		}

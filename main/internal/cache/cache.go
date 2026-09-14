@@ -23,10 +23,12 @@ func NewLessonCache(db *pgxpool.Pool) *LessonCache {
 	return &LessonCache{db: db}
 }
 
+// Первый прогрев тоже уходит в горутину: раньше он выполнялся синхронно и
+// http-сервер начинал слушать порт только после полной выборки расписания.
 func (c *LessonCache) StartRefreshLoop(ctx context.Context, interval time.Duration) {
-	c.refresh(ctx)
-
 	go func() {
+		c.refresh(ctx)
+
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 		for {
@@ -131,6 +133,14 @@ func (c *LessonCache) Filter(teacherID, group, dateFrom, dateTo string, limit in
 	return result
 }
 
+// Ready сообщает, наполнялся ли кэш хотя бы раз: пока нет — отдавать пустой
+// список нельзя, иначе клиент примет «база недоступна» за «пар нет».
+func (c *LessonCache) Ready() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return !c.updated.IsZero()
+}
+
 func (c *LessonCache) LastUpdated() time.Time {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -143,11 +153,11 @@ func (c *LessonCache) Count() int {
 	return len(c.lessons)
 }
 
-func (c *LessonCache) IsStale(treshold time.Duration) bool {
+func (c *LessonCache) IsStale(threshold time.Duration) bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	if c.updated.IsZero() {
 		return true
 	}
-	return time.Since(c.updated) > treshold
+	return time.Since(c.updated) > threshold
 }

@@ -30,7 +30,7 @@ func (h *HealthHandler) Check(w http.ResponseWriter, r *http.Request) {
 		status = "degraded"
 	}
 
-	w.Header().Set("Content-Type", "PPLIXtion/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
 		"status":             status,
 		"cache_last_updated": h.Cache.LastUpdated(),

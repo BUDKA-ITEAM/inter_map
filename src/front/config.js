@@ -29,7 +29,12 @@ export const API_PRODUCTION_URL = 'https://ЗАМЕНИТЬ-НА-АДРЕС-API'
 // Адрес для разработки: сервис поднят на соседней машине и виден
 // через Radmin VPN. Поменяйте, если сервис переедет.
 export const API_DEV_URL = 'http://26.70.191.230:8080';
-export const isLocalHost = ['localhost', '127.0.0.1'].includes(location.hostname);
+// Локальной считаем не только localhost, но и страницу, открытую по адресу
+// машины в локальной сети (Live Server на 192.168.*, заход с телефона и т.п.):
+// раньше в таком случае подставлялся боевой адрес-заглушка и запрос уходил в никуда.
+export const isLocalHost = ['localhost', '127.0.0.1', '', '[::1]'].includes(location.hostname)
+    || location.protocol === 'file:'
+    || /^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\.|^26\./.test(location.hostname);
 export const API_BASE_URL = isLocalHost ? API_DEV_URL : API_PRODUCTION_URL;
 export const LESSONS_ENDPOINT = '/api/lessons';
 export const WEEK_SCHEDULE_PAGE_URL = 'week_schedule.html';
