@@ -1,0 +1,27 @@
+FROM golang:1.25-alpine AS go-builder
+WORKDIR /src
+COPY main/go.mod main/go.sum ./
+RUN go mod download
+COPY main/ .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api-server ./cmd/api
+
+FROM python:3.12
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    supervisor \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=go-builder /api-server /usr/local/bin/api-server
+
+COPY parser/ .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ca.pem /app/ca.pem
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 8080
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
