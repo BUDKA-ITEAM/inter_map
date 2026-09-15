@@ -4,6 +4,7 @@
 // отладки (не удалён по требованию — см. план рефакторинга).
 import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
 import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay } from './state.js';
+import { applyThemeBackground } from './three.js';
 
 // управление сайдбаром
 export function setSidebarOpen(open) {
@@ -110,10 +111,12 @@ export function initTheme() {
     if (saved === 'dark') {
         themeToggle.checked = true;
     }
+    applyThemeBackground();
     // saved === 'light' / null / хранилище недоступно — оставляем поведение по умолчанию
 }
 
 themeToggle.addEventListener('change', () => {
+    applyThemeBackground();
     try {
         localStorage.setItem(THEME_STORAGE_KEY, themeToggle.checked ? 'dark' : 'light');
     } catch (error) {

@@ -177,14 +177,28 @@ export const floorRoomConfigs = {
 export const API_TIMEOUT_MS = 15000;
 
 // палитра цветов и параметры анимации
+export const AMBIENT_INTENSITY_LIGHT = 0.7;
+export const AMBIENT_INTENSITY_DARK = 0.34;
+export const DIR_INTENSITY_LIGHT = 1;
+export const DIR_INTENSITY_DARK = 0.5;
+export const DECOR_DIM_DARK = 0.6;
+
 export const COLOR_WHITE = 0xffffff;
 export const COLOR_SELECTED = 0xd8d3c4;
+export const COLOR_WHITE_DARK = 0x8d939b;
+export const COLOR_SELECTED_DARK = 0x7a7568;
 export const ANIMATION_DURATION = 350;
 
 export const statusColors = {
     past: { normal: 0xf1e2d9, bright: 0xe6cdbd },
     current: { normal: 0xdeebe1, bright: 0xb9d7c1 },
     upcoming: { normal: 0xf3e7ce, bright: 0xe9d3a0 }
+};
+
+export const statusColorsDark = {
+    past: { normal: 0x7d6b61, bright: 0x8d7566 },
+    current: { normal: 0x6c8a74, bright: 0x83a88d },
+    upcoming: { normal: 0x8d7f5d, bright: 0xa89469 }
 };
 
 export const DRAG_THRESHOLD = 5;

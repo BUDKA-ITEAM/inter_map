@@ -6,7 +6,7 @@
 // на верхнем уровне модуля, поэтому порядок вычисления модулей не важен.
 import {
     API_BASE_URL, API_TIMEOUT_MS, LESSONS_ENDPOINT, GROUPS_SCAN_LIMIT,
-    FLOOR_MODELS, COLOR_SELECTED, SHEET_EDGE_THRESHOLD, SHEET_MIN_DISTANCE
+    FLOOR_MODELS, SHEET_EDGE_THRESHOLD, SHEET_MIN_DISTANCE
 } from './config.js';
 
 import {
@@ -24,6 +24,7 @@ import {
 
 import {
     animateMeshColor, resetAllRoomsToWhite, getStatusColor, resetActiveSelection,
+    roomSelectedColor,
     showClickInfo, controls
 } from './three.js';
 
@@ -180,7 +181,7 @@ function highlightRoomByRoomId(roomId) {
             setActiveHighlightedMesh(mesh);
         }
     } else {
-        animateMeshColor(mesh, COLOR_SELECTED);
+        animateMeshColor(mesh, roomSelectedColor());
         setSelectedMesh(mesh);
     }
 

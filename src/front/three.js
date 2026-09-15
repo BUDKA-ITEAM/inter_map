@@ -16,7 +16,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
     isMobile, FIT_MARGIN, FLOOR_MODELS, DIAGONAL_MARGIN, FRUSTUM_MARGIN,
     FIXED_AZIMUTH, FIXED_POLAR, floorRoomConfigs, COLOR_WHITE, COLOR_SELECTED,
-    ANIMATION_DURATION, statusColors, DRAG_THRESHOLD
+    ANIMATION_DURATION, statusColors, DRAG_THRESHOLD,
+    COLOR_WHITE_DARK, COLOR_SELECTED_DARK, statusColorsDark,
+    AMBIENT_INTENSITY_LIGHT, AMBIENT_INTENSITY_DARK,
+    DIR_INTENSITY_LIGHT, DIR_INTENSITY_DARK, DECOR_DIM_DARK
 } from './config.js';
 
 import {
@@ -34,7 +37,48 @@ import { applyGroup, updatePairsUI } from './schedule.js';
 
 // инициализация three.js сцены
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf5f2ea);
+
+const sceneBackground = new THREE.Color();
+const sceneBackgroundHSL = { h: 0, s: 0, l: 0 };
+const decorColor = new THREE.Color();
+let darkTheme = false;
+
+export function roomBaseColor() {
+    return darkTheme ? COLOR_WHITE_DARK : COLOR_WHITE;
+}
+
+export function roomSelectedColor() {
+    return darkTheme ? COLOR_SELECTED_DARK : COLOR_SELECTED;
+}
+
+export function applyThemeBackground() {
+    const value = getComputedStyle(document.documentElement)
+        .getPropertyValue('--model-bg').trim();
+    if (!value) return;
+    scene.background = sceneBackground.setStyle(value);
+
+    sceneBackground.getHSL(sceneBackgroundHSL);
+    darkTheme = sceneBackgroundHSL.l < 0.4;
+    ambientLight.intensity = darkTheme ? AMBIENT_INTENSITY_DARK : AMBIENT_INTENSITY_LIGHT;
+    dirLight.intensity = darkTheme ? DIR_INTENSITY_DARK : DIR_INTENSITY_LIGHT;
+
+    if (!roomMeshes.length) return;
+    applyDecorColors();
+    if (currentGroup) applyGroup(currentGroup);
+    else resetAllRoomsToWhite(true);
+}
+
+function applyDecorColors() {
+    roomMeshes.forEach((mesh) => {
+        const base = mesh.userData.baseColor;
+        if (base == null) return;
+        setMeshColorInstant(mesh, darkTheme ? dimColor(base, DECOR_DIM_DARK) : base);
+    });
+}
+
+function dimColor(hex, factor) {
+    return decorColor.setHex(hex).multiplyScalar(factor).getHex();
+}
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
 camera.position.set(0, 10, 0);
 camera.lookAt(0, 0, 0);
@@ -46,10 +90,13 @@ renderer.setPixelRatio(window.devicePixelRatio);
 container.appendChild(renderer.domElement);
 
 // добавление освещения
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, AMBIENT_INTENSITY_LIGHT);
+scene.add(ambientLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, DIR_INTENSITY_LIGHT);
 dirLight.position.set(10, 20, 10);
 scene.add(dirLight);
+
+applyThemeBackground();
 
 // настройка управления камерой
 export const controls = new OrbitControls(camera, renderer.domElement);
@@ -165,8 +212,11 @@ export function loadFloorModel(floor) {
                     mesh.material = Array.isArray(mesh.material)
                         ? mesh.material.map((mat) => mat.clone())
                         : mesh.material.clone();
+                    if (!mesh.userData.showPanel) mesh.userData.baseColor = getMeshColor(mesh);
                 }
             });
+
+            applyDecorColors();
 
             // подгоняем камеру под модель и запускаем анимацию
             fitCameraToModel(model);
@@ -318,27 +368,28 @@ export function animateMeshColor(mesh, targetHex, duration = ANIMATION_DURATION)
 export function resetAllRoomsToWhite(instant = true) {
     roomMeshes.forEach((mesh) => {
         if (mesh.userData.showPanel) {
-            if (instant) setMeshColorInstant(mesh, COLOR_WHITE);
-            else animateMeshColor(mesh, COLOR_WHITE);
+            if (instant) setMeshColorInstant(mesh, roomBaseColor());
+            else animateMeshColor(mesh, roomBaseColor());
         }
     });
 }
 
 // получение цвета в зависимости от статуса пары
 export function getStatusColor(status, variant = 'normal') {
-    if (status === 'past') return COLOR_WHITE;
-    return statusColors[status]?.[variant] ?? COLOR_WHITE;
+    if (status === 'past') return roomBaseColor();
+    const palette = darkTheme ? statusColorsDark : statusColors;
+    return palette[status]?.[variant] ?? roomBaseColor();
 }
 
 // сброс активной подсветки (выбранного или активного кабинета)
 export function resetActiveSelection() {
     if (activeHighlightedMesh) {
         const status = activeHighlightedMesh.userData.pairStatus;
-        animateMeshColor(activeHighlightedMesh, status && status !== 'past' ? getStatusColor(status, 'normal') : COLOR_WHITE);
+        animateMeshColor(activeHighlightedMesh, status && status !== 'past' ? getStatusColor(status, 'normal') : roomBaseColor());
         setActiveHighlightedMesh(null);
     }
     if (selectedMesh) {
-        animateMeshColor(selectedMesh, COLOR_WHITE);
+        animateMeshColor(selectedMesh, roomBaseColor());
         setSelectedMesh(null);
     }
 }
@@ -374,7 +425,7 @@ function handleClick(event) {
         setActiveHighlightedMesh(mesh);
         showRoomPanel(userData.roomNumber, userData.roomName);
     } else if (userData.showPanel) {
-        animateMeshColor(mesh, COLOR_SELECTED);
+        animateMeshColor(mesh, roomSelectedColor());
         setSelectedMesh(mesh);
         showRoomPanel(userData.roomNumber || '', userData.roomName);
     } else {

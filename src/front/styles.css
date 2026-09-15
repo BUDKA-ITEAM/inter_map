@@ -97,8 +97,6 @@
         + var(--floor-column-width) + var(--space-3)
     );
 
-    /* Область карты одинакова в любой теме: чипы, заглушка и текст поверх
-       канваса не переопределяются в темах — см. комментарий вверху файла. */
     --model-chip-bg: rgba(255, 255, 255, 0.92);
     --model-chip-border: rgba(26, 26, 26, 0.12);
     --model-ink: #55534E;
@@ -193,7 +191,11 @@
     --status-current-bg: #2A332D;
     --status-upcoming: #a900f7;
     --status-upcoming-bg: #34302A;
-    --model-bg: #F5F2EA;
+    --model-bg: #1A1D22;
+    --model-chip-bg: rgba(38, 42, 49, 0.92);
+    --model-chip-border: rgba(228, 226, 222, 0.16);
+    --model-ink: #D5D8DD;
+    --model-stub-bg: rgba(26, 29, 34, 0.95);
     --shadow: 0 1px 3px rgba(0,0,0,0.35);
     --shadow-card-hover: 0 6px 12px rgba(0,0,0,0.40);
     --shadow-panel: 0 8px 28px rgba(0,0,0,0.50);
