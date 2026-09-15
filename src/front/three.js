@@ -14,7 +14,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 import {
-    isMobile, INITIAL_ZOOM, FLOOR_MODELS, DIAGONAL_MARGIN, FRUSTUM_MARGIN,
+    isMobile, FIT_MARGIN, FLOOR_MODELS, DIAGONAL_MARGIN, FRUSTUM_MARGIN,
     FIXED_AZIMUTH, FIXED_POLAR, floorRoomConfigs, COLOR_WHITE, COLOR_SELECTED,
     ANIMATION_DURATION, statusColors, DRAG_THRESHOLD
 } from './config.js';
@@ -195,15 +195,25 @@ export function loadFloorModel(floor) {
 
 // функция подгонки камеры под размеры модели
 function fitCameraToModel(model) {
+    model.rotation.y = 0;
+    model.position.set(0, 0, 0);
+    model.updateMatrixWorld(true);
+
+    const rawSize = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
+    if (rawSize.x > rawSize.z) {
+        model.rotation.y = Math.PI / 2;
+        model.updateMatrixWorld(true);
+    }
+
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     const diagonal = Math.sqrt(size.x ** 2 + size.y ** 2 + size.z ** 2);
 
     model.position.sub(center);
+    model.updateMatrixWorld(true);
     controls.target.set(0, 0, 0);
 
-    // вычисляем позицию камеры с учётом фиксированных углов
     const camDistance = diagonal * DIAGONAL_MARGIN + 10;
     const polar = FIXED_POLAR;
     const azimuth = FIXED_AZIMUTH;
@@ -212,9 +222,9 @@ function fitCameraToModel(model) {
         camDistance * Math.cos(polar),
         camDistance * Math.sin(polar) * Math.cos(azimuth)
     );
+    camera.up.set(0, 1, 0);
     camera.lookAt(controls.target);
 
-    // настраиваем ортографическую камеру под размеры модели
     const frustumSize = diagonal * FRUSTUM_MARGIN;
     const aspect = container.clientWidth / container.clientHeight;
     camera.left = -frustumSize * aspect / 2;
@@ -223,7 +233,25 @@ function fitCameraToModel(model) {
     camera.bottom = -frustumSize / 2;
     camera.near = 0.1;
     camera.far = diagonal * 10 + 1000;
-    camera.zoom = INITIAL_ZOOM;
+    camera.updateMatrixWorld(true);
+    camera.updateProjectionMatrix();
+
+    const half = size.clone().multiplyScalar(0.5);
+    let maxX = 0;
+    let maxY = 0;
+    for (let i = 0; i < 8; i++) {
+        const corner = new THREE.Vector3(
+            (i & 1 ? 1 : -1) * half.x,
+            (i & 2 ? 1 : -1) * half.y,
+            (i & 4 ? 1 : -1) * half.z
+        ).applyMatrix4(camera.matrixWorldInverse);
+        maxX = Math.max(maxX, Math.abs(corner.x));
+        maxY = Math.max(maxY, Math.abs(corner.y));
+    }
+
+    const zoomX = maxX > 0 ? (camera.right - camera.left) / (2 * maxX) : 1;
+    const zoomY = maxY > 0 ? (camera.top - camera.bottom) / (2 * maxY) : 1;
+    camera.zoom = Math.min(zoomX, zoomY) * FIT_MARGIN;
     camera.updateProjectionMatrix();
     controls.update();
 }

@@ -3,9 +3,9 @@
 // определение мобильного устройства для настройки зума
 export const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || window.matchMedia('(pointer: coarse)').matches;
-export const INITIAL_ZOOM_DESKTOP = 2.6;
-export const INITIAL_ZOOM_MOBILE = 1.5;
-export const INITIAL_ZOOM = isMobile ? INITIAL_ZOOM_MOBILE : INITIAL_ZOOM_DESKTOP;
+export const FIT_MARGIN_DESKTOP = 0.98;
+export const FIT_MARGIN_MOBILE = 0.95;
+export const FIT_MARGIN = isMobile ? FIT_MARGIN_MOBILE : FIT_MARGIN_DESKTOP;
 
 // модели этажей, этаж есть в списке — готов показываем его план, нет в списке - заглушка
 export const FLOOR_MODELS = {
@@ -18,7 +18,7 @@ export const FLOOR_MODELS = {
 export const DIAGONAL_MARGIN = 2.0;
 export const FRUSTUM_MARGIN = 1.0;
 export const FIXED_AZIMUTH = 0;
-export const FIXED_POLAR = 0.9472;
+export const FIXED_POLAR = 0.45;
 
 // Настройки api. заменить ссылку на норм https, на сервере нужно разрешить домен сайта в ALLOWED_ORIGINS (cors)
 // Локально работаем с сервером на своей машине, на боевом сайте —
