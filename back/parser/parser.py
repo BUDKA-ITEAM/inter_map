@@ -241,6 +241,9 @@ def save_to_db(entries: list[dict]) -> None:
                 """,
                 data,
             )
+            cur.execute(
+                "DELETE FROM teacher_schedule WHERE updated_at < now() - interval '1 day'"
+            )
     finally:
         conn.close()
 

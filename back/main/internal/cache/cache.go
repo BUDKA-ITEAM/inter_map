@@ -23,8 +23,6 @@ func NewLessonCache(db *pgxpool.Pool) *LessonCache {
 	return &LessonCache{db: db}
 }
 
-// Первый прогрев тоже уходит в горутину: раньше он выполнялся синхронно и
-// http-сервер начинал слушать порт только после полной выборки расписания.
 func (c *LessonCache) StartRefreshLoop(ctx context.Context, interval time.Duration) {
 	go func() {
 		c.refresh(ctx)
@@ -130,6 +128,15 @@ func (c *LessonCache) Filter(teacherID, group, dateFrom, dateTo string, limit in
 			break
 		}
 	}
+	return result
+}
+
+func (c *LessonCache) All() []models.Lesson {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	result := make([]models.Lesson, len(c.lessons))
+	copy(result, c.lessons)
 	return result
 }
 
