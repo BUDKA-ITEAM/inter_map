@@ -16,5 +16,6 @@ requirements.txt
 /dockerfile
 /Dockerfile
 
-# Claude Code
-CLAUDE.md
+
+# Node
+node_modules/

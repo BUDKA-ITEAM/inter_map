@@ -1046,7 +1046,7 @@ canvas {
     background: var(--surface-active);
     color: var(--ink-tertiary);
     border-color: var(--border);
-    cursor: not-allowed;
+    cursor: allowed;
 }
 
 #sidebar .group-pick-btn {
@@ -1820,6 +1820,7 @@ canvas {
     #sidebar .group-confirm-btn {
         padding: 14px;
         font-size: 14px;
+        border-radius: 10px;
     }
 
     #sidebar .group-change-btn {

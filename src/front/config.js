@@ -216,3 +216,5 @@ export const THEME_STORAGE_KEY = 'intermap.theme';
 export const DEBUG_STORAGE_KEY = 'intermap.debug';
 export const DEBUG_UNLOCK_TAPS = 20;
 export const DEBUG_VIDEO_TAPS = 30;
+export const GAMBLE_UNLOCK_SWITCHES = 20;
+export const GAMBLE_STORAGE_KEY = 'intermap.themeSwitches';

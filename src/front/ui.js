@@ -2,7 +2,7 @@
 // ссылка на страницу недельного расписания, звук заглушки этажа, сохранение
 // темы оформления. В конце файла — закомментированный код старого режима
 // отладки (не удалён по требованию — см. план рефакторинга).
-import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
+import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, GAMBLE_UNLOCK_SWITCHES, GAMBLE_STORAGE_KEY, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
 import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
 import { applyThemeBackground } from './three.js';
 
@@ -204,4 +204,33 @@ if (debugConfirmYes && debugConfirmNo) {
     debugConfirmNo.addEventListener('click', () => {
         debugConfirm.hidden = true;
     });
+}
+
+let themeSwitches = 0;
+
+function renderGambleSection() {
+    const section = document.getElementById('gamble-section');
+    if (!section) return;
+    section.hidden = themeSwitches < GAMBLE_UNLOCK_SWITCHES;
+}
+
+themeToggle.addEventListener('change', () => {
+    themeSwitches += 1;
+    try {
+        localStorage.setItem(GAMBLE_STORAGE_KEY, String(themeSwitches));
+    } catch (error) {
+    }
+    renderGambleSection();
+});
+
+export function initGambleUnlock() {
+    let saved = null;
+    try {
+        saved = localStorage.getItem(GAMBLE_STORAGE_KEY);
+    } catch (error) {
+        saved = null;
+    }
+    const parsed = Number.parseInt(saved ?? '', 10);
+    themeSwitches = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    renderGambleSection();
 }
