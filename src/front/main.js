@@ -11,10 +11,11 @@ import './ui.js';
 import { setFloor } from './three.js';
 import { getDateString } from './schedule.js';
 import { initGroupPicker } from './groups.js';
-import { initTheme } from './ui.js';
+import { initTheme, initDebugMode } from './ui.js';
 import { dateInput, currentDate, currentFloor, setCurrentDate } from './state.js';
 
 initTheme();
+initDebugMode();
 setCurrentDate(getDateString(new Date()));
 dateInput.value = currentDate;
 setFloor(currentFloor);

@@ -161,6 +161,14 @@
                         <div id="stub-overlay" role="status" aria-live="polite">
                             <video class="stub-video" src="videos/stub-floor.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
                         </div>
+
+                        <div id="debug-confirm" role="dialog" aria-modal="true" aria-labelledby="debug-confirm-text" hidden>
+                            <p id="debug-confirm-text">Вы уверены?</p>
+                            <div class="debug-confirm-actions">
+                                <button id="debug-confirm-yes" class="debug-confirm-btn debug-confirm-yes" type="button">Да</button>
+                                <button id="debug-confirm-no" class="debug-confirm-btn" type="button">Нет</button>
+                            </div>
+                        </div>
                     </div>
                     <!-- лента пар переехала в #schedule-panel: карта занимает
                          всю высоту колонки, расписание открывается кнопкой -->

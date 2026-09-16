@@ -2,8 +2,8 @@
 // ссылка на страницу недельного расписания, звук заглушки этажа, сохранение
 // темы оформления. В конце файла — закомментированный код старого режима
 // отладки (не удалён по требованию — см. план рефакторинга).
-import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
-import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay } from './state.js';
+import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
+import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
 import { applyThemeBackground } from './three.js';
 
 // управление сайдбаром
@@ -124,47 +124,84 @@ themeToggle.addEventListener('change', () => {
     }
 });
 
-// ---------------------------------------------------------------------------
+
 // РЕЖИМ ОТЛАДКИ
-//
-// подпись с id объекта нужна только крутым. от обычного пользователя она скрыта и
-// включается двадцатью нажатиями подряд на этаж 2. Столько же нажатий
-// выключает обратно. состояние запоминается в браузере.
-// ---------------------------------------------------------------------------
+let debugTaps = 0;
 
-// Ниже — закомментированный код старого режима отладки. Оставлен по просьбе
-// автора проекта, не удалять.
-//c//onst DEBUG_STORAGE_KEY = 'intermap.debug';
-//const DEBUG_UNLOCK_TAPS = 20;
+function setDebugMode(enabled) {
+    document.documentElement.dataset.debug = enabled ? 'on' : 'off';
+    try {
+        localStorage.setItem(DEBUG_STORAGE_KEY, enabled ? 'on' : 'off');
+    } catch (error) {
+    }
+    if (clickInfoDiv) {
+        clickInfoDiv.textContent = enabled ? 'Режим отладки включён' : '';
+    }
+}
 
-//let debugTaps = 0;
+floorNumbers.forEach((span) => {
+    span.addEventListener('click', () => {
+        if (span.dataset.floor !== '2') {
+            debugTaps = 0;
+            return;
+        }
 
-//function setDebugMode(enabled) {
- //   document.documentElement.dataset.debug = enabled ? 'on' : 'off';
-//    try {
-//        localStorage.setItem(DEBUG_STORAGE_KEY, enabled ? 'on' : 'off');
-//    } catch (error) {
- //       // приватный режим — просто не запоминаем
- //   }
- //   if (clickInfoDiv) {
- //       clickInfoDiv.textContent = enabled ? 'Режим отладки включён' : '';
-//    }
-//}
+        debugTaps += 1;
+        if (debugTaps < DEBUG_UNLOCK_TAPS) return;
 
-//floorNumbers.forEach((span) => {
- //   span.addEventListener('click', () => {
- //       // счётчик считает нажатия подряд: другой этаж сбрасывает его
-  //      if (span.dataset.floor !== '2') {
-  //          debugTaps = 0;
-  //          return;
-  //      }
-//
-//        debugTaps += 1;
- //       if (debugTaps < DEBUG_UNLOCK_TAPS) return;
-//
-//        debugTaps = 0;
- //       setDebugMode(document.documentElement.dataset.debug !== 'on');
-//    });
-//});
+        debugTaps = 0;
+        setDebugMode(document.documentElement.dataset.debug !== 'on');
+    });
+});
 
-// восстановление режима после перезагрузки
+export function initDebugMode() {
+    let saved = null;
+    try {
+        saved = localStorage.getItem(DEBUG_STORAGE_KEY);
+    } catch (error) {
+        saved = null;
+    }
+    document.documentElement.dataset.debug = saved === 'on' ? 'on' : 'off';
+}
+
+let videoTaps = 0;
+
+function playDebugVideo() {
+    if (!stubVideo) return;
+    stubOverlay.classList.add('visible');
+    stubVideo.currentTime = 0;
+    stubVideo.muted = false;
+    stubVideo.play().catch(() => {});
+}
+
+floorNumbers.forEach((span) => {
+    span.addEventListener('click', () => {
+        if (span.dataset.floor !== '2') {
+            videoTaps = 0;
+            return;
+        }
+
+        videoTaps += 1;
+        if (videoTaps < DEBUG_VIDEO_TAPS) return;
+
+        videoTaps = 0;
+        if (document.documentElement.dataset.debug !== 'on') return;
+        if (debugConfirm) debugConfirm.hidden = false;
+        else playDebugVideo();
+    });
+});
+
+const debugConfirm = document.getElementById('debug-confirm');
+const debugConfirmYes = document.getElementById('debug-confirm-yes');
+const debugConfirmNo = document.getElementById('debug-confirm-no');
+
+if (debugConfirmYes && debugConfirmNo) {
+    debugConfirmYes.addEventListener('click', () => {
+        debugConfirm.hidden = true;
+        playDebugVideo();
+    });
+
+    debugConfirmNo.addEventListener('click', () => {
+        debugConfirm.hidden = true;
+    });
+}

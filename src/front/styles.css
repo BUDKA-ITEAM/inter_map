@@ -678,6 +678,64 @@ canvas {
     pointer-events: none;
 }
 
+#debug-confirm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow-panel);
+    max-width: calc(100% - var(--space-5));
+}
+
+#debug-confirm p {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.debug-confirm-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.debug-confirm-btn {
+    min-width: 84px;
+    min-height: 36px;
+    padding: 0 var(--space-4);
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--duration-fast) ease;
+}
+
+.debug-confirm-btn:hover {
+    background: var(--surface-hover);
+}
+
+.debug-confirm-yes {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+}
+
+.debug-confirm-yes:hover {
+    background: var(--accent-hover);
+}
+
 #stub-overlay span {
     font-size: 18px;
     font-weight: 500;
