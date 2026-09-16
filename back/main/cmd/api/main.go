@@ -54,7 +54,7 @@ func main() {
 	r.Get("/healthz", healthH.Check)
 	r.Get("/api/lessons", scheduleH.List)
 	r.Get("/api/groups", scheduleH.Groups)
-	r.Get("api/teachers", scheduleH.Teachers)
+	r.Get("/api/teachers", scheduleH.Teachers)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,

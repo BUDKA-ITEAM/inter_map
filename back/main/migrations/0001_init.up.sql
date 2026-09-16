@@ -14,7 +14,7 @@ CREATE TABLE teacher_schedule (
     cycle_week INTEGER,
     replacement_type TEXT,
     bell_template TEXT,
-    updated_at TEXT,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (lesson_id, teacher_id)
 );
 
