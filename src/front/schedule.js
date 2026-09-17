@@ -6,7 +6,7 @@
 // на верхнем уровне модуля, поэтому порядок вычисления модулей не важен.
 import {
     API_BASE_URL, API_TIMEOUT_MS, LESSONS_ENDPOINT, GROUPS_SCAN_LIMIT,
-    FLOOR_MODELS, SHEET_EDGE_THRESHOLD, SHEET_MIN_DISTANCE
+    FLOOR_MODELS, floorRoomConfigs, SHEET_EDGE_THRESHOLD, SHEET_MIN_DISTANCE
 } from './config.js';
 
 import {
@@ -25,9 +25,10 @@ import {
 import {
     animateMeshColor, resetAllRoomsToWhite, getStatusColor, resetActiveSelection,
     roomSelectedColor,
-    showClickInfo, controls
+    showClickInfo, controls, setFloor
 } from './three.js';
 
+import { FALLBACK_LESSONS } from './fallbackSchedule.js';
 import { showRoomPanel, hideRoomPanel } from './roomPanel.js';
 import { setSidebarOpen } from './ui.js';
 import { splitGroupField } from './groups.js';
@@ -59,11 +60,13 @@ export async function fetchFromApi(path, params) {
         if (!response.ok) throw new Error(`сервер ответил ${response.status}`);
         return await response.json();
     } catch (error) {
-        if (error.name === 'AbortError') {
-            throw new Error(`нет ответа за ${API_TIMEOUT_MS / 1000} с (${url})`);
-        }
-        // сюда попадают обрыв связи и блокировка ответа по cors
-        throw new Error(`${error.message} (${url})`);
+        // сюда попадают таймаут, обрыв связи и блокировка ответа по cors.
+        // Пока сервера нет, вместо ошибки отдаём тестовые данные.
+        const reason = error.name === 'AbortError'
+            ? `нет ответа за ${API_TIMEOUT_MS / 1000} с (${url})`
+            : `${error.message} (${url})`;
+        console.warn(`Api недоступен: ${reason}. Показываем тестовое расписание.`);
+        return FALLBACK_LESSONS;
     } finally {
         clearTimeout(timer);
     }
@@ -161,8 +164,24 @@ function highlightRoomsForSchedule(schedule) {
     });
 }
 
+const roomFloors = new Map();
+Object.entries(floorRoomConfigs).forEach(([floor, config]) => {
+    Object.values(config).forEach((room) => {
+        if (room.number && !roomFloors.has(room.number)) roomFloors.set(room.number, Number(floor));
+    });
+});
+
+let pendingRoomId = null;
+
 // подсветка конкретного кабинета по его номеру (например, при клике на карточку пары)
 function highlightRoomByRoomId(roomId) {
+    const targetFloor = roomFloors.get(roomId);
+    if (targetFloor && targetFloor !== currentFloor && FLOOR_MODELS[targetFloor]) {
+        pendingRoomId = roomId;
+        setFloor(targetFloor);
+        return;
+    }
+
     resetActiveSelection();
 
     const mesh = roomMeshes.find((m) => m.userData.roomNumber === roomId);
@@ -217,9 +236,18 @@ function showPairsMessage(text, isError = false) {
 }
 
 // применение выбранной группы: загрузка и отображение расписания
+function applyPendingRoom(consume) {
+    if (!pendingRoomId) return;
+    const roomId = pendingRoomId;
+    if (consume) pendingRoomId = null;
+    highlightRoomByRoomId(roomId);
+    collapseScheduleForRoom();
+}
+
 export async function applyGroup(selectedGroup) {
     setCurrentGroup(selectedGroup);
     showPairsMessage('Загружаем расписание…');
+    applyPendingRoom(false);
 
     try {
         const schedule = await fetchSchedule(selectedGroup, currentDate);
@@ -232,6 +260,8 @@ export async function applyGroup(selectedGroup) {
         showPairsMessage(`Не удалось загрузить расписание: ${error.message}`, true);
         highlightRoomsForSchedule([]);
     }
+
+    applyPendingRoom(true);
 }
 
 // обновление интерфейса при смене даты
@@ -402,8 +432,7 @@ document.addEventListener('keydown', (event) => {
 
 // Этот обработчик добавлен вторым: сначала срабатывает тот, что выше по файлу
 // и открывает карточку кабинета, и только потом сворачивается расписание.
-pairsContainer.addEventListener('click', (event) => {
-    if (!event.target.closest('.pair-card')) return;
+function collapseScheduleForRoom() {
     if (!scheduleToggle.checked) return;
     if (!window.matchMedia('(max-width: 768px)').matches) return;
     // Кабинета может не оказаться на плане этажа — тогда карточка не
@@ -414,6 +443,11 @@ pairsContainer.addEventListener('click', (event) => {
     setScheduleCollapsedForRoom(true);
     roomPanel.classList.add('can-return');   // css покажет кнопку «Назад»
     setScheduleOpen(false);
+}
+
+pairsContainer.addEventListener('click', (event) => {
+    if (!event.target.closest('.pair-card')) return;
+    collapseScheduleForRoom();
 });
 
 // «Назад»: прячем карточку и возвращаем расписание на место
