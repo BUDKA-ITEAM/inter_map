@@ -49,12 +49,12 @@ _session = requests.Session()
 
 # ------------------------- Утилиты -------------------------
 
-def current_week_range() -> tuple[str, str]:
-    """Возвращает диапазон текущей недели: понедельник -> воскресенье."""
+def current_and_next_week_range() -> tuple[str, str]:
+    """возвращает диапазон текущей недели: понедельник -> воскресенье следующей недели"""
     today = date.today()
-    monday = today - timedelta(days=today.weekday())
-    sunday = monday + timedelta(days=6)
-    return monday.isoformat(), sunday.isoformat()
+    monday_this_week = today - timedelta(days=today.weekday())
+    sunday_next_week = monday_this_week + timedelta(days=13)
+    return monday_this_week.isoformat(), sunday_next_week.isoformat()
 
 
 def fetch(url: str, params: dict | None = None, as_json: bool = True):
@@ -93,6 +93,12 @@ def fetch(url: str, params: dict | None = None, as_json: bool = True):
 
 # ------------------------- Парсинг ссылок преподавателей -------------------------
 
+
+NON_TEACHER_NAME_PATTERNS = re.compile(
+    r"(Вакансия|Кураторы|ппп|Электив)",
+    re.IGNORECASE,
+)
+
 def fetch_teacher_links() -> list[dict]:
     """
     Скачивает страницу /teachers и собирает список преподавателей.
@@ -109,6 +115,7 @@ def fetch_teacher_links() -> list[dict]:
 
     soup = BeautifulSoup(html, "html.parser")
     teachers: dict[str, dict] = {}
+    skipped = 0
 
     for a in soup.select("a.teacher-link"):
         href = a.get("href", "").split("?", 1)[0]
@@ -117,6 +124,14 @@ def fetch_teacher_links() -> list[dict]:
             continue
 
         tid = m.group("id")
+        name = a.get_text(strip=True)
+
+        if not name or name.isdigit() or NON_TEACHER_NAME_PATTERNS.search(name):
+            skipped += 1
+            log.debug(f"Отсеяна запись: id={tid}, name='{name}'")
+            continue
+
+        
         teachers.setdefault(
             tid,
             {
@@ -147,7 +162,6 @@ def fetch_teacher_lessons(
     """Возвращает JSON с расписанием преподавателя за период."""
     url = f"{API_BASE}/{PUBLICATION_ID}/teachers/{teacher_id}/lessons"
     return fetch(url, params={"startDate": start, "endDate": end})
-
 
 # ------------------------- Нормализация -------------------------
 
@@ -272,7 +286,7 @@ def process_teacher(teacher: dict, start: str, end: str) -> list[dict]:
 # ------------------------- Точка входа -------------------------
 
 def run() -> None:
-    start, end = current_week_range()
+    start, end = current_and_next_week_range()
     log.info(f"Парсинг расписания преподавателей на {start} - {end}")
 
     teachers = fetch_teacher_links()

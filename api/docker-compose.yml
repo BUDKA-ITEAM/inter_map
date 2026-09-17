@@ -31,17 +31,5 @@ services:
       postgres:
         condition: service_healthy
 
-  parser:
-    build:
-      context: /parser
-      dockerfile: Dockerfile
-    environment:
-      COLLEGE_SCHEDULE_DB_DSN: postgres://postgres:postgres@postgres:5432/college_schedule?sslmode=disable
-      PARSE_INTERVAL_HOURS: "6"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-
 volumes:
   pgdata:
