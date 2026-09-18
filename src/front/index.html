@@ -47,16 +47,20 @@
                  не выбрана. -->
             <div id="group-picker-panel" class="group-picker-panel" hidden>
                 <label class="group-picker-label" for="direction-select">Направление</label>
-                <select id="direction-select">
-                    <option value="">Не выбрано</option>
-                </select>
+                <span class="select-wrap">
+                    <select id="direction-select">
+                        <option value="">Не выбрано</option>
+                    </select>
+                </span>
 
                 <label class="group-picker-label" for="group-select">Группа</label>
                 <!-- Тот же #group-select, из которого расписание берёт группу.
                      Наполняется группами выбранного направления. -->
-                <select id="group-select" disabled>
-                    <option value="">Сначала выберите направление</option>
-                </select>
+                <span class="select-wrap">
+                    <select id="group-select" disabled>
+                        <option value="">Сначала выберите направление</option>
+                    </select>
+                </span>
 
                 <button id="group-confirm-btn" class="group-confirm-btn" type="button" disabled>Выбрать группу</button>
             </div>

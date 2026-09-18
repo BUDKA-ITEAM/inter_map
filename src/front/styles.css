@@ -96,6 +96,11 @@
           ) / 2
         + var(--floor-column-width) + var(--space-3)
     );
+    --icon-chevron: url("img/chevron.svg");
+
+    --tag-orange: #B4531A;
+    --tag-orange-soft: rgba(180, 83, 26, 0.22);
+    --on-tag-orange: #FFF4EC;
 
     --model-chip-bg: rgba(255, 255, 255, 0.92);
     --model-chip-border: rgba(26, 26, 26, 0.12);
@@ -192,6 +197,9 @@
     --status-upcoming: #a900f7;
     --status-upcoming-bg: #34302A;
     --model-bg: #1A1D22;
+    --tag-orange: #A8501C;
+    --tag-orange-soft: rgba(214, 112, 45, 0.28);
+    --on-tag-orange: #F8E9DD;
     --model-chip-bg: rgba(38, 42, 49, 0.92);
     --model-chip-border: rgba(228, 226, 222, 0.16);
     --model-ink: #D5D8DD;
@@ -296,17 +304,39 @@ a:focus-visible,
 #date-panel input[type="date"] {
     width: 100%;
     min-width: 0;
-    padding: 10px 12px;
+    padding: 11px 12px;
     border: 1px solid var(--border);
-    border-radius: var(--radius-m);
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     font-family: inherit;
     background: var(--surface);
     color: var(--ink);
     text-align: center;
+    box-shadow: var(--shadow);
     transition: border-color var(--duration-fast) ease,
+                background var(--duration-fast) ease,
+                box-shadow var(--duration-fast) ease;
+}
+
+#date-panel input[type="date"]:focus-visible {
+    outline: none;
+    border-color: var(--tag-orange);
+    box-shadow: 0 0 0 3px var(--tag-orange-soft);
+}
+
+#date-panel input[type="date"]::-webkit-calendar-picker-indicator {
+    padding: 3px;
+    border-radius: 6px;
+    opacity: 0.55;
+    cursor: pointer;
+    transition: opacity var(--duration-fast) ease,
                 background var(--duration-fast) ease;
+}
+
+#date-panel input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    background: var(--surface-hover);
 }
 
 
@@ -319,13 +349,13 @@ a:focus-visible,
 #sidebar #date-panel .nav-btn {
     flex: 1 1 0;
     width: auto;
-    height: 32px;
+    height: 34px;
     gap: 4px;
     padding: 0 6px;
     background: var(--surface);
     color: var(--ink-secondary);
     border: 1px solid var(--border);
-    border-radius: var(--radius-s);
+    border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
 }
@@ -1065,7 +1095,15 @@ canvas {
 .group-picker-panel {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: 6px;
+}
+
+.group-picker-panel .select-wrap {
+    margin-bottom: var(--space-2);
+}
+
+.group-picker-panel .select-wrap:last-of-type {
+    margin-bottom: var(--space-1);
 }
 
 #sidebar .group-picker-label {
@@ -1112,14 +1150,18 @@ canvas {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: var(--space-2);
     padding: 8px 10px 8px 12px;
     background: var(--accent-soft);
     border: 1px solid var(--border);
-    border-radius: var(--radius-m);
+    border-radius: 10px;
 }
 
 .group-current-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-size: 14px;
     font-weight: 600;
     color: var(--ink);
@@ -1127,7 +1169,8 @@ canvas {
 
 #sidebar .group-change-btn {
     width: auto;
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    margin-left: auto;
     padding: 5px 10px;
     background: transparent;
     color: var(--ink-secondary);
@@ -1140,19 +1183,69 @@ canvas {
                 color var(--duration-fast) ease;
 }
 
+.select-wrap {
+    position: relative;
+    display: block;
+}
+
+.select-wrap::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    width: 12px;
+    height: 8px;
+    transform: translateY(-50%);
+    background-color: var(--ink-tertiary);
+    -webkit-mask-image: var(--icon-chevron);
+    mask-image: var(--icon-chevron);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 12px 8px;
+    mask-size: 12px 8px;
+    pointer-events: none;
+    transition: background-color var(--duration-fast) ease;
+}
+
+.select-wrap:focus-within::after {
+    background-color: var(--tag-orange);
+}
+
+.select-wrap:has(select:disabled)::after {
+    opacity: 0.5;
+}
+
 #sidebar select {
     width: 100%;
-    padding: 8px 10px;
-    margin-bottom: var(--space-4);
+    padding: 10px 34px 10px 12px;
+    margin-bottom: 0;
     border: 1px solid var(--border);
-    border-radius: var(--radius-s);
+    border-radius: 10px;
     box-sizing: border-box;
-    background: var(--bg);
+    background-color: var(--surface);
     color: var(--ink);
     font-size: 13px;
+    font-weight: 500;
     font-family: inherit;
     cursor: pointer;
-    transition: border-color var(--duration-fast) ease;
+    appearance: none;
+    -webkit-appearance: none;
+    box-shadow: var(--shadow);
+    transition: border-color var(--duration-fast) ease,
+                background-color var(--duration-fast) ease,
+                box-shadow var(--duration-fast) ease;
+}
+
+#sidebar select:focus-visible {
+    outline: none;
+    border-color: var(--tag-orange);
+    box-shadow: 0 0 0 3px var(--tag-orange-soft);
+}
+
+#sidebar select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 #sidebar .sidebar-section > select { margin-bottom: 0; }
@@ -1190,10 +1283,9 @@ canvas {
 .view-switch {
     display: flex;
     gap: 2px;
-    padding: 3px;
-    background: var(--accent-soft);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-m);
+    padding: 0;
+    background: transparent;
+    border: none;
 }
 
 #sidebar .view-switch-item {
@@ -1220,10 +1312,13 @@ canvas {
 
 /* активная вкладка = текущая страница */
 #sidebar .view-switch-item.is-active {
-    background: var(--surface);
-    color: var(--ink);
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--tag-orange);
+    color: var(--on-tag-orange);
     font-weight: 600;
-    box-shadow: var(--shadow);
+    letter-spacing: 0.01em;
+    box-shadow: none;
     cursor: default;
 }
 
@@ -2120,8 +2215,8 @@ canvas {
     }
 
     #sidebar .view-switch-item.is-active:hover {
-        background: var(--surface);
-        color: var(--ink);
+        background: var(--tag-orange);
+        color: var(--on-tag-orange);
         font-weight: 600;
         box-shadow: var(--shadow);
         cursor: default;
