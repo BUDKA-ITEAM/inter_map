@@ -1,0 +1,296 @@
+
+:root {
+    color-scheme: light;
+
+    /* монохромная основа */
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-secondary: #616161;
+    --ink-tertiary: #6E6E6E;
+    --border: #DDDDDD;
+    --accent: #2C2C2C;
+    --accent-hover: #1A1A1A;
+
+    /* приглушённые статусные цвета */
+    --status-past: #ff0000;
+    --status-past-bg: #F5F0EC;
+    --status-current: #00910c;
+    --status-current-bg: #EDF3EE;
+    --status-upcoming: #a600ff;
+    --status-upcoming-bg: #F7F2E8;
+
+    /* добавленные токены  */
+    --surface-hover: #F1F1F1;
+    --surface-active: #E7E7E7;
+    --border-strong: #BFBFBF;
+    --accent-soft: #EFEFEF;
+    --on-accent: #FFFFFF;
+    --overlay-bg: rgba(255, 255, 255, 0.94);
+    --overlay-veil: rgba(255, 255, 255, 0.95);
+    --focus-ring: #1A1A1A;
+    /* Красная кнопка «Закрыть». Сам красный одинаков во всех темах,
+       а цвет надписи на нём меняется — см. блоки тем ниже. */
+    --danger: #D93A3A;
+    --danger-hover: #C22F2F;
+    --on-danger: #FFFFFF;
+    /* фон сцены продублирован из app.js, чтобы фон канваса и фон
+       страницы не расходились при смене темы */
+    --model-bg: #F5F2EA;
+
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+
+    --radius-s: 4px;
+    --radius-m: 6px;
+    --radius-l: 8px;
+
+    --shadow: 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 6px 12px rgba(0,0,0,0.06);
+    --shadow-panel: 0 8px 28px rgba(0,0,0,0.10);
+
+    /* длительности анимаций одной точкой */
+    --duration-fast: 0.15s;
+    --duration-base: 0.25s;
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Кривая и длительности выезда сайдбара. */
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --duration-drawer-in: 0.36s;
+    --duration-drawer-out: 0.22s;
+    /* затемнение позади открытой шторки */
+    --scrim: rgba(18, 20, 24, 0.44);
+
+    /* геометрия закреплённого сайдбара и контентной колонки */
+    --sidebar-width: 260px;
+    --sidebar-inset: var(--space-4);
+    --content-max: 1100px;
+    --floor-column-width: 48px;
+    /* верхняя зона, которую шторка расписания не перекрывает:
+       кнопка ☰ (46px) + отступы */
+    --sheet-top-gap: 76px;
+    /* Высота верхней полосы на телефоне: под ней начинается контент
+       и от неё же отсчитывается карточка кабинета. */
+    --mobile-top-bar: 62px;
+
+    --icon-chevron: url("img/chevron.svg");
+
+    --tag-orange: #B4531A;
+    --tag-orange-soft: rgba(180, 83, 26, 0.22);
+    --on-tag-orange: #FFF4EC;
+
+    --model-chip-bg: rgba(255, 255, 255, 0.92);
+    --model-chip-border: rgba(26, 26, 26, 0.12);
+    --model-ink: #55534E;
+    --model-stub-bg: rgba(245, 242, 234, 0.95);
+}
+
+/* белая тема — явное дублирование базовых значений,
+   чтобы атрибут можно было переставлять в обе стороны */
+:root[data-theme="white"] {
+    color-scheme: light;
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-secondary: #616161;
+    --ink-tertiary: #6E6E6E;
+    --border: #DDDDDD;
+    --accent: #2C2C2C;
+    --accent-hover: #1A1A1A;
+    --surface-hover: #F1F1F1;
+    --surface-active: #E7E7E7;
+    --border-strong: #BFBFBF;
+    --accent-soft: #EFEFEF;
+    --on-accent: #FFFFFF;
+    --overlay-bg: rgba(255, 255, 255, 0.94);
+    --overlay-veil: rgba(255, 255, 255, 0.95);
+    --focus-ring: #1A1A1A;
+    --danger: #D93A3A;
+    --danger-hover: #C22F2F;
+    --on-danger: #FFFFFF;
+    --status-past-bg: #F4F1EF;
+    --status-current-bg: #ECF3EE;
+    --status-upcoming-bg: #F6F2E9;
+    --model-bg: #F5F2EA;
+}
+
+/* прежняя тёплая светлая тема — сохранена как третий вариант */
+:root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-secondary: #666666;
+    --ink-tertiary: #6F6F6B;
+    --border: #E5E5E0;
+    --accent: #2C2C2C;
+    --accent-hover: #1A1A1A;
+    --surface-hover: #F2F1EC;
+    --surface-active: #E9E8E2;
+    --border-strong: #C9C9C2;
+    --accent-soft: #EDEDE8;
+    --on-accent: #FFFFFF;
+    --overlay-bg: rgba(255, 255, 255, 0.92);
+    --overlay-veil: rgba(250, 250, 248, 0.95);
+    --focus-ring: #1A1A1A;
+    --danger: #D93A3A;
+    --danger-hover: #C22F2F;
+    --on-danger: #FFFFFF;
+    --model-bg: #F5F2EA;
+}
+
+/* темная тема. */
+:root[data-theme="dark"],
+:root:has(#theme-toggle:checked) {
+    color-scheme: dark;
+    --bg: #212429;
+    --surface: #2A2E34;
+    --ink: #E4E2DE;
+    --ink-secondary: #B4B9C1;
+    --ink-tertiary: #969CA5;
+    --border: #3A3F47;
+    /* акцент инвертирован: спокойный светло-серый с тёмным текстом */
+    --accent: #D8D5D0;
+    --accent-hover: #EAE7E2;
+    --surface-hover: #333841;
+    --surface-active: #3C424B;
+    --border-strong: #525862;
+    --accent-soft: #31363E;
+    --on-accent: #1E2126;
+    --overlay-bg: rgba(42, 46, 52, 0.92);
+    --overlay-veil: rgba(33, 36, 41, 0.95);
+    --focus-ring: #C8CDD4;
+    /* Красный чуть светлее, чем в светлых темах: на тёмном фоне
+       глубокий красный выглядит грязным пятном. */
+    --danger: #E85C5C;
+    --danger-hover: #F07070;
+    --on-danger: #1B0F0E;
+    --scrim: rgba(0, 0, 0, 0.6);
+    /* статусные цвета приглушены под темный фон */
+    --status-past: #ff0000;
+    --status-past-bg: #34302D;
+    --status-current: #1ca600;
+    --status-current-bg: #2A332D;
+    --status-upcoming: #a900f7;
+    --status-upcoming-bg: #34302A;
+    --model-bg: #1A1D22;
+    --tag-orange: #A8501C;
+    --tag-orange-soft: rgba(214, 112, 45, 0.28);
+    --on-tag-orange: #F8E9DD;
+    --model-chip-bg: rgba(38, 42, 49, 0.92);
+    --model-chip-border: rgba(228, 226, 222, 0.16);
+    --model-ink: #D5D8DD;
+    --model-stub-bg: rgba(26, 29, 34, 0.95);
+    --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    --shadow-card-hover: 0 6px 12px rgba(0,0,0,0.40);
+    --shadow-panel: 0 8px 28px rgba(0,0,0,0.50);
+}
+
+/* базовые стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Атрибут hidden должен побеждать наши display: flex и display: block.
+   Без этого правила скрытые блоки остаются на экране — так на сайте
+   одновременно показывались обе кнопки «Выбрать группу». */
+[hidden] {
+    display: none !important;
+}
+
+button {
+    font-family: inherit;
+}
+
+/* фокус для доступности — виден на всех интерактивных элементах */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+    outline: 1.5px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+@keyframes legend-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes sidebar-item-in {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* выбранная группа выделена в раскрытом списке */
+#sidebar select option:checked {
+    background: var(--accent-soft);
+    color: var(--ink);
+    font-weight: 600;
+}
+
+@keyframes schedule-in {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* карточка мягко съезжает сверху */
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-item {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    /* на низком экране верхняя полоса ниже — кнопка ☰ прижата к краю */
+    :root {
+        --mobile-top-bar: 56px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --duration-fast: 0.001s;
+        --duration-base: 0.001s;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}

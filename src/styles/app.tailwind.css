@@ -1,7 +1,7 @@
-@layer legacy, theme, components, utilities;
+@layer base, legacy, theme, components, utilities;
 
-@import "../front/styles.css" layer(legacy);
-@import "../front/gamble.css" layer(legacy);
+@import "./base.css" layer(base);
+@import "./gamble.css" layer(legacy);
 
 @import "tailwindcss/theme.css" layer(theme);
 
@@ -15,17 +15,34 @@
 @theme {
     --breakpoint-tab: 769px;
     --breakpoint-phone: 481px;
-
-    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04);
-    --shadow-card-hover: 0 6px 12px rgba(0, 0, 0, 0.06);
-    --shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.10);
 }
 
 @custom-variant short (@media (max-height: 500px) and (orientation: landscape));
 
 @custom-variant mouse (@media (hover: hover) and (pointer: fine));
 
+@custom-variant dark (:is(:root[data-theme="dark"], :root:has(#theme-toggle:checked)) &);
+
+@custom-variant debug (:root[data-debug="on"] &);
+
+@custom-variant sheet-open (:root:has(#schedule-toggle:checked) &);
+
+@custom-variant sheet-closed (:root:not(:has(#schedule-toggle:checked)) &);
+
+@custom-variant sidebar-shown (:root:has(#sidebar:not([aria-hidden="true"])) &);
+
+@custom-variant sidebar-open (:root:has(#sidebar.open) &);
+
+@custom-variant legend-open (:root:has(#legend-toggle:checked) &);
+
+@custom-variant legend-closed (:root:not(:has(#legend-toggle:checked)) &);
+
+@custom-variant legend-focus (:root:has(#legend-toggle:focus-visible) &);
+
 @theme inline {
+    --shadow-card: var(--shadow);
+    --shadow-lift: var(--shadow-card-hover);
+    --shadow-sheet: var(--shadow-panel);
     --color-bg: var(--bg);
     --color-surface: var(--surface);
     --color-surface-hover: var(--surface-hover);
@@ -42,7 +59,21 @@
     --color-danger: var(--danger);
     --color-danger-hover: var(--danger-hover);
     --color-on-danger: var(--on-danger);
+    --font-app: var(--font-ui);
+    --color-focus-ring: var(--focus-ring);
+    --color-scrim: var(--scrim);
+    --color-model-bg: var(--model-bg);
+    --color-model-chip-bg: var(--model-chip-bg);
+    --color-model-chip-border: var(--model-chip-border);
+    --color-model-ink: var(--model-ink);
+    --color-model-stub-bg: var(--model-stub-bg);
+    --color-tag-orange: var(--tag-orange);
+    --color-tag-orange-soft: var(--tag-orange-soft);
+    --color-on-tag-orange: var(--on-tag-orange);
     --color-status-past: var(--status-past);
+    --color-status-past-bg: var(--status-past-bg);
+    --color-status-current-bg: var(--status-current-bg);
+    --color-status-upcoming-bg: var(--status-upcoming-bg);
     --color-status-current: var(--status-current);
     --color-status-upcoming: var(--status-upcoming);
 }

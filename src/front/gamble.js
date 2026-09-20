@@ -259,7 +259,7 @@ class SlotMachine {
         if (this.spinning)
             return;
         if (this.balance < this.bet) {
-            this.message.textContent = 'Баланс закончился. Алмазы близко';
+            this.message.textContent = 'Баланс закончился, алмазы очень близко.';
             this.message.dataset.tone = 'lose';
             return;
         }
