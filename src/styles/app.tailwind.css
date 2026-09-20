@@ -1,0 +1,48 @@
+@layer legacy, theme, components, utilities;
+
+@import "../front/styles.css" layer(legacy);
+@import "../front/gamble.css" layer(legacy);
+
+@import "tailwindcss/theme.css" layer(theme);
+
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+@source "../front/index.html";
+@source "../front/*.js";
+
+@source not inline("hidden visible container active open");
+
+@theme {
+    --breakpoint-tab: 769px;
+    --breakpoint-phone: 481px;
+
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 6px 12px rgba(0, 0, 0, 0.06);
+    --shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.10);
+}
+
+@custom-variant short (@media (max-height: 500px) and (orientation: landscape));
+
+@custom-variant mouse (@media (hover: hover) and (pointer: fine));
+
+@theme inline {
+    --color-bg: var(--bg);
+    --color-surface: var(--surface);
+    --color-surface-hover: var(--surface-hover);
+    --color-surface-active: var(--surface-active);
+    --color-ink: var(--ink);
+    --color-ink-secondary: var(--ink-secondary);
+    --color-ink-tertiary: var(--ink-tertiary);
+    --color-border: var(--border);
+    --color-border-strong: var(--border-strong);
+    --color-accent: var(--accent);
+    --color-accent-hover: var(--accent-hover);
+    --color-accent-soft: var(--accent-soft);
+    --color-on-accent: var(--on-accent);
+    --color-danger: var(--danger);
+    --color-danger-hover: var(--danger-hover);
+    --color-on-danger: var(--on-danger);
+    --color-status-past: var(--status-past);
+    --color-status-current: var(--status-current);
+    --color-status-upcoming: var(--status-upcoming);
+}

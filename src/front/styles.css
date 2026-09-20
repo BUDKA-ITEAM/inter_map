@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 :root {
     color-scheme: light;
@@ -398,69 +397,6 @@ a:focus-visible,
 .nav-btn:active {
     background: var(--surface-active);
 }
-
-/* блок выбора этажа */
-#floor-selector {
-    width: var(--floor-column-width);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-3);
-    gap: var(--space-2);
-    background: var(--surface);
-    padding: var(--space-3) var(--space-2);
-    border-radius: var(--radius-m);
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-}
-
-/* подпись над столбиком цифр; в 48px колонки помещается при 10px */
-.floor-selector-title {
-    font-size: 10px;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--ink-secondary);
-    user-select: none;
-    white-space: nowrap;
-}
-
-.floor-numbers {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.floor-numbers span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-secondary);
-    transition: background var(--duration-fast) ease,
-                color var(--duration-fast) ease;
-    user-select: none;
-}
-
-
-.floor-numbers span:active {
-    background: var(--surface-active);
-}
-
-/* активный этаж — заливка акцентом (класс .active ставит app.js) */
-.floor-numbers span.active {
-    background: var(--accent);
-    color: var(--on-accent);
-}
-
 
 /* контейнер модели */
 #model-container {
@@ -1527,48 +1463,6 @@ canvas {
 .pair-card.current { border-left-color: var(--status-current); background: var(--status-current-bg); }
 .pair-card.upcoming { border-left-color: var(--status-upcoming); }
 
-/* Полоса под картой. На десктопе не нужна — там свободного места нет,
-   поэтому показывается только на узких экранах. */
-#map-footer {
-    display: none;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    padding-top: var(--space-1);
-}
-
-.map-footer-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    min-height: 40px;
-    padding: 0 var(--space-5);
-    background: var(--surface);
-    color: var(--ink);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    box-shadow: var(--shadow);
-    font-size: 13px;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background var(--duration-fast) ease,
-                border-color var(--duration-fast) ease,
-                transform var(--duration-fast) var(--ease);
-}
-
-.map-footer-btn:active {
-    transform: scale(0.97);
-    background: var(--surface-active);
-}
-
-.map-footer-btn-icon {
-    font-size: 15px;
-    line-height: 1;
-    color: var(--ink-secondary);
-}
-
 /* панель расписания.
    Открывается кнопкой в сайдбаре, стоит слева — вплотную к сайдбару, на
    противоположной стороне от панели кабинета, поэтому две панели не спорят
@@ -1852,10 +1746,6 @@ canvas {
         max-height: none;
     }
 
-    #map-footer {
-        display: flex;
-    }
-
     /* пока шторка сайдбара открыта, карта под ней не реагирует на жесты */
     :root:has(#sidebar.open) #model-container {
         pointer-events: none;
@@ -1873,22 +1763,6 @@ canvas {
         flex: 1 1 auto;
         max-height: none;
         height: auto;
-    }
-
-    #floor-selector {
-        order: 2;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: center;
-        padding: var(--space-2);
-        border-radius: var(--radius-m);
-        flex-shrink: 0;
-    }
-
-    .floor-numbers {
-        flex-direction: row;
-        gap: var(--space-3);
     }
 
     /* гамбургер нужен именно здесь: свайп от края работает только на
@@ -2019,16 +1893,6 @@ canvas {
         flex-shrink: 0;
     }
 
-    #floor-selector {
-        padding: var(--space-1);
-    }
-
-    .floor-numbers span {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
-    }
-
     #model-container {
         height: 55vh;
         min-height: 200px;
@@ -2110,16 +1974,6 @@ canvas {
         height: auto;
     }
 
-    #floor-selector {
-        padding: var(--space-1);
-    }
-
-    .floor-numbers span {
-        width: 24px;
-        height: 24px;
-        font-size: 10px;
-    }
-
     #room-panel {
         top: calc(var(--mobile-top-bar) + var(--space-1));
         left: var(--space-2);
@@ -2174,16 +2028,6 @@ canvas {
         background: var(--surface-hover);
         border-color: var(--border-strong);
         color: var(--ink);
-    }
-
-    .floor-numbers span:hover {
-        background: var(--surface-hover);
-        color: var(--ink);
-    }
-
-    .floor-numbers span.active:hover {
-        background: var(--accent-hover);
-        color: var(--on-accent);
     }
 
     #sidebar-toggle:hover {
