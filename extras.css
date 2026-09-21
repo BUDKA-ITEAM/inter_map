@@ -1,0 +1,400 @@
+@layer legacy {
+    #gamble-overlay {
+        --gamble-neon: #7c5cff;
+        --gamble-neon-2: #23d5ab;
+        --gamble-gold: #ffc861;
+        --gamble-panel: #14161d;
+        --gamble-panel-2: #1c1f29;
+        --gamble-ink: #f2f3f7;
+        --gamble-ink-dim: #a4a9b8;
+        --gamble-cell: 96px;
+
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-4);
+        background: rgba(8, 9, 13, 0.72);
+        backdrop-filter: blur(10px);
+        opacity: 0;
+        transition: opacity 0.22s var(--ease);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    #gamble-overlay.is-open {
+        opacity: 1;
+    }
+
+    .gamble-card {
+        position: relative;
+        width: min(880px, 100%);
+        max-height: calc(100dvh - var(--space-5));
+        overflow-y: auto;
+        padding: clamp(18px, 3vw, 30px);
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: var(--gamble-panel);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+        color: var(--gamble-ink);
+        transform: translateY(18px) scale(0.98);
+        opacity: 0;
+        transition: transform 0.28s var(--ease-drawer), opacity 0.28s var(--ease);
+    }
+
+    #gamble-overlay.is-open .gamble-card {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    .gamble-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: var(--gamble-panel-2);
+        color: var(--gamble-ink);
+        font-size: 22px;
+        line-height: 1;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .gamble-close:hover {
+        background: #2a2f3a;
+        transform: rotate(90deg);
+    }
+
+    .gamble-head h2 {
+        margin: 0;
+        font-size: clamp(22px, 4vw, 30px);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--gamble-gold);
+    }
+
+    .gamble-sub {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--gamble-ink-dim);
+        padding-right: 42px;
+    }
+
+    .gamble-stats {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: var(--space-3);
+        margin: 18px 0 14px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--gamble-panel-2);
+    }
+
+    .gamble-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .gamble-stat-bets {
+        align-items: center;
+    }
+
+    .gamble-stat-label {
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gamble-ink-dim);
+    }
+
+    .gamble-stat-value {
+        font-size: clamp(18px, 3.4vw, 24px);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .gamble-win-value {
+        color: var(--gamble-ink-dim);
+        transition: color 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .gamble-win-value.is-hot {
+        color: var(--gamble-gold);
+        text-shadow: 0 0 18px rgba(255, 200, 97, 0.55);
+    }
+
+    .gamble-bets {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .gamble-bet {
+        min-width: 46px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: var(--gamble-panel);
+        color: var(--gamble-ink);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .gamble-bet:hover {
+        background: #2a2f3a;
+    }
+
+    .gamble-bet.is-active {
+        border-color: var(--gamble-neon);
+        background: var(--gamble-neon);
+        color: #ffffff;
+    }
+
+    .gamble-machine {
+        position: relative;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(180deg, rgba(10, 11, 16, 0.9), rgba(18, 20, 28, 0.9));
+        box-shadow: 0 0 0 1px rgba(124, 92, 255, 0.12), 0 18px 40px rgba(0, 0, 0, 0.45) inset;
+        cursor: pointer;
+        user-select: none;
+        transition: box-shadow 0.25s ease, transform 0.2s var(--ease);
+    }
+
+    .gamble-machine:hover {
+        box-shadow: 0 0 0 1px rgba(124, 92, 255, 0.4), 0 0 34px rgba(124, 92, 255, 0.22), 0 18px 40px rgba(0, 0, 0, 0.45) inset;
+    }
+
+    .gamble-machine:focus-visible {
+        outline: 2px solid var(--gamble-neon-2);
+        outline-offset: 3px;
+    }
+
+    .gamble-machine.is-spinning {
+        box-shadow: 0 0 0 1px rgba(35, 213, 171, 0.45), 0 0 40px rgba(35, 213, 171, 0.25), 0 18px 40px rgba(0, 0, 0, 0.45) inset;
+    }
+
+    .gamble-machine.is-win {
+        animation: gamble-win-pulse 1s var(--ease);
+    }
+
+    @keyframes gamble-win-pulse {
+        0%, 100% { box-shadow: 0 0 0 1px rgba(255, 200, 97, 0.4), 0 18px 40px rgba(0, 0, 0, 0.45) inset; }
+        40% { box-shadow: 0 0 0 2px rgba(255, 200, 97, 0.8), 0 0 60px rgba(255, 200, 97, 0.45), 0 18px 40px rgba(0, 0, 0, 0.45) inset; }
+    }
+
+    .gamble-reels {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+    }
+
+    .gamble-reel {
+        position: relative;
+        height: calc(var(--gamble-cell) * 3);
+        overflow: hidden;
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+        box-shadow: inset 0 18px 24px -18px rgba(0, 0, 0, 0.95), inset 0 -18px 24px -18px rgba(0, 0, 0, 0.95);
+    }
+
+    .gamble-reel.is-landing {
+        animation: gamble-land 0.32s var(--ease);
+    }
+
+    @keyframes gamble-land {
+        0% { transform: translateY(-4px); }
+        60% { transform: translateY(2px); }
+        100% { transform: translateY(0); }
+    }
+
+    .gamble-strip {
+        will-change: transform;
+    }
+
+    .gamble-cell {
+        height: var(--gamble-cell);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        font-size: calc(var(--gamble-cell) * 0.52);
+        line-height: 1;
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--tone, #fff) 45%, transparent));
+        transition: filter 0.2s ease, transform 0.2s ease;
+    }
+
+    .gamble-cell.is-win {
+        animation: gamble-cell-pop 0.9s var(--ease) infinite;
+        filter: drop-shadow(0 0 18px var(--tone, #fff));
+    }
+
+    @keyframes gamble-cell-pop {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.14); }
+    }
+
+    .gamble-mult {
+        font-size: calc(var(--gamble-cell) * 0.19);
+        font-weight: 700;
+        line-height: 1;
+        color: var(--tone, #fff);
+    }
+
+    .gamble-cell:not(.is-bomb) .gamble-mult {
+        display: none;
+    }
+
+    .gamble-line {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        top: 50%;
+        height: 2px;
+        transform: translateY(-50%);
+        background: linear-gradient(90deg, transparent, rgba(255, 200, 97, 0.85), transparent);
+        box-shadow: 0 0 14px rgba(255, 200, 97, 0.6);
+        pointer-events: none;
+    }
+
+    .gamble-hint {
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        max-width: calc(100% - 16px);
+        padding: 4px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(12, 13, 18, 0.92);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gamble-ink-dim);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .gamble-hint.is-hidden {
+        opacity: 0;
+        transform: translateX(-50%) translateY(6px);
+    }
+
+    .gamble-message {
+        margin: 22px 0 0;
+        min-height: 20px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--gamble-ink-dim);
+    }
+
+    .gamble-message[data-tone="win"] {
+        color: var(--gamble-gold);
+        text-shadow: 0 0 16px rgba(255, 200, 97, 0.4);
+    }
+
+    .gamble-message[data-tone="lose"] {
+        color: #ff8f9a;
+    }
+
+    .gamble-open {
+        overflow: hidden;
+    }
+
+    #sidebar #gamble-btn {
+        background: #7c5cff;
+        border: 1px solid #7c5cff;
+        color: #ffffff;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    #sidebar #gamble-btn:hover {
+        background: #6b4bf0;
+        border-color: #6b4bf0;
+    }
+
+    @media (max-width: 900px) {
+        #gamble-overlay {
+            --gamble-cell: 74px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        #gamble-overlay {
+            --gamble-cell: clamp(44px, 15vw, 62px);
+            padding: var(--space-3);
+        }
+
+        .gamble-card {
+            width: 100%;
+            max-height: calc(100dvh - var(--space-4));
+            padding: 16px 14px calc(18px + env(safe-area-inset-bottom, 0px));
+        }
+
+        .gamble-stats {
+            grid-template-columns: 1fr 1fr;
+            row-gap: var(--space-3);
+            padding: 12px;
+        }
+
+        .gamble-stat-bets {
+            grid-column: 1 / -1;
+            align-items: flex-start;
+        }
+
+        .gamble-bets {
+            justify-content: flex-start;
+        }
+
+        .gamble-machine {
+            padding: 10px;
+        }
+
+        .gamble-reels {
+            gap: 5px;
+        }
+
+        .gamble-line {
+            left: 10px;
+            right: 10px;
+        }
+
+        .gamble-hint {
+            padding: 3px 10px;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .gamble-message {
+            margin-top: 18px;
+        }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .gamble-cell.is-win,
+        .gamble-machine.is-win,
+        .gamble-reel.is-landing {
+            animation: none;
+        }
+    }
+}
