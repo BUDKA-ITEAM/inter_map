@@ -20,7 +20,6 @@ const SPRITE = [
     'chevron-up',
     'circle-check',
     'contrast',
-    'dices',
     'info',
     'loader-circle',
     'maximize',

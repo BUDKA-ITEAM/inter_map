@@ -1,7 +1,6 @@
 @layer base, legacy, theme, components, utilities;
 
 @import "./base.css" layer(base);
-@import "./gamble.css" layer(legacy);
 
 @import "tailwindcss/theme.css" layer(theme);
 

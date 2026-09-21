@@ -402,6 +402,55 @@ function openGamble() {
         machine?.measure();
     });
 }
+const DICE_ICON = '<svg class="size-4 shrink-0 [stroke-width:2.1]" viewBox="0 0 24 24" fill="none"'
+    + ' stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'
+    + '<rect width="12" height="12" x="2" y="10" rx="2" ry="2" />'
+    + '<path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6" />'
+    + '<path d="M6 18h.01" /><path d="M10 14h.01" /><path d="M15 6h.01" /><path d="M18 9h.01" /></svg>';
+const SECTION_MARKUP = `
+    <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
+        ${DICE_ICON.replace('shrink-0', 'shrink-0 text-ink')}Развлечения
+    </span>
+    <button id="gamble-btn" type="button"
+            class="w-full inline-flex items-center justify-center gap-2
+                   min-h-11 py-[10px] px-4 rounded-control
+                   text-[13px] font-semibold cursor-pointer
+                   bg-accent text-on-accent border border-accent
+                   transition-[background-color,border-color,scale] duration-150 ease-[ease]
+                   active:enabled:scale-[0.98]
+                   mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
+                   max-tab:min-h-12 max-tab:text-[14px]">${DICE_ICON}Gamble</button>
+`;
+let mounted = false;
+function loadStyles() {
+    return new Promise((resolve) => {
+        const href = 'extras.css';
+        if (document.querySelector(`link[href="${href}"]`)) {
+            resolve();
+            return;
+        }
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.addEventListener('load', () => resolve(), { once: true });
+        link.addEventListener('error', () => resolve(), { once: true });
+        document.head.appendChild(link);
+    });
+}
+export async function mount() {
+    if (mounted)
+        return;
+    mounted = true;
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar || !sidebar.lastElementChild)
+        return;
+    await loadStyles();
+    const section = document.createElement('div');
+    section.className = 'flex flex-col gap-[10px]';
+    section.innerHTML = SECTION_MARKUP;
+    sidebar.insertBefore(section, sidebar.lastElementChild);
+    initGamble();
+}
 export function initGamble() {
     const button = document.getElementById('gamble-btn');
     if (!button)

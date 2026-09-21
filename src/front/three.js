@@ -170,6 +170,13 @@ export function loadFloorModel(floor) {
 
     if (loadedModel) {
         scene.remove(loadedModel);
+        loadedModel.traverse((child) => {
+            if (!child.isMesh) return;
+            if (child.geometry) child.geometry.dispose();
+            const material = child.material;
+            if (Array.isArray(material)) material.forEach((item) => item.dispose());
+            else if (material) material.dispose();
+        });
         loadedModel = null;
     }
 

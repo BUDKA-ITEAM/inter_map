@@ -14,7 +14,6 @@ const SHELL = [
     './roomPanel.js',
     './groups.js',
     './ui.js',
-    './gamble.js',
     './config.js',
     './fallbackSchedule.js',
     './glbSizes.js',

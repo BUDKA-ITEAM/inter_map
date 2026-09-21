@@ -2,7 +2,7 @@
 // ссылка на страницу недельного расписания, звук заглушки этажа, сохранение
 // темы оформления. В конце файла — закомментированный код старого режима
 // отладки (не удалён по требованию — см. план рефакторинга).
-import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, GAMBLE_UNLOCK_SWITCHES, GAMBLE_STORAGE_KEY, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
+import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
 import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
 import { applyThemeBackground } from './three.js';
 
@@ -208,29 +208,34 @@ if (debugConfirmYes && debugConfirmNo) {
 
 let themeSwitches = 0;
 
-function renderGambleSection() {
-    const section = document.getElementById('gamble-section');
-    if (!section) return;
-    section.hidden = themeSwitches < GAMBLE_UNLOCK_SWITCHES;
+const EXTRAS_UNLOCK_SWITCHES = 20;
+const SWITCH_COUNT_KEY = 'intermap.themeSwitches.v2';
+
+let extrasRequested = false;
+
+function unlockExtrasIfEarned() {
+    if (extrasRequested || themeSwitches < EXTRAS_UNLOCK_SWITCHES) return;
+    extrasRequested = true;
+    import('./extras.js').then((module) => module.mount());
 }
 
 themeToggle.addEventListener('change', () => {
     themeSwitches += 1;
     try {
-        localStorage.setItem(GAMBLE_STORAGE_KEY, String(themeSwitches));
+        localStorage.setItem(SWITCH_COUNT_KEY, String(themeSwitches));
     } catch (error) {
     }
-    renderGambleSection();
+    unlockExtrasIfEarned();
 });
 
-export function initGambleUnlock() {
+export function initExtrasUnlock() {
     let saved = null;
     try {
-        saved = localStorage.getItem(GAMBLE_STORAGE_KEY);
+        saved = localStorage.getItem(SWITCH_COUNT_KEY);
     } catch (error) {
         saved = null;
     }
     const parsed = Number.parseInt(saved ?? '', 10);
     themeSwitches = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-    renderGambleSection();
+    unlockExtrasIfEarned();
 }
