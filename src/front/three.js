@@ -32,6 +32,7 @@ import {
     setCurrentSchedule
 } from './state.js';
 
+import { GLB_SIZES } from './glbSizes.js';
 import { showRoomPanel, hideRoomPanel } from './roomPanel.js';
 import { applyGroup, updatePairsUI } from './schedule.js';
 
@@ -143,6 +144,23 @@ let animationStarted = false;
 let activeFloor = null;
 let loadToken = 0;
 
+const modelProgress = modelLoading.querySelector('.model-progress');
+const modelProgressFill = modelLoading.querySelector('.model-progress-fill');
+const modelProgressValue = modelLoading.querySelector('.model-progress-value');
+
+function setLoadProgress(percent) {
+    if (!modelProgress) return;
+    if (percent === null) {
+        modelProgress.hidden = true;
+        modelProgressFill.style.width = '0%';
+        return;
+    }
+    modelProgress.hidden = false;
+    modelProgress.setAttribute('aria-valuenow', String(percent));
+    modelProgressFill.style.width = `${percent}%`;
+    modelProgressValue.textContent = `${percent}%`;
+}
+
 // загрузка плана выбранного этажа, вызывается при каждом переключении
 export function loadFloorModel(floor) {
     const url = FLOOR_MODELS[floor];
@@ -163,6 +181,9 @@ export function loadFloorModel(floor) {
     modelLoading.classList.remove('hidden');
     modelLoading.querySelector('.spinner').style.display = '';
     modelLoading.querySelector('p').textContent = 'Загружаем план этажа…';
+
+    const expectedBytes = GLB_SIZES[url] || 0;
+    setLoadProgress(expectedBytes ? 0 : null);
 
     loader.load(
         url,
@@ -221,6 +242,7 @@ export function loadFloorModel(floor) {
             // подгоняем камеру под модель и запускаем анимацию
             fitCameraToModel(model);
             resetAllRoomsToWhite();
+            setLoadProgress(null);
             modelLoading.classList.add('hidden');
 
             if (!animationStarted) {
@@ -231,13 +253,25 @@ export function loadFloorModel(floor) {
             // подсветка пар на новом этаже
             if (currentGroup) applyGroup(currentGroup);
         },
-        undefined,
+        (event) => {
+            if (token !== loadToken) return;
+
+            const total = expectedBytes
+                || (event.lengthComputable && event.total > event.loaded ? event.total : 0);
+            if (!total) {
+                setLoadProgress(null);
+                return;
+            }
+
+            setLoadProgress(Math.min(100, Math.round((event.loaded / total) * 100)));
+        },
         (error) => {
             if (token !== loadToken) return; // ответ от уже неактуальной загрузки
 
             console.error('Ошибка загрузки модели:', error);
             modelLoading.querySelector('.spinner').style.display = 'none';
             modelLoading.querySelector('p').textContent = 'Ошибка соединения. Попробуйте выбрать этаж ещё раз.';
+            setLoadProgress(null);
             activeFloor = null; // разрешаем повторную попытку по клику на тот же этаж
         }
     );

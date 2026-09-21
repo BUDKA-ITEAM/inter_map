@@ -226,6 +226,18 @@ pairsContainer.addEventListener('click', (event) => {
     }
 });
 
+function showPairsLoading(text) {
+    pairsContainer.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'pairs-loading';
+    box.setAttribute('role', 'status');
+    box.innerHTML = `
+        <span class="pairs-circle" aria-hidden="true"><span class="pairs-circle-fill"></span></span>
+        <span>${text}</span>
+    `;
+    pairsContainer.appendChild(box);
+}
+
 // сообщение вместо списка пар: загрузка, ошибка, пустой день.
 function showPairsMessage(text, isError = false) {
     pairsContainer.innerHTML = '';
@@ -246,7 +258,7 @@ function applyPendingRoom(consume) {
 
 export async function applyGroup(selectedGroup) {
     setCurrentGroup(selectedGroup);
-    showPairsMessage('Загружаем расписание…');
+    showPairsLoading('Загружаем расписание…');
     applyPendingRoom(false);
 
     try {

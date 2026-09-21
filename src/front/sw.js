@@ -1,6 +1,7 @@
-const VERSION = 'v1';
-const SHELL_CACHE = `shell-${VERSION}`;
-const ASSET_CACHE = `assets-${VERSION}`;
+const SHELL_VERSION = 'v2';
+const ASSET_VERSION = 'v1';
+const SHELL_CACHE = `shell-${SHELL_VERSION}`;
+const ASSET_CACHE = `assets-${ASSET_VERSION}`;
 
 const SHELL = [
     './',
@@ -16,6 +17,7 @@ const SHELL = [
     './gamble.js',
     './config.js',
     './fallbackSchedule.js',
+    './glbSizes.js',
     './manifest.webmanifest',
     './img/icons.svg',
     './img/icons/calendar-x.svg',

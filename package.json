@@ -6,9 +6,10 @@
   "scripts": {
     "icons": "node scripts/build-icons.mjs",
     "icons:app": "node scripts/build-app-icons.mjs",
+    "glb-sizes": "node scripts/build-glb-sizes.mjs",
     "css": "tailwindcss -i ./src/styles/app.tailwind.css -o ./src/front/app.css --minify",
     "css:watch": "tailwindcss -i ./src/styles/app.tailwind.css -o ./src/front/app.css --watch",
-    "build": "npm run icons && npm run icons:app && npm run css && tsc -p tsconfig.json",
+    "build": "npm run icons && npm run icons:app && npm run glb-sizes && npm run css && tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {

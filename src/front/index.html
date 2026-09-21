@@ -381,6 +381,16 @@
                                         animate-[spin_0.9s_linear_infinite] motion-reduce:animate-none [stroke-width:1.9]"
                                  role="status" aria-label="Загрузка модели" focusable="false"><use href="img/icons.svg#loader-circle"/></svg>
                             <p class="text-[12px] text-center px-4 text-model-ink">Загружаем план этажа…</p>
+                            <div class="model-progress flex flex-col items-center gap-2 w-[min(220px,68%)]" hidden
+                                 role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                                 aria-label="Загрузка плана этажа">
+                                <span class="block w-full h-[5px] rounded-full overflow-hidden bg-model-chip-border">
+                                    <span class="model-progress-fill block h-full w-0 rounded-full bg-model-ink
+                                                 transition-[width] duration-200 ease-out
+                                                 motion-reduce:transition-none"></span>
+                                </span>
+                                <span class="model-progress-value text-[11px] font-semibold tabular-nums text-model-ink">0%</span>
+                            </div>
                         </div>
 
                         <div class="absolute bottom-3 right-3 z-4 inline-flex">
@@ -589,6 +599,24 @@
                     [&_.pair-teacher]:before:size-[12px] [&_.pair-teacher]:before:shrink-0
                     [&_.pair-teacher]:before:bg-ink-secondary
                     [&_.pair-teacher]:before:[mask:var(--icon-teacher)_center/contain_no-repeat]
+
+                    [&>.pairs-loading]:col-span-full [&>.pairs-loading]:w-full
+                    [&>.pairs-loading]:flex [&>.pairs-loading]:flex-col
+                    [&>.pairs-loading]:items-center [&>.pairs-loading]:justify-center
+                    [&>.pairs-loading]:gap-3 [&>.pairs-loading]:py-8 [&>.pairs-loading]:px-4
+                    [&>.pairs-loading]:text-center [&>.pairs-loading]:text-[13px]
+                    [&>.pairs-loading]:text-ink-tertiary
+                    [&_.pairs-circle]:relative [&_.pairs-circle]:block
+                    [&_.pairs-circle]:size-11 [&_.pairs-circle]:shrink-0
+                    [&_.pairs-circle]:rounded-full [&_.pairs-circle]:overflow-hidden
+                    [&_.pairs-circle]:border-2 [&_.pairs-circle]:border-border-strong
+                    [&_.pairs-circle]:bg-surface
+                    [&_.pairs-circle-fill]:absolute [&_.pairs-circle-fill]:inset-x-0
+                    [&_.pairs-circle-fill]:top-0 [&_.pairs-circle-fill]:h-0
+                    [&_.pairs-circle-fill]:bg-accent
+                    [&_.pairs-circle-fill]:animate-[pairs-fill_9s_linear_forwards]
+                    motion-reduce:[&_.pairs-circle-fill]:animate-none
+                    motion-reduce:[&_.pairs-circle-fill]:h-1/2
 
                     [&>.no-pairs]:col-span-full [&>.no-pairs]:w-full
                     [&>.no-pairs]:flex [&>.no-pairs]:flex-col [&>.no-pairs]:items-center
