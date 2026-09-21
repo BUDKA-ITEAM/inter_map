@@ -6,7 +6,13 @@
     <meta name="color-scheme" content="light dark">
     <title>Навигатор по этажам</title>
     <link rel="icon" type="image/jpeg" href="img/xd.jpg">
-    <link rel="apple-touch-icon" href="img/xd.jpg">
+    <link rel="apple-touch-icon" href="img/icon-180.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#212429" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Навигатор">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
@@ -687,5 +693,12 @@
         }
     </script>
     <script type="module" src="main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>

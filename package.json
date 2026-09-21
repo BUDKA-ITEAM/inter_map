@@ -5,14 +5,16 @@
   "type": "module",
   "scripts": {
     "icons": "node scripts/build-icons.mjs",
+    "icons:app": "node scripts/build-app-icons.mjs",
     "css": "tailwindcss -i ./src/styles/app.tailwind.css -o ./src/front/app.css --minify",
     "css:watch": "tailwindcss -i ./src/styles/app.tailwind.css -o ./src/front/app.css --watch",
-    "build": "npm run icons && npm run css && tsc -p tsconfig.json",
+    "build": "npm run icons && npm run icons:app && npm run css && tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.0",
     "lucide-static": "^1.47.0",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.1.0"
   }
 }

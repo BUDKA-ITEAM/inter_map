@@ -14,6 +14,7 @@ import { initGroupPicker } from './groups.js';
 import { initTheme, initDebugMode, initGambleUnlock } from './ui.js';
 import { initGamble } from './gamble.js';
 import { dateInput, currentDate, currentFloor, setCurrentDate } from './state.js';
+import { scheduleToggle } from './schedule.js';
 
 initTheme();
 initDebugMode();
@@ -23,3 +24,8 @@ setCurrentDate(getDateString(new Date()));
 dateInput.value = currentDate;
 setFloor(currentFloor);
 initGroupPicker();
+
+if (new URLSearchParams(window.location.search).get('schedule') === '1') {
+    scheduleToggle.checked = true;
+    scheduleToggle.dispatchEvent(new Event('change'));
+}
