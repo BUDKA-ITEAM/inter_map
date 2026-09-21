@@ -369,7 +369,8 @@
                         <div id="model-loading"
                              class="absolute inset-0 z-6 flex flex-col items-center justify-center gap-3
                                     bg-model-bg transition-opacity duration-200 ease-[ease]
-                                    [&.hidden]:opacity-0 [&.hidden]:pointer-events-none">
+                                    [&.hidden]:opacity-0 [&.hidden]:pointer-events-none
+                                    [&.hidden_.spinner]:[animation-play-state:paused]">
                             <svg class="spinner block size-7 text-model-ink
                                         animate-[spin_0.9s_linear_infinite] motion-reduce:animate-none [stroke-width:1.9]"
                                  role="status" aria-label="Загрузка модели" focusable="false"><use href="img/icons.svg#loader-circle"/></svg>

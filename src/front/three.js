@@ -86,7 +86,7 @@ camera.lookAt(0, 0, 0);
 // создание рендерера и добавление его в контейнер
 export const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
 // добавление освещения
