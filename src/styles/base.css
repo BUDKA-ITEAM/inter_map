@@ -2,7 +2,6 @@
 :root {
     color-scheme: light;
 
-    /* монохромная основа */
     --bg: #FFFFFF;
     --surface: #FFFFFF;
     --ink: #1A1A1A;
@@ -12,7 +11,6 @@
     --accent: #2C2C2C;
     --accent-hover: #1A1A1A;
 
-    /* приглушённые статусные цвета */
     --status-past: #ff0000;
     --status-past-bg: #F5F0EC;
     --status-current: #00910c;
@@ -20,7 +18,6 @@
     --status-upcoming: #a600ff;
     --status-upcoming-bg: #F7F2E8;
 
-    /* добавленные токены  */
     --surface-hover: #F1F1F1;
     --surface-active: #E7E7E7;
     --border-strong: #BFBFBF;
@@ -29,13 +26,9 @@
     --overlay-bg: rgba(255, 255, 255, 0.94);
     --overlay-veil: rgba(255, 255, 255, 0.95);
     --focus-ring: #1A1A1A;
-    /* Красная кнопка «Закрыть». Сам красный одинаков во всех темах,
-       а цвет надписи на нём меняется — см. блоки тем ниже. */
     --danger: #D93A3A;
     --danger-hover: #C22F2F;
     --on-danger: #FFFFFF;
-    /* фон сцены продублирован из app.js, чтобы фон канваса и фон
-       страницы не расходились при смене темы */
     --model-bg: #F5F2EA;
 
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -55,30 +48,26 @@
     --shadow-card-hover: 0 6px 12px rgba(0,0,0,0.06);
     --shadow-panel: 0 8px 28px rgba(0,0,0,0.10);
 
-    /* длительности анимаций одной точкой */
     --duration-fast: 0.15s;
     --duration-base: 0.25s;
     --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-    /* Кривая и длительности выезда сайдбара. */
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
     --duration-drawer-in: 0.36s;
     --duration-drawer-out: 0.22s;
-    /* затемнение позади открытой шторки */
     --scrim: rgba(18, 20, 24, 0.44);
 
-    /* геометрия закреплённого сайдбара и контентной колонки */
     --sidebar-width: 260px;
     --sidebar-inset: var(--space-4);
     --content-max: 1100px;
-    --floor-column-width: 48px;
-    /* верхняя зона, которую шторка расписания не перекрывает:
-       кнопка ☰ (46px) + отступы */
+    --floor-column-width: 52px;
     --sheet-top-gap: 76px;
-    /* Высота верхней полосы на телефоне: под ней начинается контент
-       и от неё же отсчитывается карточка кабинета. */
     --mobile-top-bar: 62px;
 
-    --icon-chevron: url("img/chevron.svg");
+    --icon-chevron: url("img/icons/chevron-down.svg");
+    --icon-teacher: url("img/icons/user.svg");
+    --icon-room: url("img/icons/map-pin.svg");
+    --icon-empty: url("img/icons/calendar-x.svg");
+    --icon-alert: url("img/icons/triangle-alert.svg");
 
     --tag-orange: #B4531A;
     --tag-orange-soft: rgba(180, 83, 26, 0.22);
@@ -89,9 +78,6 @@
     --model-ink: #55534E;
     --model-stub-bg: rgba(245, 242, 234, 0.95);
 }
-
-/* белая тема — явное дублирование базовых значений,
-   чтобы атрибут можно было переставлять в обе стороны */
 :root[data-theme="white"] {
     color-scheme: light;
     --bg: #FFFFFF;
@@ -119,7 +105,6 @@
     --model-bg: #F5F2EA;
 }
 
-/* прежняя тёплая светлая тема — сохранена как третий вариант */
 :root[data-theme="light"] {
     color-scheme: light;
     --bg: #FAFAF8;
@@ -165,13 +150,10 @@
     --overlay-bg: rgba(42, 46, 52, 0.92);
     --overlay-veil: rgba(33, 36, 41, 0.95);
     --focus-ring: #C8CDD4;
-    /* Красный чуть светлее, чем в светлых темах: на тёмном фоне
-       глубокий красный выглядит грязным пятном. */
     --danger: #E85C5C;
     --danger-hover: #F07070;
     --on-danger: #1B0F0E;
     --scrim: rgba(0, 0, 0, 0.6);
-    /* статусные цвета приглушены под темный фон */
     --status-past: #ff0000;
     --status-past-bg: #34302D;
     --status-current: #1ca600;
@@ -198,9 +180,6 @@
     box-sizing: border-box;
 }
 
-/* Атрибут hidden должен побеждать наши display: flex и display: block.
-   Без этого правила скрытые блоки остаются на экране — так на сайте
-   одновременно показывались обе кнопки «Выбрать группу». */
 [hidden] {
     display: none !important;
 }
@@ -209,7 +188,14 @@ button {
     font-family: inherit;
 }
 
-/* фокус для доступности — виден на всех интерактивных элементах */
+/* Толщина штриха иконок задаётся здесь, а не в самом спрайте: содержимое
+   внешнего <use> наследует её от хоста, поэтому мелкие иконки могут
+   попросить штрих потолще утилитой stroke-width и не выглядеть волоском. */
+svg {
+    stroke-width: 2;
+}
+
+
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -274,7 +260,6 @@ a:focus-visible,
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
-    /* на низком экране верхняя полоса ниже — кнопка ☰ прижата к краю */
     :root {
         --mobile-top-bar: 56px;
     }
