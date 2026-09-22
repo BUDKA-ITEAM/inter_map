@@ -74,6 +74,9 @@
     --tag-orange-soft: rgba(180, 83, 26, 0.22);
     --on-tag-orange: #FFF4EC;
 
+    --tag-blue: #1E3A8A;
+    --on-tag-blue: #EEF2FF;
+
     --model-chip-bg: rgba(255, 255, 255, 0.92);
     --model-chip-border: rgba(26, 26, 26, 0.12);
     --model-ink: #55534E;
@@ -165,6 +168,8 @@
     --tag-orange: #A8501C;
     --tag-orange-soft: rgba(214, 112, 45, 0.28);
     --on-tag-orange: #F8E9DD;
+    --tag-blue: #8FADEA;
+    --on-tag-blue: #131C31;
     --model-chip-bg: rgba(38, 42, 49, 0.92);
     --model-chip-border: rgba(228, 226, 222, 0.16);
     --model-ink: #D5D8DD;

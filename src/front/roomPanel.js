@@ -1,9 +1,9 @@
 // Панель кабинета: показ пар выбранного кабинета, закрытие по кнопке/Escape/клику мимо.
 import {
     roomPanel, roomPanelClose, roomPanelTitle, roomPanelContent,
-    currentSchedule, setScheduleCollapsedForRoom
+    currentSchedule, currentDate, setScheduleCollapsedForRoom
 } from './state.js';
-import { getPairStatus } from './schedule.js';
+import { getPairStatus, shortDate } from './schedule.js';
 import { resetActiveSelection, renderer } from './three.js';
 
 export function showRoomPanel(roomNumber, roomName) {
@@ -18,7 +18,7 @@ export function showRoomPanel(roomNumber, roomName) {
             const item = document.createElement('div');
             item.className = `room-pair-item ${getPairStatus(pair)}`;
             item.innerHTML = `
-                <span class="room-pair-date">${pair.time}</span>
+                <span class="room-pair-date">${pair.date && pair.date !== currentDate ? `${shortDate(pair.date)}, ` : ''}${pair.time}</span>
                 <div class="room-pair-group">${pair.name}</div>
                 <div class="room-pair-teacher">${pair.teacher || 'Преподаватель не указан'}</div>
             `;

@@ -1,4 +1,4 @@
-const SHELL_VERSION = 'v3';
+const SHELL_VERSION = 'v4';
 const ASSET_VERSION = 'v1';
 const SHELL_CACHE = `shell-${SHELL_VERSION}`;
 const ASSET_CACHE = `assets-${ASSET_VERSION}`;
@@ -64,24 +64,16 @@ async function cacheFirst(request, cacheName) {
     return store(cache, request, await fetch(request));
 }
 
-async function networkFirst(request) {
+async function networkFirst(request, shellFallback = false) {
     const cache = await caches.open(SHELL_CACHE);
     try {
         return store(cache, request, await fetch(request));
     } catch (error) {
-        const hit = await cache.match(request) || await cache.match('./index.html');
+        const hit = await cache.match(request)
+            || (shellFallback ? await cache.match('./index.html') : null);
         if (hit) return hit;
         throw error;
     }
-}
-
-async function staleWhileRevalidate(request) {
-    const cache = await caches.open(SHELL_CACHE);
-    const hit = await cache.match(request);
-    const fresh = fetch(request)
-        .then((response) => store(cache, request, response))
-        .catch(() => hit);
-    return hit || fresh;
 }
 
 self.addEventListener('fetch', (event) => {
@@ -94,7 +86,7 @@ self.addEventListener('fetch', (event) => {
     if (sameOrigin && url.pathname.includes('/api/')) return;
 
     if (request.mode === 'navigate') {
-        event.respondWith(networkFirst(request));
+        event.respondWith(networkFirst(request, true));
         return;
     }
 
@@ -110,5 +102,5 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    event.respondWith(staleWhileRevalidate(request));
+    event.respondWith(networkFirst(request));
 });

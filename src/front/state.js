@@ -33,6 +33,9 @@ export function setCurrentTeacher(value) { currentTeacher = value; }
 export let scheduleMode = 'group';
 export function setScheduleMode(value) { scheduleMode = value; }
 
+export let viewMode = 'day';
+export function setViewMode(value) { viewMode = value; }
+
 export let currentSchedule = [];
 export function setCurrentSchedule(value) { currentSchedule = value; }
 

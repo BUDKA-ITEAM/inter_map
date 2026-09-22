@@ -2,8 +2,8 @@
 // ссылка на страницу недельного расписания, звук заглушки этажа, сохранение
 // темы оформления. В конце файла — закомментированный код старого режима
 // отладки (не удалён по требованию — см. план рефакторинга).
-import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
-import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
+import { THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
+import { sidebarToggle, sidebar, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
 import { applyThemeBackground } from './three.js';
 
 const scheduleDrawer = document.getElementById('schedule-drawer');
@@ -52,21 +52,6 @@ document.addEventListener('pointerdown', (event) => {
 
 // Кнопки «Применить» больше нет: группу применяет открытие расписания,
 // см. applySelectionIfNeeded в schedule.js.
-
-// Переход на страницу недельного расписания.
-//
-// Кнопка «На неделю» сейчас закомментирована в разметке, поэтому
-// getElementById вернул null. Раньше на этом месте скрипт обрывался
-// и переставало работать всё, что регистрируется ниже: закрытие
-// сайдбара, свайпы, сброс вида, применение группы. Проверка ниже
-// делает обработчик необязательным — вернёте кнопку в index.html,
-// и переход заработает сам, без правок здесь.
-if (weekDetailsBtn) {
-    weekDetailsBtn.addEventListener('click', () => {
-        const params = new URLSearchParams({ group: currentGroup || '', floor: currentFloor });
-        window.location.href = `${WEEK_SCHEDULE_PAGE_URL}?${params.toString()}`;
-    });
-}
 
 let swipeStartX = null;
 let swipeStartY = null;

@@ -75,6 +75,8 @@
     --color-tag-orange: var(--tag-orange);
     --color-tag-orange-soft: var(--tag-orange-soft);
     --color-on-tag-orange: var(--on-tag-orange);
+    --color-tag-blue: var(--tag-blue);
+    --color-on-tag-blue: var(--on-tag-blue);
     --color-status-past: var(--status-past);
     --color-status-past-bg: var(--status-past-bg);
     --color-status-current-bg: var(--status-current-bg);

@@ -83,14 +83,26 @@
                 <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
             </span>
             <div class="flex gap-[2px]" role="group" aria-labelledby="view-switch-label">
-                <span class="is-active flex-1 inline-flex items-center justify-center
-                             min-h-10 py-[10px] px-[14px] rounded-control
-                             bg-tag-orange text-on-tag-orange
-                             text-[13px] font-semibold tracking-[0.01em] text-center
-                             cursor-default select-none
-                             transition-colors duration-150 ease-[ease]
-                             mouse:hover:shadow-card" aria-current="page">На день</span>
-                <!-- <button id="week-details-btn" type="button" class="flex-1 inline-flex items-center justify-center min-h-10 py-[7px] px-2 rounded-control bg-transparent border-none text-ink-secondary text-[13px] font-medium text-center cursor-pointer select-none transition-colors duration-150 ease-[ease] mouse:hover:bg-surface-hover mouse:hover:text-ink" aria-label="Открыть расписание на неделю">На неделю</button> -->
+                <button id="day-view-btn" type="button" aria-pressed="true"
+                        aria-label="Расписание на день"
+                        class="flex-1 inline-flex items-center justify-center
+                               min-h-10 py-[7px] px-2 rounded-control
+                               bg-transparent border-2 border-tag-orange text-tag-orange
+                               text-[13px] font-medium text-center cursor-pointer select-none
+                               transition-colors duration-150 ease-[ease]
+                               aria-pressed:bg-tag-orange aria-pressed:text-on-tag-orange
+                               aria-pressed:font-semibold
+                               mouse:hover:[&:not([aria-pressed=true])]:bg-surface-hover">На день</button>
+                <button id="week-details-btn" type="button" aria-pressed="false"
+                        aria-label="Расписание на неделю"
+                        class="flex-1 inline-flex items-center justify-center
+                               min-h-10 py-[7px] px-2 rounded-control
+                               bg-transparent border-2 border-tag-blue text-tag-blue
+                               text-[13px] font-medium text-center cursor-pointer select-none
+                               transition-colors duration-150 ease-[ease]
+                               aria-pressed:bg-tag-blue aria-pressed:text-on-tag-blue
+                               aria-pressed:font-semibold
+                               mouse:hover:[&:not([aria-pressed=true])]:bg-surface-hover">На неделю</button>
             </div>
             <button id="open-schedule-drawer" type="button"
                     class="w-full inline-flex items-center justify-center gap-2
@@ -718,7 +730,7 @@
                           mouse:hover:bg-surface-hover mouse:hover:text-ink"><svg class="size-[18px] [stroke-width:1.9]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg></label>
         </div>
         <div id="pairs-container" aria-live="polite"
-             class="flex-auto w-full grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))]
+             class="flex-auto w-full grid grid-cols-[repeat(auto-fill,minmax(min(210px,100%),1fr))]
                     content-start overflow-x-hidden overflow-y-auto gap-2 py-1 px-0 box-border
                     [-webkit-overflow-scrolling:touch] overscroll-contain
 
@@ -753,6 +765,7 @@
                     [&_.pair-name]:text-[13px] [&_.pair-name]:font-semibold
                     [&_.pair-name]:leading-[1.35] [&_.pair-name]:mt-1
                     [&_.pair-name]:mb-2 [&_.pair-name]:mx-0
+                    [&_.pair-name]:[overflow-wrap:anywhere]
                     [&_.pair-room]:inline-flex [&_.pair-room]:items-center [&_.pair-room]:gap-1
                     [&_.pair-room]:py-[3px] [&_.pair-room]:px-2 [&_.pair-room]:rounded-full
                     [&_.pair-room]:bg-accent-soft [&_.pair-room]:text-ink
@@ -791,6 +804,27 @@
                     motion-reduce:[&_.pairs-circle-fill]:animate-none
                     motion-reduce:[&_.pairs-circle-fill]:h-1/2
 
+                    [&>.week-day-head]:col-span-full [&>.week-day-head]:w-full
+                    [&>.week-day-head]:min-w-0
+                    [&>.week-day-head]:flex [&>.week-day-head]:items-baseline
+                    [&>.week-day-head]:justify-between [&>.week-day-head]:gap-2
+                    [&>.week-day-head]:mt-3 [&>.week-day-head]:first:mt-0
+                    [&>.week-day-head]:pb-[6px]
+                    [&>.week-day-head]:border-b [&>.week-day-head]:border-border
+                    [&>.week-day-head]:text-[12px] [&>.week-day-head]:font-semibold
+                    [&>.week-day-head]:uppercase [&>.week-day-head]:tracking-[0.06em]
+                    [&>.week-day-head]:text-ink
+                    [&>.week-day-head.is-today]:text-tag-blue
+                    [&>.week-day-head.is-today]:border-tag-blue
+                    [&_.week-day-date]:font-medium [&_.week-day-date]:normal-case
+                    [&_.week-day-date]:tracking-normal [&_.week-day-date]:tabular-nums
+                    [&_.week-day-date]:text-ink-tertiary [&_.week-day-date]:shrink-0
+                    [&>.week-day-empty]:col-span-full [&>.week-day-empty]:w-full
+                    [&>.week-day-empty]:py-3 [&>.week-day-empty]:px-3
+                    [&>.week-day-empty]:rounded-card
+                    [&>.week-day-empty]:border [&>.week-day-empty]:border-dashed
+                    [&>.week-day-empty]:border-border
+                    [&>.week-day-empty]:text-[12px] [&>.week-day-empty]:text-ink-tertiary
                     [&>.no-pairs]:col-span-full [&>.no-pairs]:w-full
                     [&>.no-pairs]:flex [&>.no-pairs]:flex-col [&>.no-pairs]:items-center
                     [&>.no-pairs]:justify-center [&>.no-pairs]:gap-[10px]

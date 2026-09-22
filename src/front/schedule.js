@@ -14,6 +14,8 @@ import {
     currentGroup, setCurrentGroup,
     currentTeacher, setCurrentTeacher,
     scheduleMode,
+    viewMode, setViewMode,
+    currentSchedule,
     setCurrentSchedule,
     currentDate, setCurrentDate,
     currentFloor,
@@ -79,14 +81,59 @@ function trimSeconds(time) {
 }
 
 // урок из api -> карточка пары, как ее ждет остальной код.
-function lessonToPair(lesson) {
+function lessonToPair(lesson, dayDate = null) {
     return {
         time: `${trimSeconds(lesson.time_start)} - ${trimSeconds(lesson.time_end)}`,
         name: lesson.subject,
         roomId: lesson.room_number,
         teacher: lesson.teacher_name,
-        group: lesson.group
+        group: lesson.group,
+        date: dayDate || (lesson.date ? String(lesson.date).slice(0, 10) : null)
     };
+}
+
+const WEEKDAY_TITLES = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+
+function weekDaysFor(dateStr) {
+    const monday = parseDateString(dateStr);
+    monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+
+    return WEEKDAY_TITLES.map((title, index) => {
+        const day = new Date(monday);
+        day.setDate(monday.getDate() + index);
+        return { title, date: getDateString(day) };
+    });
+}
+
+// Дату урока берём из поля date. Тестовое расписание дат не содержит,
+// поэтому при их отсутствии раскладываем по weekday: 1 — понедельник.
+function lessonDayDate(lesson, days) {
+    if (lesson.date) return String(lesson.date).slice(0, 10);
+    const weekday = Number(lesson.weekday);
+    if (Number.isFinite(weekday) && weekday >= 1 && weekday <= days.length) return days[weekday - 1].date;
+    return null;
+}
+
+async function fetchWeekSchedule(matches, extraParams = {}) {
+    if (!FLOOR_MODELS[currentFloor]) return [];
+
+    const days = weekDaysFor(currentDate);
+    const params = new URLSearchParams({
+        ...extraParams,
+        date_from: days[0].date,
+        date_to: days[days.length - 1].date,
+        limit: String(GROUPS_SCAN_LIMIT)
+    });
+
+    const lessons = (await fetchFromApi(LESSONS_ENDPOINT, params)).filter(matches);
+
+    return days.map((day) => ({
+        ...day,
+        pairs: lessons
+            .filter((lesson) => lessonDayDate(lesson, days) === day.date)
+            .map((lesson) => lessonToPair(lesson, day.date))
+            .sort((a, b) => a.time.localeCompare(b.time))
+    }));
 }
 
 // Запрос расписания за один день.
@@ -135,14 +182,34 @@ export async function fetchTeacherSchedule(teacher, dateStr = currentDate) {
 // определение статуса пары (прошла, идёт, предстоит)
 export function getPairStatus(pair) {
     const now = new Date();
+    const day = pair.date || currentDate;
     const [startStr, endStr] = pair.time.split(' - ');
     const [startH, startM] = startStr.split(':').map(Number);
     const [endH, endM] = endStr.split(':').map(Number);
-    const start = new Date(`${currentDate}T${String(startH).padStart(2, '0')}:${String(startM).padStart(2, '0')}:00`);
-    const end = new Date(`${currentDate}T${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`);
+    const start = new Date(`${day}T${String(startH).padStart(2, '0')}:${String(startM).padStart(2, '0')}:00`);
+    const end = new Date(`${day}T${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`);
     if (now < start) return 'upcoming';
     if (now >= start && now <= end) return 'current';
     return 'past';
+}
+
+function createPairCard(pair) {
+    const card = document.createElement('div');
+    card.className = `pair-card ${getPairStatus(pair)}`;
+    card.dataset.roomId = pair.roomId;
+    // карточка ведёт себя как кнопка: попадает в обход по Tab
+    // и озвучивается скринридером как нажимаемая
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.innerHTML = `
+        <div class="pair-time">${pair.time}</div>
+        <div class="pair-name">${pair.name}</div>
+        <div class="pair-room">Каб. ${pair.roomId}</div>
+        ${scheduleMode === 'teacher'
+            ? `<div class="pair-group">${pair.group || 'Группа не указана'}</div>`
+            : `<div class="pair-teacher">${pair.teacher || 'Преподаватель не указан'}</div>`}
+    `;
+    return card;
 }
 
 // обновление списка пар в нижней панели
@@ -152,23 +219,32 @@ export function updatePairsUI(schedule) {
         pairsContainer.innerHTML = '<div class="no-pairs">На выбранную дату пар нет</div>';
         return;
     }
-    schedule.forEach((pair) => {
-        const card = document.createElement('div');
-        card.className = `pair-card ${getPairStatus(pair)}`;
-        card.dataset.roomId = pair.roomId;
-        // карточка ведёт себя как кнопка: попадает в обход по Tab
-        // и озвучивается скринридером как нажимаемая
-        card.tabIndex = 0;
-        card.setAttribute('role', 'button');
-        card.innerHTML = `
-            <div class="pair-time">${pair.time}</div>
-            <div class="pair-name">${pair.name}</div>
-            <div class="pair-room">Каб. ${pair.roomId}</div>
-            ${scheduleMode === 'teacher'
-                ? `<div class="pair-group">${pair.group || 'Группа не указана'}</div>`
-                : `<div class="pair-teacher">${pair.teacher || 'Преподаватель не указан'}</div>`}
-        `;
-        pairsContainer.appendChild(card);
+    schedule.forEach((pair) => pairsContainer.appendChild(createPairCard(pair)));
+}
+
+export function shortDate(dateStr) {
+    const [, month, day] = dateStr.split('-');
+    return `${day}.${month}`;
+}
+
+function updateWeekUI(week) {
+    pairsContainer.innerHTML = '';
+
+    week.forEach((day) => {
+        const head = document.createElement('div');
+        head.className = day.date === currentDate ? 'week-day-head is-today' : 'week-day-head';
+        head.innerHTML = `<span>${day.title}</span><span class="week-day-date">${shortDate(day.date)}</span>`;
+        pairsContainer.appendChild(head);
+
+        if (!day.pairs.length) {
+            const empty = document.createElement('div');
+            empty.className = 'week-day-empty';
+            empty.textContent = 'Пар на эту дату нет';
+            pairsContainer.appendChild(empty);
+            return;
+        }
+
+        day.pairs.forEach((pair) => pairsContainer.appendChild(createPairCard(pair)));
     });
 }
 
@@ -284,16 +360,52 @@ function applyPendingRoom(consume) {
 
 let appliedKey = null;
 
-async function loadInto(key, loader) {
-    appliedKey = key;
+function selectedGroupName() {
+    return groupSelect.value || currentGroup;
+}
+
+export function hasSelection() {
+    return Boolean(scheduleMode === 'teacher' ? currentTeacher : selectedGroupName());
+}
+
+function selectionKey() {
+    const base = scheduleMode === 'teacher'
+        ? (currentTeacher ? `teacher:${currentTeacher.id}` : null)
+        : (selectedGroupName() ? `group:${selectedGroupName()}` : null);
+    return base ? `${base}:${viewMode}:${currentDate}` : null;
+}
+
+function loadForSelection() {
+    if (scheduleMode === 'teacher') {
+        const teacher = currentTeacher;
+        return viewMode === 'week'
+            ? fetchWeekSchedule((lesson) => matchesTeacher(lesson, teacher), { teacher_id: teacher.id })
+            : fetchTeacherSchedule(teacher, currentDate);
+    }
+
+    const group = selectedGroupName();
+    return viewMode === 'week'
+        ? fetchWeekSchedule((lesson) => splitGroupField(lesson.group).includes(group))
+        : fetchSchedule(group, currentDate);
+}
+
+async function loadSelection() {
+    appliedKey = selectionKey();
     showPairsLoading('Загружаем расписание…');
     applyPendingRoom(false);
 
     try {
-        const schedule = await loader();
-        setCurrentSchedule(schedule);
-        updatePairsUI(schedule);
-        highlightRoomsForSchedule(schedule);
+        const data = await loadForSelection();
+        if (viewMode === 'week') {
+            const today = data.find((day) => day.date === currentDate);
+            setCurrentSchedule(data.flatMap((day) => day.pairs));
+            updateWeekUI(data);
+            highlightRoomsForSchedule(today ? today.pairs : []);
+        } else {
+            setCurrentSchedule(data);
+            updatePairsUI(data);
+            highlightRoomsForSchedule(data);
+        }
     } catch (error) {
         console.error('Не удалось загрузить расписание:', error);
         appliedKey = null;
@@ -307,20 +419,12 @@ async function loadInto(key, loader) {
 
 export async function applyGroup(selectedGroup) {
     setCurrentGroup(selectedGroup);
-    await loadInto(`group:${selectedGroup}`, () => fetchSchedule(selectedGroup, currentDate));
+    await loadSelection();
 }
 
 export async function applyTeacher(teacher) {
     setCurrentTeacher(teacher);
-    await loadInto(`teacher:${teacher.id}`, () => fetchTeacherSchedule(teacher, currentDate));
-}
-
-function selectedGroupName() {
-    return groupSelect.value || currentGroup;
-}
-
-export function hasSelection() {
-    return Boolean(scheduleMode === 'teacher' ? currentTeacher : selectedGroupName());
+    await loadSelection();
 }
 
 function clearScheduleView() {
@@ -332,19 +436,15 @@ function clearScheduleView() {
 }
 
 export function applySelection() {
-    if (scheduleMode === 'teacher') {
-        if (currentTeacher) return applyTeacher(currentTeacher);
-    } else {
-        const group = selectedGroupName();
-        if (group) return applyGroup(group);
+    if (!hasSelection()) {
+        clearScheduleView();
+        return Promise.resolve();
     }
-    clearScheduleView();
-    return Promise.resolve();
+    return loadSelection();
 }
 
 // обновление интерфейса при смене даты
 function refreshForDateChange() {
-    appliedKey = null;
     applySelection();
 }
 
@@ -397,15 +497,26 @@ let sheetFromBottomEdge = false;
 // нажал «Показать расписание». Отдельное «Применить» больше не нужно,
 // но продолжает работать как раньше.
 export function applySelectionIfNeeded() {
-    const group = selectedGroupName();
-    const desired = scheduleMode === 'teacher'
-        ? (currentTeacher ? `teacher:${currentTeacher.id}` : null)
-        : (group ? `group:${group}` : null);
-
-    if (desired === appliedKey) return;
+    if (selectionKey() === appliedKey) return;
     applySelection();
     hideRoomPanel();
 }
+
+const dayViewBtn = document.getElementById('day-view-btn');
+const weekViewBtn = document.getElementById('week-details-btn');
+
+function switchView(mode) {
+    if (viewMode !== mode) {
+        setViewMode(mode);
+        dayViewBtn.setAttribute('aria-pressed', String(mode === 'day'));
+        weekViewBtn.setAttribute('aria-pressed', String(mode === 'week'));
+        if (scheduleToggle.checked && hasSelection()) applySelection();
+    }
+    setScheduleDrawerOpen(true);
+}
+
+dayViewBtn.addEventListener('click', () => switchView('day'));
+weekViewBtn.addEventListener('click', () => switchView('week'));
 
 // На телефоне сайдбар выезжает поверх карты. Если оставить его открытым,
 // нажатие на пару подсветит кабинет, но самого кабинета видно не будет —
@@ -480,6 +591,8 @@ document.addEventListener('pointerdown', (event) => {
     if (event.target.closest('#schedule-drawer')) return;
     if (event.target.closest('#schedule-drawer-toggle')) return;
     if (event.target.closest('#open-schedule-drawer')) return;
+    if (event.target.closest('#day-view-btn')) return;
+    if (event.target.closest('#week-details-btn')) return;
     setScheduleOpen(false);
 });
 
