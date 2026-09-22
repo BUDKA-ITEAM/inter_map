@@ -19,671 +19,234 @@
     <link rel="stylesheet" href="app.css">
     <link rel="preload" as="image" href="img/icons.svg" type="image/svg+xml">
 </head>
-<body class="h-dvh flex justify-center items-center bg-bg font-app text-ink
-            overflow-hidden text-[14px] antialiased
-            max-tab:items-stretch
-            short:overflow-y-auto short:h-auto">
+<body class="app-body">
 
-    <button id="sidebar-toggle" aria-label="Открыть настройки" aria-expanded="false" aria-controls="sidebar"
-            class="fixed top-3 left-3 z-20 flex items-center justify-start gap-2
-                   w-[46px] h-[46px] px-[13px] py-0 overflow-hidden whitespace-nowrap
-                   bg-surface border border-border-strong rounded-control shadow-card
-                   text-ink cursor-pointer
-                   transition-[width,background-color,border-color,color] duration-250 ease-[var(--ease)]
-                   active:bg-surface-active
-                   focus-visible:w-[140px] focus-visible:bg-accent focus-visible:border-accent focus-visible:text-on-accent
-                   focus-visible:[&_.label]:opacity-100 focus-visible:[&_.label]:delay-80
-                   mouse:hover:w-[140px] mouse:hover:bg-accent mouse:hover:border-accent mouse:hover:text-on-accent
-                   mouse:hover:[&_.label]:opacity-100 mouse:hover:[&_.label]:delay-80
-                   tab:sidebar-shown:hidden max-tab:sidebar-open:hidden
-                   short:top-1 short:left-1"><svg class="size-5 shrink-0 [stroke-width:1.75]" aria-hidden="true" focusable="false"><use href="img/icons.svg#menu"/></svg><span class="label text-[13px] font-medium opacity-0 transition-opacity duration-150 ease-[ease]">Настройки</span></button>
+    <button id="sidebar-toggle" class="edge-btn edge-btn-left"
+            aria-label="Открыть настройки" aria-expanded="false" aria-controls="sidebar"><svg class="edge-btn-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#menu"/></svg><span class="label">Настройки</span></button>
 
-    <button id="schedule-drawer-toggle" aria-label="Открыть расписание" aria-expanded="false" aria-controls="schedule-drawer"
-            class="fixed top-3 right-3 z-20 flex items-center justify-end gap-2
-                   w-[46px] h-[46px] px-[13px] py-0 overflow-hidden whitespace-nowrap
-                   bg-surface border border-border-strong rounded-control shadow-card
-                   text-ink cursor-pointer
-                   transition-[width,background-color,border-color,color] duration-250 ease-[var(--ease)]
-                   active:bg-surface-active
-                   focus-visible:w-[152px] focus-visible:bg-accent focus-visible:border-accent focus-visible:text-on-accent
-                   focus-visible:[&_.label]:opacity-100 focus-visible:[&_.label]:delay-80
-                   mouse:hover:w-[152px] mouse:hover:bg-accent mouse:hover:border-accent mouse:hover:text-on-accent
-                   mouse:hover:[&_.label]:opacity-100 mouse:hover:[&_.label]:delay-80
-                   drawer-open:hidden
-                   short:top-1 short:right-1"><span class="label text-[13px] font-medium opacity-0 transition-opacity duration-150 ease-[ease]">Расписание</span><svg class="size-5 shrink-0 [stroke-width:1.75]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg></button>
-    <aside id="sidebar" aria-label="Настройки расписания"
-           class="fixed z-15 flex flex-col gap-6 box-border overflow-y-auto
-                  top-[var(--sidebar-inset)] left-[var(--sidebar-inset)]
-                  w-[var(--sidebar-width)] h-[calc(100%_-_var(--sidebar-inset)*2)]
-                  bg-surface border border-border rounded-panel shadow-card p-5
-                  tab:[transition:transform_var(--duration-drawer-in)_var(--ease-drawer)]
-                  tab:aria-hidden:[transform:translateX(calc(-100%_-_var(--sidebar-inset)_-_4px))]
-                  tab:aria-hidden:invisible
-                  tab:aria-hidden:[transition:transform_var(--duration-drawer-out)_var(--ease-drawer),visibility_0s_linear_var(--duration-drawer-out)]
-                  tab:[&.open]:[transition:transform_var(--duration-drawer-in)_var(--ease-drawer),visibility_0s]
-                  max-tab:top-0 max-tab:left-0 max-tab:w-[min(288px,86vw)] max-tab:h-full
-                  max-tab:border-y-0 max-tab:border-l-0 max-tab:border-r max-tab:border-r-border
-                  max-tab:rounded-none max-tab:shadow-none max-tab:pt-[56px]
-                  max-tab:[&:not(.open)]:[transform:translateX(-100%)]
-                  max-tab:[&:not(.open)]:invisible
-                  max-tab:[transition:transform_var(--duration-drawer-out)_var(--ease-drawer),box-shadow_var(--duration-drawer-out)_linear,visibility_0s_linear_var(--duration-drawer-out)]
-                  max-tab:[&.open]:shadow-sheet
-                  max-tab:[&.open]:[transition:transform_var(--duration-drawer-in)_var(--ease-drawer),box-shadow_var(--duration-drawer-in)_linear,visibility_0s]
-                  [&.open>*]:animate-[sidebar-item-in_var(--duration-base)_var(--ease-drawer)_both]
-                  [&.open>*:nth-child(1)]:[animation-delay:0.06s]
-                  [&.open>*:nth-child(2)]:[animation-delay:0.10s]
-                  [&.open>*:nth-child(3)]:[animation-delay:0.14s]
-                  [&.open>*:nth-child(4)]:[animation-delay:0.18s]
-                  [&.open>*:nth-child(5)]:[animation-delay:0.22s]
-                  [&.open>*:nth-child(6)]:[animation-delay:0.26s]">
-        <h3 class="m-0 text-[18px] font-semibold tracking-[-0.01em] text-ink">Настройки</h3>
+    <button id="schedule-drawer-toggle" class="edge-btn edge-btn-right"
+            aria-label="Открыть расписание" aria-expanded="false" aria-controls="schedule-drawer"><span class="label">Расписание</span><svg class="edge-btn-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg></button>
 
-        <div class="flex flex-col gap-[10px]">
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary" id="view-switch-label">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
+    <aside id="sidebar" class="drawer drawer-left" aria-label="Настройки расписания">
+        <h3 class="drawer-title">Настройки</h3>
+
+        <div class="drawer-section">
+            <span class="section-label" id="view-switch-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
             </span>
-            <div class="flex gap-[2px]" role="group" aria-labelledby="view-switch-label">
-                <button id="day-view-btn" type="button" aria-pressed="true"
-                        aria-label="Расписание на день"
-                        class="flex-1 inline-flex items-center justify-center
-                               min-h-10 py-[7px] px-2 rounded-control
-                               bg-transparent border-2 border-tag-orange text-tag-orange
-                               text-[13px] font-medium text-center cursor-pointer select-none
-                               transition-colors duration-150 ease-[ease]
-                               aria-pressed:bg-tag-orange aria-pressed:text-on-tag-orange
-                               aria-pressed:font-semibold
-                               mouse:hover:[&:not([aria-pressed=true])]:bg-surface-hover">На день</button>
-                <button id="week-details-btn" type="button" aria-pressed="false"
-                        aria-label="Расписание на неделю"
-                        class="flex-1 inline-flex items-center justify-center
-                               min-h-10 py-[7px] px-2 rounded-control
-                               bg-transparent border-2 border-tag-blue text-tag-blue
-                               text-[13px] font-medium text-center cursor-pointer select-none
-                               transition-colors duration-150 ease-[ease]
-                               aria-pressed:bg-tag-blue aria-pressed:text-on-tag-blue
-                               aria-pressed:font-semibold
-                               mouse:hover:[&:not([aria-pressed=true])]:bg-surface-hover">На неделю</button>
+            <div class="view-switch" role="group" aria-labelledby="view-switch-label">
+                <button id="day-view-btn" type="button" class="view-btn view-btn-day"
+                        aria-pressed="true" aria-label="Расписание на день">На день</button>
+                <button id="week-details-btn" type="button" class="view-btn view-btn-week"
+                        aria-pressed="false" aria-label="Расписание на неделю">На неделю</button>
             </div>
-            <button id="open-schedule-drawer" type="button"
-                    class="w-full inline-flex items-center justify-center gap-2
-                           min-h-11 py-[10px] px-4 rounded-control
-                           text-[13px] font-semibold cursor-pointer
-                           bg-surface text-ink border border-border-strong
-                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                           active:scale-[0.98]
-                           mouse:hover:bg-surface-hover mouse:hover:border-accent
-                           max-tab:min-h-12">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Открыть расписание
+            <button id="open-schedule-drawer" type="button" class="btn btn-neutral">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Открыть расписание
             </button>
         </div>
 
-
-        <div class="flex flex-col gap-[10px]">
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#contrast"/></svg>Оформление
+        <div class="drawer-section">
+            <span class="section-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#contrast"/></svg>Оформление
             </span>
-            <label for="theme-toggle"
-                   class="relative flex items-center gap-3 m-0 py-[2px] px-0
-                          text-[13px] font-normal normal-case tracking-normal text-ink cursor-pointer">
-                <input type="checkbox" id="theme-toggle" role="switch"
-                       class="peer absolute top-0 left-0 w-[46px] h-[26px] m-0 opacity-0 cursor-pointer">
-                <span aria-hidden="true"
-                      class="relative flex-none w-[46px] h-[26px] rounded-full
-                             bg-surface-active border border-border
-                             transition-[background-color,border-color] duration-250 ease-[ease]
-                             peer-checked:bg-accent peer-checked:border-accent
-                             peer-focus-visible:outline-[1.5px] peer-focus-visible:outline-focus-ring
-                             peer-focus-visible:outline-offset-2
-                             peer-checked:[&_.thumb]:translate-x-5
-                             peer-checked:[&_.moon]:opacity-0
-                             peer-checked:[&_.moon]:rotate-90
-                             peer-checked:[&_.moon]:scale-50
-                             peer-checked:[&_.sun]:opacity-100
-                             peer-checked:[&_.sun]:rotate-0
-                             peer-checked:[&_.sun]:scale-100">
-                    <span class="thumb absolute top-[2px] left-[2px] w-[22px] h-[22px] rounded-full
-                                 bg-surface shadow-card ring-1 ring-border-strong
-                                 transition-[translate,background-color] duration-250 ease-[var(--ease)]">
-                        <span class="moon absolute inset-0 flex items-center justify-center text-ink
-                                     transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)]"><svg class="size-[15px] [stroke-width:2.6]" aria-hidden="true" focusable="false"><use href="img/icons.svg#moon"/></svg></span>
-                        <span class="sun absolute inset-0 flex items-center justify-center text-ink
-                                     opacity-0 rotate-[-90deg] scale-50
-                                     transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)]"><svg class="size-[15px] [stroke-width:2.6]" aria-hidden="true" focusable="false"><use href="img/icons.svg#sun"/></svg></span>
+            <label for="theme-toggle" class="switch-row">
+                <input type="checkbox" id="theme-toggle" class="switch-input" role="switch">
+                <span class="switch-track" aria-hidden="true">
+                    <span class="switch-thumb">
+                        <span class="switch-icon switch-icon-moon"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#moon"/></svg></span>
+                        <span class="switch-icon switch-icon-sun"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#sun"/></svg></span>
                     </span>
                 </span>
-                <span class="text-ink">Тёмная тема</span>
+                <span>Тёмная тема</span>
             </label>
         </div>
 
-
-
-        <div class="mt-auto flex flex-col gap-3 max-tab:mt-2">
-            <button id="sidebar-close" type="button" aria-label="Закрыть меню"
-                    class="inline-flex items-center justify-center gap-2 mt-0 w-full min-h-11 p-[10px] rounded-control
-                           bg-danger text-on-danger border border-danger
-                           text-[13px] font-medium leading-none cursor-pointer
-                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                           active:scale-[0.98]
-                           mouse:hover:bg-danger-hover mouse:hover:border-danger-hover
-                           max-tab:min-h-12">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Закрыть
+        <div class="drawer-actions">
+            <button id="sidebar-close" type="button" class="btn btn-danger" aria-label="Закрыть меню">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Закрыть
             </button>
         </div>
     </aside>
 
-    <div id="sidebar-scrim" aria-hidden="true"
-         class="fixed inset-0 z-14 bg-scrim opacity-0 pointer-events-none
-                transition-opacity duration-[var(--duration-drawer-out)] ease-[var(--ease-drawer)]
-                max-tab:sidebar-open:opacity-100 max-tab:sidebar-open:pointer-events-auto
-                max-tab:sidebar-open:duration-[var(--duration-drawer-in)]"></div>
+    <div id="sidebar-scrim" class="scrim scrim-sidebar" aria-hidden="true"></div>
 
-    <aside id="schedule-drawer" aria-label="Расписание" aria-hidden="true"
-           class="fixed z-15 flex flex-col gap-6 box-border overflow-y-auto
-                  top-[var(--sidebar-inset)] right-[var(--sidebar-inset)]
-                  w-[var(--sidebar-width)] h-[calc(100%_-_var(--sidebar-inset)*2)]
-                  bg-surface border border-border rounded-panel shadow-card p-5
-                  [transition:transform_var(--duration-drawer-out)_var(--ease-drawer),visibility_0s_linear_var(--duration-drawer-out)]
-                  [&:not(.open)]:[transform:translateX(calc(100%_+_var(--sidebar-inset)_+_4px))]
-                  [&:not(.open)]:invisible
-                  [&.open]:[transition:transform_var(--duration-drawer-in)_var(--ease-drawer),visibility_0s]
-                  max-tab:top-0 max-tab:right-0 max-tab:w-[min(288px,86vw)] max-tab:h-full
-                  max-tab:border-y-0 max-tab:border-r-0 max-tab:border-l max-tab:border-l-border
-                  max-tab:rounded-none max-tab:shadow-none max-tab:pt-[56px]
-                  max-tab:[&:not(.open)]:[transform:translateX(100%)]
-                  max-tab:[&.open]:shadow-sheet
-                  [&.open>*]:animate-[sidebar-item-in_var(--duration-base)_var(--ease-drawer)_both]
-                  [&.open>*:nth-child(1)]:[animation-delay:0.06s]
-                  [&.open>*:nth-child(2)]:[animation-delay:0.10s]
-                  [&.open>*:nth-child(3)]:[animation-delay:0.14s]
-                  [&.open>*:nth-child(4)]:[animation-delay:0.18s]">
-        <h3 class="m-0 text-[18px] font-semibold tracking-[-0.01em] text-ink">Расписание</h3>
+    <aside id="schedule-drawer" class="drawer drawer-right" aria-label="Расписание" aria-hidden="true">
+        <h3 class="drawer-title">Расписание</h3>
 
-        <div class="flex flex-col gap-[10px]">
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary" id="schedule-mode-label">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Показывать по
+        <div class="drawer-section">
+            <span class="section-label" id="schedule-mode-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Показывать по
             </span>
-            <div class="flex gap-[2px] p-[3px] rounded-control bg-surface-active" role="group" aria-labelledby="schedule-mode-label">
-                <button id="mode-group-btn" type="button" aria-pressed="true"
-                        class="flex-1 inline-flex items-center justify-center gap-[6px]
-                               min-h-9 py-[7px] px-2 rounded-[8px] border border-transparent
-                               bg-transparent text-ink-secondary
-                               text-[12px] font-medium text-center cursor-pointer select-none
-                               transition-[background-color,color,border-color] duration-150 ease-[ease]
-                               aria-pressed:bg-surface aria-pressed:text-ink
-                               aria-pressed:font-semibold aria-pressed:border-border aria-pressed:shadow-card
-                               mouse:hover:text-ink
-                               max-tab:min-h-10 max-tab:text-[13px]">
-                    <svg class="size-[14px] shrink-0 [stroke-width:2.3]" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группе
+            <div class="mode-switch" role="group" aria-labelledby="schedule-mode-label">
+                <button id="mode-group-btn" type="button" class="mode-btn" aria-pressed="true">
+                    <svg class="icon-xs" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группе
                 </button>
-                <button id="mode-teacher-btn" type="button" aria-pressed="false"
-                        class="flex-1 inline-flex items-center justify-center gap-[6px]
-                               min-h-9 py-[7px] px-2 rounded-[8px] border border-transparent
-                               bg-transparent text-ink-secondary
-                               text-[12px] font-medium text-center cursor-pointer select-none
-                               transition-[background-color,color,border-color] duration-150 ease-[ease]
-                               aria-pressed:bg-surface aria-pressed:text-ink
-                               aria-pressed:font-semibold aria-pressed:border-border aria-pressed:shadow-card
-                               mouse:hover:text-ink
-                               max-tab:min-h-10 max-tab:text-[13px]">
-                    <svg class="size-[14px] shrink-0 [stroke-width:2.3]" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Преподавателю
+                <button id="mode-teacher-btn" type="button" class="mode-btn" aria-pressed="false">
+                    <svg class="icon-xs" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Преподавателю
                 </button>
             </div>
         </div>
 
-        <div class="flex flex-col gap-[10px]" id="group-picker">
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группа
+        <div id="group-picker" class="drawer-section">
+            <span class="section-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группа
             </span>
 
             <!-- состояние 1: группа ещё не выбрана -->
-            <button id="group-pick-btn" type="button"
-                    class="w-full inline-flex items-center justify-center gap-2
-                           min-h-11 py-[10px] px-4 rounded-control
-                           text-[13px] font-semibold cursor-pointer
-                           bg-accent text-on-accent border border-accent
-                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                           active:enabled:scale-[0.98]
-                           disabled:bg-surface-active disabled:text-ink-tertiary
-                           disabled:border-border disabled:cursor-not-allowed
-                           mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
-                           max-tab:min-h-12 max-tab:text-[14px]">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Выбрать группу
+            <button id="group-pick-btn" type="button" class="btn btn-primary">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Выбрать группу
             </button>
-
 
             <!-- Состояние 2: выбор. сначала направление, затем группа —
                  оба обычные селекторы. кнопка внизу неактивна, пока группа
                  не выбрана. -->
-            <div id="group-picker-panel" class="flex flex-col gap-[6px]" hidden>
-                <label for="direction-select"
-                       class="block m-0 text-[12px] font-medium normal-case tracking-normal text-ink-secondary">Направление</label>
-                <span class="select-wrap mb-2 relative block
-                             after:absolute after:top-1/2 after:right-3
-                             after:size-[14px] after:-translate-y-1/2 after:bg-ink-secondary
-                             after:[mask:var(--icon-chevron)_center/contain_no-repeat]
-                             after:pointer-events-none after:transition-colors after:duration-150 after:ease-[ease]
-                             focus-within:after:bg-tag-orange
-                             has-[select:disabled]:after:opacity-50">
-                    <select id="direction-select"
-                            class="w-full min-h-11 py-[10px] pr-[38px] pl-3 mb-0 box-border
-                                   border border-border rounded-control
-                                   bg-surface text-ink text-[13px] font-medium [font-family:inherit]
-                                   cursor-pointer appearance-none [-webkit-appearance:none] shadow-card
-                                   transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
-                                   focus-visible:outline-none focus-visible:border-tag-orange
-                                   focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
-                                   disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none
-                                   mouse:hover:enabled:border-border-strong
-                                   max-tab:min-h-12 max-tab:text-[14px]">
+            <div id="group-picker-panel" class="flex flex-col gap-1.5" hidden>
+                <label for="direction-select" class="field-label">Направление</label>
+                <span class="select-wrap mb-2">
+                    <select id="direction-select" class="select">
                         <option value="">Не выбрано</option>
                     </select>
                 </span>
 
-                <label for="group-select"
-                       class="block m-0 text-[12px] font-medium normal-case tracking-normal text-ink-secondary">Группа</label>
-                <span class="select-wrap mb-1 relative block
-                             after:absolute after:top-1/2 after:right-3
-                             after:size-[14px] after:-translate-y-1/2 after:bg-ink-secondary
-                             after:[mask:var(--icon-chevron)_center/contain_no-repeat]
-                             after:pointer-events-none after:transition-colors after:duration-150 after:ease-[ease]
-                             focus-within:after:bg-tag-orange
-                             has-[select:disabled]:after:opacity-50">
-                    <select id="group-select" disabled
-                            class="w-full min-h-11 py-[10px] pr-[38px] pl-3 mb-0 box-border
-                                   border border-border rounded-control
-                                   bg-surface text-ink text-[13px] font-medium [font-family:inherit]
-                                   cursor-pointer appearance-none [-webkit-appearance:none] shadow-card
-                                   transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
-                                   focus-visible:outline-none focus-visible:border-tag-orange
-                                   focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
-                                   disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none
-                                   mouse:hover:enabled:border-border-strong
-                                   max-tab:min-h-12 max-tab:text-[14px]">
+                <label for="group-select" class="field-label">Группа</label>
+                <span class="select-wrap mb-1">
+                    <select id="group-select" class="select" disabled>
                         <option value="">Сначала выберите направление</option>
                     </select>
                 </span>
 
-                <button id="group-confirm-btn" type="button" disabled
-                        class="w-full inline-flex items-center justify-center gap-2
-                               min-h-11 py-3 px-4 rounded-control
-                               text-[13px] font-semibold cursor-pointer
-                               bg-accent text-on-accent border border-accent
-                               transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                               active:enabled:scale-[0.98]
-                               disabled:bg-surface-active disabled:text-ink-tertiary
-                               disabled:border-border disabled:cursor-not-allowed
-                               mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
-                               max-tab:min-h-12 max-tab:text-[14px]">
-                    <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Выбрать группу
+                <button id="group-confirm-btn" type="button" class="btn btn-primary" disabled>
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Выбрать группу
                 </button>
             </div>
 
             <!-- состояние 3: группа выбрана -->
-            <div id="group-current" hidden
-                 class="flex items-center justify-between flex-wrap gap-2
-                        py-2 pr-[10px] pl-3 bg-accent-soft border border-border rounded-control">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>
-                <span id="group-current-name"
-                      class="flex-auto min-w-0 [overflow-wrap:anywhere] text-[14px] font-semibold text-ink"></span>
-                <button id="group-change-btn" type="button"
-                        class="w-auto flex-none ml-auto inline-flex items-center gap-[5px]
-                               py-[6px] px-[10px] rounded-full
-                               bg-transparent text-ink-secondary border border-border-strong
-                               text-[11px] font-medium cursor-pointer
-                               transition-colors duration-150 ease-[ease]
-                               mouse:hover:bg-surface mouse:hover:text-ink
-                               max-tab:py-2 max-tab:px-3 max-tab:text-[12px]">
-                    <svg class="size-[13px] shrink-0 text-ink [stroke-width:2.5]" aria-hidden="true" focusable="false"><use href="img/icons.svg#pencil"/></svg>Изменить группу
+            <div id="group-current" class="chosen-row" hidden>
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>
+                <span id="group-current-name" class="chosen-name"></span>
+                <button id="group-change-btn" type="button" class="btn-pill ml-auto">
+                    <svg class="icon-edit" aria-hidden="true" focusable="false"><use href="img/icons.svg#pencil"/></svg>Изменить группу
                 </button>
             </div>
 
-
-            <p id="group-status" role="status" aria-live="polite"
-               class="m-0 text-[12px] leading-[1.4] text-ink-tertiary
-                      empty:hidden
-                      [&.is-error:not(:empty)]:flex [&.is-error]:items-start [&.is-error]:gap-[6px]
-                      [&.is-error]:text-danger
-                      [&.is-error]:before:mt-[2px] [&.is-error]:before:size-[13px]
-                      [&.is-error]:before:shrink-0 [&.is-error]:before:bg-danger
-                      [&.is-error]:before:[mask:var(--icon-alert)_center/contain_no-repeat]"></p>
+            <p id="group-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 
-        <div class="flex flex-col gap-[10px]" id="teacher-picker" hidden>
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Преподаватель
+        <div id="teacher-picker" class="drawer-section" hidden>
+            <span class="section-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Преподаватель
             </span>
 
-            <button id="teacher-pick-btn" type="button"
-                    class="w-full inline-flex items-center justify-center gap-2
-                           min-h-11 py-[10px] px-4 rounded-control
-                           text-[13px] font-semibold cursor-pointer
-                           bg-accent text-on-accent border border-accent
-                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                           active:enabled:scale-[0.98]
-                           disabled:bg-surface-active disabled:text-ink-tertiary
-                           disabled:border-border disabled:cursor-not-allowed
-                           mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
-                           max-tab:min-h-12 max-tab:text-[14px]">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Выбрать преподавателя
+            <button id="teacher-pick-btn" type="button" class="btn btn-primary">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Выбрать преподавателя
             </button>
 
-            <div id="teacher-picker-panel" class="flex flex-col gap-[6px]" hidden>
-                <label for="teacher-select"
-                       class="block m-0 text-[12px] font-medium normal-case tracking-normal text-ink-secondary">Преподаватель</label>
-                <span class="select-wrap mb-1 relative block
-                             after:absolute after:top-1/2 after:right-3
-                             after:size-[14px] after:-translate-y-1/2 after:bg-ink-secondary
-                             after:[mask:var(--icon-chevron)_center/contain_no-repeat]
-                             after:pointer-events-none after:transition-colors after:duration-150 after:ease-[ease]
-                             focus-within:after:bg-tag-orange
-                             has-[select:disabled]:after:opacity-50">
-                    <select id="teacher-select" disabled
-                            class="w-full min-h-11 py-[10px] pr-[38px] pl-3 mb-0 box-border
-                                   border border-border rounded-control
-                                   bg-surface text-ink text-[13px] font-medium [font-family:inherit]
-                                   cursor-pointer appearance-none [-webkit-appearance:none] shadow-card
-                                   transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
-                                   focus-visible:outline-none focus-visible:border-tag-orange
-                                   focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
-                                   disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none
-                                   mouse:hover:enabled:border-border-strong
-                                   max-tab:min-h-12 max-tab:text-[14px]">
+            <div id="teacher-picker-panel" class="flex flex-col gap-1.5" hidden>
+                <label for="teacher-select" class="field-label">Преподаватель</label>
+                <span class="select-wrap mb-1">
+                    <select id="teacher-select" class="select" disabled>
                         <option value="">Загружаем список…</option>
                     </select>
                 </span>
 
-                <button id="teacher-confirm-btn" type="button" disabled
-                        class="w-full inline-flex items-center justify-center gap-2
-                               min-h-11 py-3 px-4 rounded-control
-                               text-[13px] font-semibold cursor-pointer
-                               bg-accent text-on-accent border border-accent
-                               transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                               active:enabled:scale-[0.98]
-                               disabled:bg-surface-active disabled:text-ink-tertiary
-                               disabled:border-border disabled:cursor-not-allowed
-                               mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
-                               max-tab:min-h-12 max-tab:text-[14px]">
-                    <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Выбрать преподавателя
+                <button id="teacher-confirm-btn" type="button" class="btn btn-primary" disabled>
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Выбрать преподавателя
                 </button>
             </div>
 
-            <div id="teacher-current" hidden
-                 class="flex items-center justify-between flex-wrap gap-2
-                        py-2 pr-[10px] pl-3 bg-accent-soft border border-border rounded-control">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>
-                <span id="teacher-current-name"
-                      class="flex-auto min-w-0 [overflow-wrap:anywhere] text-[14px] font-semibold text-ink"></span>
-                <button id="teacher-change-btn" type="button"
-                        class="w-auto flex-none ml-auto inline-flex items-center gap-[5px]
-                               py-[6px] px-[10px] rounded-full
-                               bg-transparent text-ink-secondary border border-border-strong
-                               text-[11px] font-medium cursor-pointer
-                               transition-colors duration-150 ease-[ease]
-                               mouse:hover:bg-surface mouse:hover:text-ink
-                               max-tab:py-2 max-tab:px-3 max-tab:text-[12px]">
-                    <svg class="size-[13px] shrink-0 text-ink [stroke-width:2.5]" aria-hidden="true" focusable="false"><use href="img/icons.svg#pencil"/></svg>Изменить
+            <div id="teacher-current" class="chosen-row" hidden>
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>
+                <span id="teacher-current-name" class="chosen-name"></span>
+                <button id="teacher-change-btn" type="button" class="btn-pill ml-auto">
+                    <svg class="icon-edit" aria-hidden="true" focusable="false"><use href="img/icons.svg#pencil"/></svg>Изменить
                 </button>
             </div>
 
-            <p id="teacher-status" role="status" aria-live="polite"
-               class="m-0 text-[12px] leading-[1.4] text-ink-tertiary
-                      empty:hidden
-                      [&.is-error:not(:empty)]:flex [&.is-error]:items-start [&.is-error]:gap-[6px]
-                      [&.is-error]:text-danger
-                      [&.is-error]:before:mt-[2px] [&.is-error]:before:size-[13px]
-                      [&.is-error]:before:shrink-0 [&.is-error]:before:bg-danger
-                      [&.is-error]:before:[mask:var(--icon-alert)_center/contain_no-repeat]"></p>
+            <p id="teacher-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 
-        <div class="flex flex-col gap-[10px]">
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary" id="date-panel-label">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-days"/></svg>Дата
+        <div class="drawer-section">
+            <span class="section-label" id="date-panel-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-days"/></svg>Дата
             </span>
 
-            <div id="date-panel" role="group" aria-labelledby="date-panel-label"
-                 class="flex flex-col items-stretch gap-2 p-0 shrink-0">
-                <input type="date" id="date-input" aria-label="Дата"
-                       class="w-full min-w-0 min-h-11 py-[11px] px-3 border border-border rounded-control
-                              text-[14px] font-semibold [font-family:inherit] text-center
-                              bg-surface text-ink shadow-card
-                              transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
-                              focus-visible:outline-none focus-visible:border-tag-orange
-                              focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
-                              mouse:hover:border-border-strong mouse:hover:bg-surface-hover
-                              [&::-webkit-calendar-picker-indicator]:p-[3px]
-                              [&::-webkit-calendar-picker-indicator]:rounded-md
-                              [&::-webkit-calendar-picker-indicator]:opacity-70
-                              [&::-webkit-calendar-picker-indicator]:cursor-pointer
-                              [&::-webkit-calendar-picker-indicator]:transition-[opacity,background-color]
-                              [&::-webkit-calendar-picker-indicator]:duration-150
-                              [&::-webkit-calendar-picker-indicator]:ease-[ease]
-                              [&::-webkit-calendar-picker-indicator:hover]:opacity-100
-                              [&::-webkit-calendar-picker-indicator:hover]:bg-surface-hover
-                              dark:[&::-webkit-calendar-picker-indicator]:[filter:invert(1)_brightness(0.9)]">
+            <div id="date-panel" class="flex flex-col gap-2" role="group" aria-labelledby="date-panel-label">
+                <input type="date" id="date-input" class="date-input" aria-label="Дата">
                 <div class="flex gap-2">
-                    <button id="prev-day" type="button"
-                            class="inline-flex items-center justify-center flex-1 w-auto min-h-10 gap-[6px] px-[6px] py-0
-                                   bg-surface text-ink-secondary border border-border rounded-full
-                                   text-[12px] font-medium cursor-pointer
-                                   transition-[background-color,border-color,color,scale] duration-150 ease-[ease]
-                                   active:scale-[0.97] active:bg-surface-active
-                                   mouse:hover:bg-surface-hover mouse:hover:border-border-strong mouse:hover:text-ink
-                                   max-tab:min-h-11"><svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-left"/></svg>Назад</button>
-                    <button id="next-day" type="button"
-                            class="inline-flex items-center justify-center flex-1 w-auto min-h-10 gap-[6px] px-[6px] py-0
-                                   bg-surface text-ink-secondary border border-border rounded-full
-                                   text-[12px] font-medium cursor-pointer
-                                   transition-[background-color,border-color,color,scale] duration-150 ease-[ease]
-                                   active:scale-[0.97] active:bg-surface-active
-                                   mouse:hover:bg-surface-hover mouse:hover:border-border-strong mouse:hover:text-ink
-                                   max-tab:min-h-11">Вперёд<svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-right"/></svg></button>
+                    <button id="prev-day" type="button" class="btn-nav"><svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-left"/></svg>Назад</button>
+                    <button id="next-day" type="button" class="btn-nav">Вперёд<svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-right"/></svg></button>
                 </div>
             </div>
         </div>
 
-        <div class="mt-auto flex flex-col gap-3 max-tab:mt-2">
-            <div class="sidebar-action relative flex">
-                <input type="checkbox" id="schedule-toggle"
-                       class="peer absolute inset-0 w-full h-full m-0 opacity-0 cursor-pointer">
-                <label for="schedule-toggle"
-                       class="flex items-center justify-center gap-2 w-full m-0 min-h-11 p-[10px] rounded-control
-                              bg-surface text-ink border border-border-strong
-                              text-[13px] font-medium leading-none tracking-normal normal-case
-                              cursor-pointer
-                              transition-[background-color,border-color] duration-150 ease-[ease]
-                              mouse:hover:bg-surface-hover
-                              peer-checked:bg-accent-soft peer-checked:border-accent
-                              peer-focus-visible:outline-[1.5px] peer-focus-visible:outline-focus-ring
-                              peer-focus-visible:outline-offset-2
-                              [&_.hide]:hidden
-                              peer-checked:[&_.show]:hidden peer-checked:[&_.hide]:inline-flex
-                              max-tab:min-h-12">
-                    <span class="show inline-flex items-center gap-2"><svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-up"/></svg>Показать расписание</span>
-                    <span class="hide items-center gap-2"><svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-down"/></svg>Скрыть расписание</span>
+        <div class="drawer-actions">
+            <div class="sheet-switch">
+                <input type="checkbox" id="schedule-toggle" class="sheet-switch-input">
+                <label for="schedule-toggle" class="sheet-switch-label">
+                    <span class="show"><svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-up"/></svg>Показать расписание</span>
+                    <span class="hide"><svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-down"/></svg>Скрыть расписание</span>
                 </label>
             </div>
-            <button id="schedule-drawer-close" type="button" aria-label="Закрыть расписание"
-                    class="inline-flex items-center justify-center gap-2 mt-0 w-full min-h-11 p-[10px] rounded-control
-                           bg-danger text-on-danger border border-danger
-                           text-[13px] font-medium leading-none cursor-pointer
-                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                           active:scale-[0.98]
-                           mouse:hover:bg-danger-hover mouse:hover:border-danger-hover
-                           max-tab:min-h-12">
-                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Закрыть
+            <button id="schedule-drawer-close" type="button" class="btn btn-danger" aria-label="Закрыть расписание">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Закрыть
             </button>
         </div>
     </aside>
 
-    <div id="schedule-drawer-scrim" aria-hidden="true"
-         class="fixed inset-0 z-14 bg-scrim opacity-0 pointer-events-none
-                transition-opacity duration-[var(--duration-drawer-out)] ease-[var(--ease-drawer)]
-                max-tab:drawer-open:opacity-100 max-tab:drawer-open:pointer-events-auto
-                max-tab:drawer-open:duration-[var(--duration-drawer-in)]"></div>
+    <div id="schedule-drawer-scrim" class="scrim scrim-drawer" aria-hidden="true"></div>
 
     <!-- основной контент -->
-    <div id="app-wrapper"
-         class="flex w-full h-full items-stretch justify-center p-4
-                pl-[calc(var(--sidebar-width)_+_var(--sidebar-inset)*2)]
-                max-tab:h-full max-tab:min-h-0
-                max-tab:pl-2 max-tab:pr-2 max-tab:pb-2 max-tab:pt-[var(--mobile-top-bar)]
-                max-phone:pl-1 max-phone:pr-1 max-phone:pb-1 max-phone:pt-[var(--mobile-top-bar)]
-                short:h-auto short:min-h-screen
-                short:pl-1 short:pr-1 short:pb-1 short:pt-[var(--mobile-top-bar)]">
-        <div id="main-container"
-             class="flex-1 max-w-[var(--content-max)] h-full flex flex-col gap-3 min-w-0
-                    max-tab:max-w-full max-tab:gap-2">
-            <div id="content-row"
-                 class="flex-1 flex items-stretch gap-3 min-h-0
-                        max-tab:flex-auto max-tab:flex-col max-tab:gap-2
-                        short:gap-1">
-                <div id="map-column"
-                     class="flex-1 flex flex-col gap-3 min-w-0
-                            max-tab:flex-auto max-tab:gap-2 max-tab:min-h-0">
-                    <div id="model-container" aria-label="Интерактивный план этажа"
-                         class="flex-auto w-full border border-border rounded-card bg-model-bg
-                                relative overflow-hidden touch-none min-h-0
-                                [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full
-                                [&>canvas]:cursor-pointer [&>canvas:active]:cursor-grabbing
-                                sheet-open:pointer-events-none
-                                max-tab:sidebar-open:pointer-events-none
-                                max-tab:drawer-open:pointer-events-none
-                                max-tab:h-auto max-tab:min-h-[180px] max-tab:max-h-none
-                                max-phone:h-[55vh] max-phone:min-h-[200px]
-                                short:h-[70vh] short:min-h-[200px]">
-                        <div id="model-loading"
-                             class="absolute inset-0 z-6 flex flex-col items-center justify-center gap-3
-                                    bg-model-bg transition-opacity duration-200 ease-[ease]
-                                    [&.hidden]:opacity-0 [&.hidden]:pointer-events-none
-                                    [&.hidden_.spinner]:[animation-play-state:paused]">
-                            <svg class="spinner block size-7 text-model-ink
-                                        animate-[spin_0.9s_linear_infinite] motion-reduce:animate-none [stroke-width:1.9]"
-                                 role="status" aria-label="Загрузка модели" focusable="false"><use href="img/icons.svg#loader-circle"/></svg>
-                            <p class="text-[12px] text-center px-4 text-model-ink">Загружаем план этажа…</p>
-                            <div class="model-progress flex flex-col items-center gap-2 w-[min(220px,68%)]" hidden
+    <div id="app-wrapper" class="app-wrapper">
+        <div id="main-container" class="main-container">
+            <div id="content-row" class="content-row">
+                <div id="map-column" class="map-column">
+                    <div id="model-container" class="map-card" aria-label="Интерактивный план этажа">
+                        <div id="model-loading" class="model-loading">
+                            <svg class="spinner model-spinner" role="status" aria-label="Загрузка модели" focusable="false"><use href="img/icons.svg#loader-circle"/></svg>
+                            <p class="model-text">Загружаем план этажа…</p>
+                            <div class="model-progress" hidden
                                  role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
                                  aria-label="Загрузка плана этажа">
-                                <span class="block w-full h-[5px] rounded-full overflow-hidden bg-model-chip-border">
-                                    <span class="model-progress-fill block h-full w-0 rounded-full bg-model-ink
-                                                 transition-[width] duration-200 ease-out
-                                                 motion-reduce:transition-none"></span>
+                                <span class="model-progress-track">
+                                    <span class="model-progress-fill"></span>
                                 </span>
-                                <span class="model-progress-value text-[11px] font-semibold tabular-nums text-model-ink">0%</span>
+                                <span class="model-progress-value">0%</span>
                             </div>
                         </div>
 
-                        <div class="absolute bottom-3 right-3 z-4 inline-flex">
-                            <input type="checkbox" id="legend-toggle" aria-label="Показать легенду карты"
-                                   class="peer absolute inset-0 w-full h-full m-0 opacity-0 cursor-pointer
-                                          legend-open:pointer-events-none">
-                            <label for="legend-toggle"
-                                   class="legend-btn inline-flex items-center justify-center gap-[5px] min-h-8 py-[5px] px-3
-                                          bg-model-chip-bg border border-model-chip-border rounded-full
-                                          text-[11px] font-medium leading-[1.4] text-model-ink
-                                          cursor-pointer select-none pointer-events-auto
-                                          transition-colors duration-150 ease-[ease] mouse:hover:bg-surface
-                                          peer-focus-visible:outline-[1.5px] peer-focus-visible:outline-focus-ring
-                                          peer-focus-visible:outline-offset-2
-                                          legend-open:hidden"><svg class="size-[13px] shrink-0 [stroke-width:2.5]" aria-hidden="true" focusable="false"><use href="img/icons.svg#info"/></svg>Подробнее</label>
+                        <div class="legend-slot">
+                            <input type="checkbox" id="legend-toggle" class="legend-input" aria-label="Показать легенду карты">
+                            <label for="legend-toggle" class="map-chip"><svg class="icon-tiny" aria-hidden="true" focusable="false"><use href="img/icons.svg#info"/></svg>Подробнее</label>
                         </div>
 
-                        <div id="status-legend"
-                             class="absolute bottom-3 right-3 z-4 flex-col flex-nowrap gap-2
-                                    bg-model-chip-bg py-2 px-3 rounded-control
-                                    border border-model-chip-border
-                                    text-[11px] text-model-ink pointer-events-none
-                                    max-w-[calc(100%_-_var(--space-5))]
-                                    max-phone:text-[10px]
-                                    legend-closed:hidden legend-open:flex
-                                    legend-open:animate-[legend-in_var(--duration-base)_var(--ease-drawer)]">
-                            <span class="flex items-center gap-[6px]"><span class="w-1.5 h-1.5 rounded-full shrink-0 bg-status-current"></span>Идёт сейчас</span>
-                            <span class="flex items-center gap-[6px]"><span class="w-1.5 h-1.5 rounded-full shrink-0 bg-status-upcoming"></span>Предстоит</span>
-                            <span class="flex items-center gap-[6px]"><span class="w-1.5 h-1.5 rounded-full shrink-0 bg-status-past"></span>Прошло</span>
-                            <label for="legend-toggle"
-                                   class="legend-btn inline-flex items-center justify-center gap-[5px] min-h-8 py-[5px] px-3
-                                          self-stretch mt-1
-                                          bg-model-chip-bg border border-model-chip-border rounded-full
-                                          text-[11px] font-medium leading-[1.4] text-model-ink
-                                          cursor-pointer select-none pointer-events-auto
-                                          transition-colors duration-150 ease-[ease] mouse:hover:bg-surface
-                                          legend-focus:outline-[1.5px] legend-focus:outline-focus-ring
-                                          legend-focus:outline-offset-2"><svg class="size-[13px] shrink-0 [stroke-width:2.5]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Скрыть</label>
+                        <div id="status-legend" class="legend">
+                            <span class="legend-row"><span class="legend-dot legend-dot-current"></span>Идёт сейчас</span>
+                            <span class="legend-row"><span class="legend-dot legend-dot-upcoming"></span>Предстоит</span>
+                            <span class="legend-row"><span class="legend-dot legend-dot-past"></span>Прошло</span>
+                            <label for="legend-toggle" class="map-chip"><svg class="icon-tiny" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Скрыть</label>
                         </div>
 
-                        <div id="click-info" role="status" aria-live="polite"
-                             class="[display:none] absolute right-3 bottom-3 z-4
-                                    max-w-[calc(100%_-_var(--space-6)*2)] py-[5px] px-[10px]
-                                    bg-model-chip-bg border border-model-chip-border rounded-control
-                                    text-[11px] leading-[1.4] text-model-ink pointer-events-none
-                                    debug:[&:not(:empty)]:block"></div>
+                        <div id="click-info" class="click-info" role="status" aria-live="polite"></div>
 
-                        <div id="stub-overlay" role="status" aria-live="polite"
-                             class="absolute inset-0 z-5 items-center justify-center
-                                    bg-model-stub-bg rounded-card
-                                    [&:not(.visible)]:hidden [&.visible]:flex">
-                            <video class="stub-video absolute inset-0 w-full h-full object-contain
-                                          bg-model-stub-bg pointer-events-none motion-reduce:hidden"
-                                   src="videos/stub-floor.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+                        <div id="stub-overlay" class="stub-overlay" role="status" aria-live="polite">
+                            <video class="stub-video" src="videos/stub-floor.mp4"
+                                   autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
                         </div>
 
-                        <div id="debug-confirm" role="dialog" aria-modal="true" aria-labelledby="debug-confirm-text" hidden
-                             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-7
-                                    flex flex-col items-center gap-4 py-5 px-6
-                                    bg-surface border border-border rounded-panel shadow-sheet
-                                    max-w-[calc(100%_-_var(--space-5))]">
-                            <p id="debug-confirm-text" class="text-[15px] font-semibold text-ink">Вы уверены?</p>
+                        <div id="debug-confirm" class="debug-dialog" role="dialog" aria-modal="true"
+                             aria-labelledby="debug-confirm-text" hidden>
+                            <p id="debug-confirm-text">Вы уверены?</p>
                             <div class="flex gap-2">
-                                <button id="debug-confirm-yes" type="button"
-                                        class="min-w-[84px] min-h-10 px-4 rounded-control text-[13px] font-semibold cursor-pointer
-                                               bg-accent text-on-accent border border-accent
-                                               transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                                               active:scale-[0.98]
-                                               mouse:hover:bg-accent-hover mouse:hover:border-accent-hover">Да</button>
-                                <button id="debug-confirm-no" type="button"
-                                        class="min-w-[84px] min-h-10 px-4 rounded-control text-[13px] font-medium cursor-pointer
-                                               bg-surface text-ink border border-border
-                                               transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                                               active:scale-[0.98]
-                                               mouse:hover:bg-surface-hover mouse:hover:border-border-strong">Нет</button>
+                                <button id="debug-confirm-yes" type="button" class="btn-dialog btn-primary">Да</button>
+                                <button id="debug-confirm-no" type="button" class="btn-dialog btn-quiet">Нет</button>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
-                <nav id="floor-selector" aria-label="Выбор этажа"
-                     class="flex flex-col items-center justify-center shrink-0 gap-2
-                            w-[var(--floor-column-width)] py-3 px-2
-                            bg-surface border border-border rounded-card
-                            max-tab:order-2 max-tab:w-full max-tab:flex-row
-                            max-tab:py-2 max-tab:px-2
-                            max-phone:py-[6px] max-phone:px-1
-                            short:py-1 short:px-1">
-                    <span class="text-[10px] font-semibold leading-none tracking-[0.06em] uppercase
-                                 text-ink-tertiary select-none whitespace-nowrap">Этаж</span>
-                    <div class="floor-numbers flex flex-col items-center gap-[6px]
-                                max-tab:flex-row max-tab:gap-2
-                                [&>span]:flex [&>span]:items-center [&>span]:justify-center
-                                [&>span]:w-[34px] [&>span]:h-[34px] [&>span]:rounded-full
-                                [&>span]:cursor-pointer [&>span]:select-none
-                                [&>span]:text-[13px] [&>span]:font-medium [&>span]:text-ink-secondary
-                                [&>span]:border [&>span]:border-transparent
-                                [&>span]:transition-[background-color,color,border-color,scale]
-                                [&>span]:duration-150 [&>span]:ease-[ease]
-                                [&>span]:active:scale-95
-                                [&>span]:active:bg-surface-active
-                                [&>span.active]:bg-accent [&>span.active]:text-on-accent
-                                [&>span.active]:border-accent [&>span.active]:font-semibold
-                                mouse:[&>span]:hover:bg-surface-hover
-                                mouse:[&>span]:hover:text-ink
-                                mouse:[&>span]:hover:border-border
-                                mouse:[&>span.active]:hover:bg-accent-hover
-                                mouse:[&>span.active]:hover:text-on-accent
-                                mouse:[&>span.active]:hover:border-accent-hover
-                                max-tab:[&>span]:w-10 max-tab:[&>span]:h-10
-                                max-tab:[&>span]:text-[14px]
-                                max-phone:[&>span]:w-[38px] max-phone:[&>span]:h-[38px]
-                                short:[&>span]:w-[26px] short:[&>span]:h-[26px] short:[&>span]:text-[11px]">
+                <nav id="floor-selector" class="floor-nav" aria-label="Выбор этажа">
+                    <span class="floor-nav-label">Этаж</span>
+                    <div class="floor-numbers">
                         <span data-floor="2" role="button" tabindex="0">2</span>
                         <span data-floor="3" role="button" tabindex="0">3</span>
                         <span data-floor="4" role="button" tabindex="0">4</span>
@@ -693,229 +256,37 @@
                 </nav>
             </div>
 
-            <div id="map-footer" class="tab:hidden max-tab:flex shrink-0 items-center justify-center pt-1">
-                <button id="reset-view" type="button"
-                        class="inline-flex items-center justify-center gap-2 min-h-11 px-6
-                               bg-surface text-ink border border-border rounded-full shadow-card
-                               text-[13px] font-medium cursor-pointer
-                               transition-[background-color,border-color,scale]
-                               duration-150 ease-[var(--ease)]
-                               active:scale-[0.97] active:bg-surface-active">
-                    <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#maximize"/></svg>Сбросить вид
+            <div id="map-footer" class="map-footer">
+                <button id="reset-view" type="button" class="map-reset">
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#maximize"/></svg>Сбросить вид
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="schedule-panel" role="region" aria-labelledby="schedule-panel-title"
-         class="fixed top-auto bottom-0 z-24 my-0 mx-auto w-auto
-                left-[calc(var(--sidebar-width)_+_var(--sidebar-inset)*2)] right-4
-                max-w-[760px] max-h-[calc(100dvh_-_var(--sheet-top-gap))]
-                flex-col gap-2 pt-2 px-4 pb-4
-                bg-surface border border-border border-b-0 rounded-t-panel shadow-sheet
-                sheet-closed:hidden sheet-open:flex
-                sheet-open:animate-[schedule-in_var(--duration-base)_var(--ease)]
-                max-tab:left-0 max-tab:right-0 max-tab:max-w-none
-                max-tab:px-3 max-tab:pb-[calc(var(--space-3)_+_env(safe-area-inset-bottom,0px))]
-                short:[--sheet-top-gap:56px] short:pt-1 short:px-3 short:pb-3">
-        <span class="shrink-0 self-center w-10 h-1 mb-1 rounded-full bg-border-strong" aria-hidden="true"></span>
-        <div class="flex items-center justify-between gap-2 pb-2 border-b border-border shrink-0">
-            <h2 id="schedule-panel-title" class="flex items-center gap-2 m-0 text-[16px] font-semibold tracking-[-0.01em] text-ink">
-                <svg class="size-[18px] shrink-0 [stroke-width:1.9]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
+    <div id="schedule-panel" class="sheet" role="region" aria-labelledby="schedule-panel-title">
+        <span class="sheet-grabber" aria-hidden="true"></span>
+        <div class="sheet-head">
+            <h2 id="schedule-panel-title" class="sheet-title">
+                <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
             </h2>
-            <label for="schedule-toggle" aria-label="Закрыть расписание"
-                   class="flex items-center justify-center size-8 shrink-0 rounded-full
-                          text-ink-secondary cursor-pointer select-none
-                          transition-colors duration-150 ease-[ease]
-                          mouse:hover:bg-surface-hover mouse:hover:text-ink"><svg class="size-[18px] [stroke-width:1.9]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg></label>
+            <label for="schedule-toggle" class="sheet-close" aria-label="Закрыть расписание"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg></label>
         </div>
-        <div id="pairs-container" aria-live="polite"
-             class="flex-auto w-full grid grid-cols-[repeat(auto-fill,minmax(min(210px,100%),1fr))]
-                    content-start overflow-x-hidden overflow-y-auto gap-2 py-1 px-0 box-border
-                    [-webkit-overflow-scrolling:touch] overscroll-contain
-
-                    [&>.pair-card]:w-auto [&>.pair-card]:max-w-none
-                    [&>.pair-card]:bg-surface [&>.pair-card]:border [&>.pair-card]:border-border
-                    [&>.pair-card]:border-l-[3px] [&>.pair-card]:rounded-card
-                    [&>.pair-card]:p-3
-                    [&>.pair-card]:text-[12px] [&>.pair-card]:text-ink [&>.pair-card]:cursor-pointer
-                    [&>.pair-card]:transition-[transform,box-shadow,background-color,border-color]
-                    [&>.pair-card]:duration-250 [&>.pair-card]:ease-[ease]
-                    [&>.pair-card:active]:[transform:translateY(-1px)_scale(0.98)]
-                    [&>.pair-card:active]:shadow-[0_2px_4px_rgba(0,0,0,0.04)]
-                    [&>.pair-card:focus-visible]:outline-[1.5px]
-                    [&>.pair-card:focus-visible]:outline-focus-ring
-                    [&>.pair-card:focus-visible]:outline-offset-2
-                    mouse:[&>.pair-card:hover]:[transform:translateY(-3px)]
-                    mouse:[&>.pair-card:hover]:shadow-lift
-                    mouse:[&>.pair-card:hover]:bg-surface-hover
-                    mouse:[&>.pair-card:hover]:border-border-strong
-                    motion-reduce:[&>.pair-card:hover]:[transform:none]
-                    motion-reduce:[&>.pair-card:active]:[transform:none]
-                    max-phone:[&>.pair-card]:w-full
-                    max-phone:[&>.pair-card]:p-[10px]
-
-                    [&>.pair-card.past]:border-l-status-past
-                    [&>.pair-card.current]:border-l-status-current
-                    [&>.pair-card.current]:bg-status-current-bg
-                    [&>.pair-card.upcoming]:border-l-status-upcoming
-
-                    [&_.pair-time]:font-semibold [&_.pair-time]:text-[12px]
-                    [&_.pair-time]:tracking-[0.02em] [&_.pair-time]:text-ink-secondary
-                    [&_.pair-name]:text-[13px] [&_.pair-name]:font-semibold
-                    [&_.pair-name]:leading-[1.35] [&_.pair-name]:mt-1
-                    [&_.pair-name]:mb-2 [&_.pair-name]:mx-0
-                    [&_.pair-name]:[overflow-wrap:anywhere]
-                    [&_.pair-room]:inline-flex [&_.pair-room]:items-center [&_.pair-room]:gap-1
-                    [&_.pair-room]:py-[3px] [&_.pair-room]:px-2 [&_.pair-room]:rounded-full
-                    [&_.pair-room]:bg-accent-soft [&_.pair-room]:text-ink
-                    [&_.pair-room]:text-[11px] [&_.pair-room]:font-medium
-                    [&_.pair-room]:before:size-[12px] [&_.pair-room]:before:shrink-0
-                    [&_.pair-room]:before:bg-ink-secondary
-                    [&_.pair-room]:before:[mask:var(--icon-room)_center/contain_no-repeat]
-                    [&_.pair-teacher]:flex [&_.pair-teacher]:items-center [&_.pair-teacher]:gap-[5px]
-                    [&_.pair-teacher]:text-[11px] [&_.pair-teacher]:text-ink-tertiary
-                    [&_.pair-teacher]:mt-2
-                    [&_.pair-teacher]:before:size-[12px] [&_.pair-teacher]:before:shrink-0
-                    [&_.pair-teacher]:before:bg-ink-secondary
-                    [&_.pair-teacher]:before:[mask:var(--icon-teacher)_center/contain_no-repeat]
-                    [&_.pair-group]:flex [&_.pair-group]:items-center [&_.pair-group]:gap-[5px]
-                    [&_.pair-group]:text-[11px] [&_.pair-group]:text-ink-tertiary
-                    [&_.pair-group]:mt-2
-                    [&_.pair-group]:before:size-[12px] [&_.pair-group]:before:shrink-0
-                    [&_.pair-group]:before:bg-ink-secondary
-                    [&_.pair-group]:before:[mask:var(--icon-group)_center/contain_no-repeat]
-
-                    [&>.pairs-loading]:col-span-full [&>.pairs-loading]:w-full
-                    [&>.pairs-loading]:flex [&>.pairs-loading]:flex-col
-                    [&>.pairs-loading]:items-center [&>.pairs-loading]:justify-center
-                    [&>.pairs-loading]:gap-3 [&>.pairs-loading]:py-8 [&>.pairs-loading]:px-4
-                    [&>.pairs-loading]:text-center [&>.pairs-loading]:text-[13px]
-                    [&>.pairs-loading]:text-ink-tertiary
-                    [&_.pairs-circle]:relative [&_.pairs-circle]:block
-                    [&_.pairs-circle]:size-11 [&_.pairs-circle]:shrink-0
-                    [&_.pairs-circle]:rounded-full [&_.pairs-circle]:overflow-hidden
-                    [&_.pairs-circle]:border-2 [&_.pairs-circle]:border-border-strong
-                    [&_.pairs-circle]:bg-surface
-                    [&_.pairs-circle-fill]:absolute [&_.pairs-circle-fill]:inset-x-0
-                    [&_.pairs-circle-fill]:top-0 [&_.pairs-circle-fill]:h-0
-                    [&_.pairs-circle-fill]:bg-accent
-                    [&_.pairs-circle-fill]:animate-[pairs-fill_9s_linear_forwards]
-                    motion-reduce:[&_.pairs-circle-fill]:animate-none
-                    motion-reduce:[&_.pairs-circle-fill]:h-1/2
-
-                    [&>.week-day-head]:col-span-full [&>.week-day-head]:w-full
-                    [&>.week-day-head]:min-w-0
-                    [&>.week-day-head]:flex [&>.week-day-head]:items-baseline
-                    [&>.week-day-head]:justify-between [&>.week-day-head]:gap-2
-                    [&>.week-day-head]:mt-3 [&>.week-day-head]:first:mt-0
-                    [&>.week-day-head]:pb-[6px]
-                    [&>.week-day-head]:border-b [&>.week-day-head]:border-border
-                    [&>.week-day-head]:text-[12px] [&>.week-day-head]:font-semibold
-                    [&>.week-day-head]:uppercase [&>.week-day-head]:tracking-[0.06em]
-                    [&>.week-day-head]:text-ink
-                    [&>.week-day-head.is-today]:text-tag-blue
-                    [&>.week-day-head.is-today]:border-tag-blue
-                    [&_.week-day-date]:font-medium [&_.week-day-date]:normal-case
-                    [&_.week-day-date]:tracking-normal [&_.week-day-date]:tabular-nums
-                    [&_.week-day-date]:text-ink-tertiary [&_.week-day-date]:shrink-0
-                    [&>.week-day-empty]:col-span-full [&>.week-day-empty]:w-full
-                    [&>.week-day-empty]:py-3 [&>.week-day-empty]:px-3
-                    [&>.week-day-empty]:rounded-card
-                    [&>.week-day-empty]:border [&>.week-day-empty]:border-dashed
-                    [&>.week-day-empty]:border-border
-                    [&>.week-day-empty]:text-[12px] [&>.week-day-empty]:text-ink-tertiary
-                    [&>.no-pairs]:col-span-full [&>.no-pairs]:w-full
-                    [&>.no-pairs]:flex [&>.no-pairs]:flex-col [&>.no-pairs]:items-center
-                    [&>.no-pairs]:justify-center [&>.no-pairs]:gap-[10px]
-                    [&>.no-pairs]:text-center [&>.no-pairs]:text-ink-tertiary
-                    [&>.no-pairs]:py-8 [&>.no-pairs]:px-4 [&>.no-pairs]:text-[13px]
-                    [&>.no-pairs]:before:size-7 [&>.no-pairs]:before:shrink-0
-                    [&>.no-pairs:not(.pairs-error)]:before:bg-ink-secondary
-                    [&>.no-pairs:not(.pairs-error)]:before:[mask:var(--icon-empty)_center/contain_no-repeat]
-                    [&>.pairs-error]:text-danger
-                    [&>.pairs-error]:before:bg-danger
-                    [&>.pairs-error]:before:[mask:var(--icon-alert)_center/contain_no-repeat]">
+        <div id="pairs-container" class="pairs" aria-live="polite">
             <div class="no-pairs">Выберите группу, чтобы увидеть пары</div>
         </div>
     </div>
 
     <!-- всплывающая панель кабинета -->
-    <div id="room-panel" role="dialog" aria-labelledby="room-panel-title" aria-modal="false"
-         class="fixed z-25 my-0 mx-auto w-auto bottom-auto overflow-y-auto
-                top-[calc(var(--sidebar-inset)_+_var(--space-3))]
-                left-[calc(var(--sidebar-width)_+_var(--sidebar-inset)*2_+_var(--space-3))]
-                right-[calc(var(--space-4)_+_var(--floor-column-width)_+_var(--space-3))]
-                max-w-[340px] max-h-[min(46vh,340px)]
-                bg-surface rounded-panel shadow-sheet p-4 border border-border
-                [&:not(.visible)]:hidden
-                [&.visible]:block
-                [&.visible]:animate-[panel-in_var(--duration-base)_var(--ease)]
-                [&:not(.can-return)_.back]:hidden [&.can-return_.back]:inline-flex
-                max-tab:top-[calc(var(--mobile-top-bar)_+_var(--space-2))]
-                max-tab:left-3 max-tab:right-3 max-tab:max-w-none
-                max-tab:max-h-[44dvh]
-                max-tab:pt-3 max-tab:px-3 max-tab:pb-3
-                max-phone:max-h-[70vh]
-                max-phone:pb-[calc(var(--space-3)_+_env(safe-area-inset-bottom,0px))]
-                short:top-[calc(var(--mobile-top-bar)_+_var(--space-1))]
-                short:left-2 short:right-2 short:max-w-none
-                short:max-h-[calc(100dvh_-_var(--mobile-top-bar)_-_var(--space-4))]
-                short:rounded-card short:pt-3 short:px-3 short:pb-3">
-        <button id="room-panel-close" type="button" aria-label="Закрыть"
-                class="absolute top-2 right-2 flex items-center justify-center size-8
-                       bg-transparent border-none rounded-full
-                       cursor-pointer text-ink-secondary
-                       transition-colors duration-150 ease-[ease]
-                       mouse:hover:bg-surface-hover mouse:hover:text-ink">
-            <svg class="size-[18px] [stroke-width:1.9]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>
+    <div id="room-panel" class="room-panel" role="dialog" aria-labelledby="room-panel-title" aria-modal="false">
+        <button id="room-panel-close" type="button" class="room-panel-close" aria-label="Закрыть">
+            <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>
         </button>
-        <button id="room-panel-back" type="button"
-                class="back items-center gap-[6px] mb-3 min-h-8 py-[7px] px-3
-                       bg-accent-soft text-ink border border-border rounded-full
-                       text-[12px] font-medium [font-family:inherit] cursor-pointer
-                       transition-[background-color,border-color,scale] duration-150 ease-[ease]
-                       active:scale-[0.97]
-                       mouse:hover:bg-surface-hover mouse:hover:border-border-strong">
-            <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#arrow-left"/></svg>Назад к расписанию
+        <button id="room-panel-back" type="button" class="back room-panel-back">
+            <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#arrow-left"/></svg>Назад к расписанию
         </button>
-        <h2 id="room-panel-title"
-            class="flex items-center gap-2 mt-0 mx-0 mb-3 text-[16px] font-semibold tracking-[-0.01em] text-ink
-                   border-b border-border pb-2 pr-8 max-phone:text-[15px]
-                   before:size-[16px] before:shrink-0 before:bg-ink
-                   before:[mask:var(--icon-room)_center/contain_no-repeat]">Кабинет</h2>
-        <div id="room-panel-content"
-             class="[&_p]:flex [&_p]:flex-col [&_p]:items-center [&_p]:justify-center
-                    [&_p]:gap-[10px] [&_p]:py-6 [&_p]:text-center
-                    [&_p]:text-[13px] [&_p]:text-ink-tertiary
-                    [&_p]:before:size-6 [&_p]:before:shrink-0
-                    [&_p]:before:bg-ink-secondary
-                    [&_p]:before:[mask:var(--icon-empty)_center/contain_no-repeat]
-
-                    [&>.room-pair-item]:bg-bg [&>.room-pair-item]:rounded-control
-                    [&>.room-pair-item]:py-[10px] [&>.room-pair-item]:px-3
-                    [&>.room-pair-item]:mb-2 [&>.room-pair-item]:text-[12px]
-                    [&>.room-pair-item]:border [&>.room-pair-item]:border-border
-                    [&>.room-pair-item]:border-l-[3px] [&>.room-pair-item]:text-ink
-                    [&>.room-pair-item]:animate-[fade-item_var(--duration-base)_ease_both]
-                    [&>.room-pair-item:last-child]:mb-0
-                    [&>.room-pair-item.past]:border-l-status-past
-                    [&>.room-pair-item.current]:border-l-status-current
-                    [&>.room-pair-item.current]:bg-status-current-bg
-                    [&>.room-pair-item.upcoming]:border-l-status-upcoming
-                    [&_.room-pair-date]:text-[11px] [&_.room-pair-date]:font-semibold
-                    [&_.room-pair-date]:tracking-[0.02em]
-                    [&_.room-pair-date]:text-ink-secondary
-                    [&_.room-pair-date]:block [&_.room-pair-date]:mb-[3px]
-                    [&_.room-pair-group]:font-semibold [&_.room-pair-group]:text-[13px]
-                    [&_.room-pair-group]:leading-[1.35]
-                    [&_.room-pair-teacher]:flex [&_.room-pair-teacher]:items-center
-                    [&_.room-pair-teacher]:gap-[5px]
-                    [&_.room-pair-teacher]:text-[11px] [&_.room-pair-teacher]:text-ink-tertiary
-                    [&_.room-pair-teacher]:mt-[5px]
-                    [&_.room-pair-teacher]:before:size-[12px] [&_.room-pair-teacher]:before:shrink-0
-                    [&_.room-pair-teacher]:before:bg-ink-secondary
-                    [&_.room-pair-teacher]:before:[mask:var(--icon-teacher)_center/contain_no-repeat]"></div>
+        <h2 id="room-panel-title" class="room-panel-title">Кабинет</h2>
+        <div id="room-panel-content" class="room-panel-content"></div>
     </div>
 
     <!-- импорт three.js -->

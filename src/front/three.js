@@ -1,14 +1,10 @@
-// Инициализация three.js-сцены, загрузка моделей этажей, подсветка кабинетов,
-// обработка кликов по 3d-сцене.
+// Сцена three.js: загрузка планов этажей, подсветка кабинетов, клики по карте.
 //
-// Файл называется three.js, но импортирует npm/cdn-пакет 'three' через bare
-// specifier из importmap в index.html — конфликта имён нет, это разные
-// механизмы резолва путей у бандлера... точнее у самого браузера.
+// Файл называется three.js, но импортирует пакет 'three' по bare specifier
+// из importmap — конфликта имён нет, это разные механизмы резолва.
 //
-// Есть циклическая зависимость с schedule.js и roomPanel.js: applyGroup,
-// updatePairsUI, showRoomPanel, hideRoomPanel используются только внутри
-// тел функций/обработчиков, а не на верхнем уровне модуля, поэтому порядок
-// вычисления модулей не важен.
+// Циклическая зависимость с schedule.js и roomPanel.js разрешена тем, что
+// импортированные оттуда функции вызываются только внутри тел функций.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -19,7 +15,9 @@ import {
     ANIMATION_DURATION, statusColors, DRAG_THRESHOLD,
     COLOR_WHITE_DARK, COLOR_SELECTED_DARK, statusColorsDark,
     AMBIENT_INTENSITY_LIGHT, AMBIENT_INTENSITY_DARK,
-    DIR_INTENSITY_LIGHT, DIR_INTENSITY_DARK, DECOR_DIM_DARK
+    DIR_INTENSITY_LIGHT, DIR_INTENSITY_DARK, DECOR_DIM_DARK,
+    MAX_PIXEL_RATIO, CAMERA_DISTANCE_PADDING, FAR_PLANE_FACTOR, FAR_PLANE_PADDING,
+    DARK_LIGHTNESS_THRESHOLD
 } from './config.js';
 
 import {
@@ -28,16 +26,68 @@ import {
     highlightedMeshes, setHighlightedMeshes,
     selectedMesh, setSelectedMesh,
     activeHighlightedMesh, setActiveHighlightedMesh,
-    setCurrentFloor,
-    setCurrentSchedule
+    setCurrentFloor, setCurrentSchedule
 } from './state.js';
 
 import { GLB_SIZES } from './glbSizes.js';
 import { showRoomPanel, hideRoomPanel } from './roomPanel.js';
 import { applySelection, hasSelection, updatePairsUI } from './schedule.js';
 
-// инициализация three.js сцены
+// ---------------------------------------------------------------------------
+// СЦЕНА
+// ---------------------------------------------------------------------------
+
 const scene = new THREE.Scene();
+
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+camera.position.set(0, 10, 0);
+camera.lookAt(0, 0, 0);
+
+export const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
+container.appendChild(renderer.domElement);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, AMBIENT_INTENSITY_LIGHT);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, DIR_INTENSITY_LIGHT);
+dirLight.position.set(10, 20, 10);
+scene.add(dirLight);
+
+export const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.1;
+controls.screenSpacePanning = true;
+controls.enableZoom = true;
+controls.zoomSpeed = 1.2;
+controls.enableRotate = !isMobile;
+controls.minPolarAngle = 0;
+controls.maxPolarAngle = Math.PI / 2;
+controls.enablePan = true;
+controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+// на телефоне одним пальцем панорамируем, а не вращаем
+controls.touches = {
+    ONE: isMobile ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE,
+    TWO: THREE.TOUCH.DOLLY_PAN
+};
+controls.update();
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const pointerDownPos = new THREE.Vector2();
+let isPointerDown = false;
+
+const loader = new GLTFLoader();
+
+// ссылка на загруженную модель нужна кнопке «Сбросить вид»
+let loadedModel = null;
+let animationStarted = false;
+
+// ---------------------------------------------------------------------------
+// ТЕМА
+// ---------------------------------------------------------------------------
 
 const sceneBackground = new THREE.Color();
 const sceneBackgroundHSL = { h: 0, s: 0, l: 0 };
@@ -52,240 +102,250 @@ export function roomSelectedColor() {
     return darkTheme ? COLOR_SELECTED_DARK : COLOR_SELECTED;
 }
 
-export function applyThemeBackground() {
-    const value = getComputedStyle(document.documentElement)
-        .getPropertyValue('--model-bg').trim();
-    if (!value) return;
-    scene.background = sceneBackground.setStyle(value);
+function dimColor(hex, factor) {
+    return decorColor.setHex(hex).multiplyScalar(factor).getHex();
+}
 
+function applyDecorColors() {
+    roomMeshes.forEach((mesh) => {
+        const { baseColor } = mesh.userData;
+        if (baseColor == null) return;
+        setMeshColorInstant(mesh, darkTheme ? dimColor(baseColor, DECOR_DIM_DARK) : baseColor);
+    });
+}
+
+export function applyThemeBackground() {
+    const value = getComputedStyle(document.documentElement).getPropertyValue('--model-bg').trim();
+    if (!value) return;
+
+    scene.background = sceneBackground.setStyle(value);
     sceneBackground.getHSL(sceneBackgroundHSL);
-    darkTheme = sceneBackgroundHSL.l < 0.4;
+    darkTheme = sceneBackgroundHSL.l < DARK_LIGHTNESS_THRESHOLD;
+
     ambientLight.intensity = darkTheme ? AMBIENT_INTENSITY_DARK : AMBIENT_INTENSITY_LIGHT;
     dirLight.intensity = darkTheme ? DIR_INTENSITY_DARK : DIR_INTENSITY_LIGHT;
 
     if (!roomMeshes.length) return;
+
     applyDecorColors();
     if (hasSelection()) applySelection();
     else resetAllRoomsToWhite(true);
 }
 
-function applyDecorColors() {
+applyThemeBackground();
+
+
+// ЦВЕТА МЕШЕЙ
+
+
+const activeAnimations = new Map();
+
+function getMeshColor(mesh) {
+    const { material } = mesh;
+    return Array.isArray(material) ? material[0].color.getHex() : material.color.getHex();
+}
+
+function setMeshColorInstant(mesh, hexColor) {
+    const { material } = mesh;
+    if (Array.isArray(material)) material.forEach((item) => item.color.setHex(hexColor));
+    else material.color.setHex(hexColor);
+    material.needsUpdate = true;
+}
+
+export function animateMeshColor(mesh, targetHex, duration = ANIMATION_DURATION) {
+    if (activeAnimations.has(mesh)) {
+        cancelAnimationFrame(activeAnimations.get(mesh));
+        activeAnimations.delete(mesh);
+    }
+
+    const startColor = new THREE.Color(getMeshColor(mesh));
+    const targetColor = new THREE.Color(targetHex);
+    const startTime = performance.now();
+
+    function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        setMeshColorInstant(mesh, startColor.clone().lerp(targetColor, progress).getHex());
+
+        if (progress < 1) activeAnimations.set(mesh, requestAnimationFrame(step));
+        else activeAnimations.delete(mesh);
+    }
+
+    activeAnimations.set(mesh, requestAnimationFrame(step));
+}
+
+export function resetAllRoomsToWhite(instant = true) {
     roomMeshes.forEach((mesh) => {
-        const base = mesh.userData.baseColor;
-        if (base == null) return;
-        setMeshColorInstant(mesh, darkTheme ? dimColor(base, DECOR_DIM_DARK) : base);
+        if (!mesh.userData.showPanel) return;
+        if (instant) setMeshColorInstant(mesh, roomBaseColor());
+        else animateMeshColor(mesh, roomBaseColor());
     });
 }
 
-function dimColor(hex, factor) {
-    return decorColor.setHex(hex).multiplyScalar(factor).getHex();
+export function getStatusColor(status, variant = 'normal') {
+    if (status === 'past') return roomBaseColor();
+    const palette = darkTheme ? statusColorsDark : statusColors;
+    return palette[status]?.[variant] ?? roomBaseColor();
 }
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
-camera.position.set(0, 10, 0);
-camera.lookAt(0, 0, 0);
 
-// создание рендерера и добавление его в контейнер
-export const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-container.appendChild(renderer.domElement);
+export function resetActiveSelection() {
+    if (activeHighlightedMesh) {
+        const { pairStatus } = activeHighlightedMesh.userData;
+        const color = pairStatus && pairStatus !== 'past'
+            ? getStatusColor(pairStatus, 'normal')
+            : roomBaseColor();
+        animateMeshColor(activeHighlightedMesh, color);
+        setActiveHighlightedMesh(null);
+    }
 
-// добавление освещения
-const ambientLight = new THREE.AmbientLight(0xffffff, AMBIENT_INTENSITY_LIGHT);
-scene.add(ambientLight);
-const dirLight = new THREE.DirectionalLight(0xffffff, DIR_INTENSITY_LIGHT);
-dirLight.position.set(10, 20, 10);
-scene.add(dirLight);
-
-applyThemeBackground();
-
-// настройка управления камерой
-export const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, 0);
-controls.enableDamping = true;
-controls.dampingFactor = 0.1;
-controls.screenSpacePanning = true;
-controls.enableZoom = true;
-controls.zoomSpeed = 1.2;
-controls.enableRotate = true;
-controls.minPolarAngle = 0;
-controls.maxPolarAngle = Math.PI / 2;
-controls.enablePan = true;
-controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
-controls.update();
-
-// на мобильных отключаем вращение, оставляем панорамирование и зум
-if (isMobile) {
-    controls.enableRotate = false;
-    controls.touches.ONE = THREE.TOUCH.PAN;
-    controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
+    if (selectedMesh) {
+        animateMeshColor(selectedMesh, roomBaseColor());
+        setSelectedMesh(null);
+    }
 }
-controls.update();
 
-// инициализация raycaster для обработки кликов
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-const pointerDownPos = new THREE.Vector2();
-let isPointerDown = false;
+// ЗАГРУЗКА ЭТАЖА
 
-// загрузка glb-модели
-const loader = new GLTFLoader();
-
-// ссылка на загруженную модель — нужна кнопке «Сбросить вид»
-let loadedModel = null;
-
-// анимация запускается один раз, дальше рисует текущую сцену
-let animationStarted = false;
-
-// какой этаж сейчас активен (загружен или ещё грузится) — блокирует повторный
-// клик по тому же этажу и делает так, что при быстрой смене кликов
-// применится только самый последний запрошенный этаж
 let activeFloor = null;
 let loadToken = 0;
 
 const modelProgress = modelLoading.querySelector('.model-progress');
 const modelProgressFill = modelLoading.querySelector('.model-progress-fill');
 const modelProgressValue = modelLoading.querySelector('.model-progress-value');
+const modelSpinner = modelLoading.querySelector('.spinner');
+const modelText = modelLoading.querySelector('p');
 
 function setLoadProgress(percent) {
-    if (!modelProgress) return;
     if (percent === null) {
         modelProgress.hidden = true;
         modelProgressFill.style.width = '0%';
         return;
     }
+
     modelProgress.hidden = false;
     modelProgress.setAttribute('aria-valuenow', String(percent));
     modelProgressFill.style.width = `${percent}%`;
     modelProgressValue.textContent = `${percent}%`;
 }
 
-// загрузка плана выбранного этажа, вызывается при каждом переключении
+function disposeFloorModel() {
+    if (!loadedModel) return;
+
+    scene.remove(loadedModel);
+    loadedModel.traverse((child) => {
+        if (!child.isMesh) return;
+        child.geometry?.dispose();
+        const { material } = child;
+        if (Array.isArray(material)) material.forEach((item) => item.dispose());
+        else material?.dispose();
+    });
+    loadedModel = null;
+}
+
+function findRoomConfig(meshName, floorConfig) {
+    for (const [id, config] of Object.entries(floorConfig)) {
+        if (meshName.includes(id)) return { id, config };
+    }
+    return null;
+}
+
+function assignRoomData(mesh, index, floorConfig) {
+    const name = mesh.name || '';
+    const match = findRoomConfig(name, floorConfig);
+
+    if (match) {
+        const { number, name: roomName, showPanel } = match.config;
+        Object.assign(mesh.userData, { roomId: match.id, roomNumber: number, roomName, showPanel });
+    } else {
+        Object.assign(mesh.userData, {
+            roomId: name || `unknown_${index}`,
+            roomNumber: '',
+            roomName: name || `Объект ${index}`,
+            showPanel: false
+        });
+    }
+
+
+    const { material } = mesh;
+    mesh.material = Array.isArray(material) ? material.map((item) => item.clone()) : material.clone();
+    if (!mesh.userData.showPanel) mesh.userData.baseColor = getMeshColor(mesh);
+}
+
+function handleFloorLoaded(gltf, floor) {
+    const model = gltf.scene;
+    loadedModel = model;
+    scene.add(model);
+
+    model.traverse((child) => {
+        if (child.isMesh) roomMeshes.push(child);
+    });
+
+    const floorConfig = floorRoomConfigs[floor] || {};
+    roomMeshes.forEach((mesh, index) => assignRoomData(mesh, index, floorConfig));
+
+    applyDecorColors();
+    fitCameraToModel(model);
+    resetAllRoomsToWhite();
+    setLoadProgress(null);
+    modelLoading.classList.add('hidden');
+
+    if (!animationStarted) {
+        animationStarted = true;
+        animate();
+    }
+
+    if (hasSelection()) applySelection();
+}
+
+
+function handleFloorProgress(event, expectedBytes) {
+    const total = expectedBytes
+        || (event.lengthComputable && event.total > event.loaded ? event.total : 0);
+
+    if (!total) {
+        setLoadProgress(null);
+        return;
+    }
+
+    setLoadProgress(Math.min(100, Math.round((event.loaded / total) * 100)));
+}
+
+function handleFloorError(error) {
+    console.error('Ошибка загрузки модели:', error);
+    modelSpinner.style.display = 'none';
+    modelText.textContent = 'Ошибка соединения. Попробуйте выбрать этаж ещё раз.';
+    setLoadProgress(null);
+    activeFloor = null; 
+}
+
 export function loadFloorModel(floor) {
     const url = FLOOR_MODELS[floor];
     if (!url) return;
 
     const token = ++loadToken;
+    const expectedBytes = GLB_SIZES[url] || 0;
 
-    if (loadedModel) {
-        scene.remove(loadedModel);
-        loadedModel.traverse((child) => {
-            if (!child.isMesh) return;
-            if (child.geometry) child.geometry.dispose();
-            const material = child.material;
-            if (Array.isArray(material)) material.forEach((item) => item.dispose());
-            else if (material) material.dispose();
-        });
-        loadedModel = null;
-    }
-
+    disposeFloorModel();
     setRoomMeshes([]);
     setHighlightedMeshes([]);
     setSelectedMesh(null);
     setActiveHighlightedMesh(null);
 
     modelLoading.classList.remove('hidden');
-    modelLoading.querySelector('.spinner').style.display = '';
-    modelLoading.querySelector('p').textContent = 'Загружаем план этажа…';
-
-    const expectedBytes = GLB_SIZES[url] || 0;
+    modelSpinner.style.display = '';
+    modelText.textContent = 'Загружаем план этажа…';
     setLoadProgress(expectedBytes ? 0 : null);
 
     loader.load(
         url,
-        (gltf) => {
-            if (token !== loadToken) return; // ответ от уже неактуальной загрузки
-
-            const model = gltf.scene;
-            loadedModel = model;
-            scene.add(model);
-
-            // собираем все меши в массив
-            model.traverse((child) => {
-                if (child.isMesh) roomMeshes.push(child);
-            });
-
-            // конфиг кабинетов у каждого этажа свой
-            const floorConfig = floorRoomConfigs[floor] || {};
-
-            // сопоставляем каждый меш с конфигурацией кабинета
-            roomMeshes.forEach((mesh, index) => {
-                let config = null;
-                let roomId = null;
-                const name = mesh.name || '';
-
-                for (const id in floorConfig) {
-                    if (name.includes(id)) {
-                        config = floorConfig[id];
-                        roomId = id;
-                        break;
-                    }
-                }
-
-                if (config) {
-                    mesh.userData.roomId = roomId;
-                    mesh.userData.roomNumber = config.number;
-                    mesh.userData.roomName = config.name;
-                    mesh.userData.showPanel = config.showPanel;
-                } else {
-                    mesh.userData.roomId = roomId || name || `unknown_${index}`;
-                    mesh.userData.roomNumber = '';
-                    mesh.userData.roomName = name || `Объект ${index}`;
-                    mesh.userData.showPanel = false;
-                }
-
-                // клонируем материал, чтобы можно было менять цвет индивидуально
-                if (mesh.material) {
-                    mesh.material = Array.isArray(mesh.material)
-                        ? mesh.material.map((mat) => mat.clone())
-                        : mesh.material.clone();
-                    if (!mesh.userData.showPanel) mesh.userData.baseColor = getMeshColor(mesh);
-                }
-            });
-
-            applyDecorColors();
-
-            // подгоняем камеру под модель и запускаем анимацию
-            fitCameraToModel(model);
-            resetAllRoomsToWhite();
-            setLoadProgress(null);
-            modelLoading.classList.add('hidden');
-
-            if (!animationStarted) {
-                animationStarted = true;
-                animate();
-            }
-
-            // подсветка пар на новом этаже
-            if (hasSelection()) applySelection();
-        },
-        (event) => {
-            if (token !== loadToken) return;
-
-            const total = expectedBytes
-                || (event.lengthComputable && event.total > event.loaded ? event.total : 0);
-            if (!total) {
-                setLoadProgress(null);
-                return;
-            }
-
-            setLoadProgress(Math.min(100, Math.round((event.loaded / total) * 100)));
-        },
-        (error) => {
-            if (token !== loadToken) return; // ответ от уже неактуальной загрузки
-
-            console.error('Ошибка загрузки модели:', error);
-            modelLoading.querySelector('.spinner').style.display = 'none';
-            modelLoading.querySelector('p').textContent = 'Ошибка соединения. Попробуйте выбрать этаж ещё раз.';
-            setLoadProgress(null);
-            activeFloor = null; // разрешаем повторную попытку по клику на тот же этаж
-        }
+        (gltf) => { if (token === loadToken) handleFloorLoaded(gltf, floor); },
+        (event) => { if (token === loadToken) handleFloorProgress(event, expectedBytes); },
+        (error) => { if (token === loadToken) handleFloorError(error); }
     );
 }
 
-// функция подгонки камеры под размеры модели
-function fitCameraToModel(model) {
+// КАМЕРА
+
+function orientModel(model) {
     model.rotation.y = 0;
     model.position.set(0, 0, 0);
     model.updateMatrixWorld(true);
@@ -295,23 +355,14 @@ function fitCameraToModel(model) {
         model.rotation.y = Math.PI / 2;
         model.updateMatrixWorld(true);
     }
+}
 
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const diagonal = Math.sqrt(size.x ** 2 + size.y ** 2 + size.z ** 2);
-
-    model.position.sub(center);
-    model.updateMatrixWorld(true);
-    controls.target.set(0, 0, 0);
-
-    const camDistance = diagonal * DIAGONAL_MARGIN + 10;
-    const polar = FIXED_POLAR;
-    const azimuth = FIXED_AZIMUTH;
+function placeCamera(diagonal) {
+    const distance = diagonal * DIAGONAL_MARGIN + CAMERA_DISTANCE_PADDING;
     camera.position.set(
-        camDistance * Math.sin(polar) * Math.sin(azimuth),
-        camDistance * Math.cos(polar),
-        camDistance * Math.sin(polar) * Math.cos(azimuth)
+        distance * Math.sin(FIXED_POLAR) * Math.sin(FIXED_AZIMUTH),
+        distance * Math.cos(FIXED_POLAR),
+        distance * Math.sin(FIXED_POLAR) * Math.cos(FIXED_AZIMUTH)
     );
     camera.up.set(0, 1, 0);
     camera.lookAt(controls.target);
@@ -323,13 +374,16 @@ function fitCameraToModel(model) {
     camera.top = frustumSize / 2;
     camera.bottom = -frustumSize / 2;
     camera.near = 0.1;
-    camera.far = diagonal * 10 + 1000;
+    camera.far = diagonal * FAR_PLANE_FACTOR + FAR_PLANE_PADDING;
     camera.updateMatrixWorld(true);
     camera.updateProjectionMatrix();
+}
 
+function fitZoom(size) {
     const half = size.clone().multiplyScalar(0.5);
     let maxX = 0;
     let maxY = 0;
+
     for (let i = 0; i < 8; i++) {
         const corner = new THREE.Vector3(
             (i & 1 ? 1 : -1) * half.x,
@@ -347,12 +401,24 @@ function fitCameraToModel(model) {
     controls.update();
 }
 
-// подпись с id по obj.
-// первым идёт id меша из модели (это ключ для roomConfig), следом номер
-// и название кабинета, если заданы.
-export function showClickInfo(mesh) {
-    if (!clickInfoDiv) return;
+function fitCameraToModel(model) {
+    orientModel(model);
 
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    model.position.sub(center);
+    model.updateMatrixWorld(true);
+    controls.target.set(0, 0, 0);
+
+    placeCamera(Math.hypot(size.x, size.y, size.z));
+    fitZoom(size);
+}
+
+// КЛИКИ ПО КАРТЕ
+
+export function showClickInfo(mesh) {
     if (!mesh) {
         clickInfoDiv.textContent = '';
         return;
@@ -363,157 +429,90 @@ export function showClickInfo(mesh) {
     clickInfoDiv.textContent = details ? `ID ${roomId} — ${details}` : `ID ${roomId}`;
 }
 
-// хранилище активных анимаций для возможности отмены
-const activeAnimations = new Map();
-
-// получение текущего цвета меша
-function getMeshColor(mesh) {
-    return Array.isArray(mesh.material) ? mesh.material[0].color.getHex() : mesh.material.color.getHex();
-}
-
-// мгновенная установка цвета
-function setMeshColorInstant(mesh, hexColor) {
-    if (!mesh.material) return;
-    if (Array.isArray(mesh.material)) {
-        mesh.material.forEach((mat) => mat.color.setHex(hexColor));
-    } else {
-        mesh.material.color.setHex(hexColor);
-    }
-    mesh.material.needsUpdate = true;
-}
-
-// плавная анимация изменения цвета
-export function animateMeshColor(mesh, targetHex, duration = ANIMATION_DURATION) {
-    if (!mesh.material) return;
-    if (activeAnimations.has(mesh)) {
-        cancelAnimationFrame(activeAnimations.get(mesh));
-        activeAnimations.delete(mesh);
-    }
-    const startColor = new THREE.Color(getMeshColor(mesh));
-    const targetColor = new THREE.Color(targetHex);
-    const startTime = performance.now();
-
-    function step(now) {
-        const t = Math.min((now - startTime) / duration, 1);
-        setMeshColorInstant(mesh, startColor.clone().lerp(targetColor, t).getHex());
-        if (t < 1) {
-            activeAnimations.set(mesh, requestAnimationFrame(step));
-        } else {
-            activeAnimations.delete(mesh);
-        }
-    }
-    activeAnimations.set(mesh, requestAnimationFrame(step));
-}
-
-// сброс всех кабинетов к белому цвету
-export function resetAllRoomsToWhite(instant = true) {
-    roomMeshes.forEach((mesh) => {
-        if (mesh.userData.showPanel) {
-            if (instant) setMeshColorInstant(mesh, roomBaseColor());
-            else animateMeshColor(mesh, roomBaseColor());
-        }
-    });
-}
-
-// получение цвета в зависимости от статуса пары
-export function getStatusColor(status, variant = 'normal') {
-    if (status === 'past') return roomBaseColor();
-    const palette = darkTheme ? statusColorsDark : statusColors;
-    return palette[status]?.[variant] ?? roomBaseColor();
-}
-
-// сброс активной подсветки (выбранного или активного кабинета)
-export function resetActiveSelection() {
-    if (activeHighlightedMesh) {
-        const status = activeHighlightedMesh.userData.pairStatus;
-        animateMeshColor(activeHighlightedMesh, status && status !== 'past' ? getStatusColor(status, 'normal') : roomBaseColor());
-        setActiveHighlightedMesh(null);
-    }
-    if (selectedMesh) {
-        animateMeshColor(selectedMesh, roomBaseColor());
-        setSelectedMesh(null);
-    }
-}
-
-// обработка клика по 3d-сцене
-function handleClick(event) {
-    const clientX = event.clientX ?? event.touches?.[0]?.clientX;
-    const clientY = event.clientY ?? event.touches?.[0]?.clientY;
-    if (clientX == null || clientY == null) return;
-
+function pickMeshAt(clientX, clientY) {
     const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(roomMeshes, false);
+    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
 
+    const [hit] = raycaster.intersectObjects(roomMeshes, false);
+    return hit?.object ?? null;
+}
+
+function handleClick({ clientX, clientY }) {
     resetActiveSelection();
 
-    if (intersects.length === 0) {
+    const mesh = pickMeshAt(clientX, clientY);
+    if (!mesh) {
         hideRoomPanel();
         showClickInfo(null);
         return;
     }
 
-    const mesh = intersects[0].object;
-    const userData = mesh.userData;
-    // подпись показываем для любого объекта, даже если карточки у него нет
+
     showClickInfo(mesh);
 
+    const { roomNumber, roomName, showPanel, pairStatus } = mesh.userData;
+
     if (highlightedMeshes.includes(mesh)) {
-        const status = mesh.userData.pairStatus;
-        if (status && status !== 'past') animateMeshColor(mesh, getStatusColor(status, 'bright'));
+        if (pairStatus && pairStatus !== 'past') animateMeshColor(mesh, getStatusColor(pairStatus, 'bright'));
         setActiveHighlightedMesh(mesh);
-        showRoomPanel(userData.roomNumber, userData.roomName);
-    } else if (userData.showPanel) {
-        animateMeshColor(mesh, roomSelectedColor());
-        setSelectedMesh(mesh);
-        showRoomPanel(userData.roomNumber || '', userData.roomName);
-    } else {
-        hideRoomPanel();
+        showRoomPanel(roomNumber, roomName);
+        return;
     }
+
+    if (!showPanel) {
+        hideRoomPanel();
+        return;
+    }
+
+    animateMeshColor(mesh, roomSelectedColor());
+    setSelectedMesh(mesh);
+    showRoomPanel(roomNumber || '', roomName);
 }
 
-// регистрация событий pointer и touch для различения клика и перетаскивания
-renderer.domElement.addEventListener('pointerdown', (event) => {
+function isTap(clientX, clientY) {
+    return Math.hypot(clientX - pointerDownPos.x, clientY - pointerDownPos.y) < DRAG_THRESHOLD;
+}
+
+renderer.domElement.addEventListener('pointerdown', ({ clientX, clientY }) => {
     isPointerDown = true;
-    pointerDownPos.set(event.clientX, event.clientY);
+    pointerDownPos.set(clientX, clientY);
 });
+
 renderer.domElement.addEventListener('pointerup', (event) => {
     if (!isPointerDown) return;
     isPointerDown = false;
-    const dx = event.clientX - pointerDownPos.x;
-    const dy = event.clientY - pointerDownPos.y;
-    if (Math.hypot(dx, dy) < DRAG_THRESHOLD) handleClick(event);
+    if (isTap(event.clientX, event.clientY)) handleClick(event);
 });
+
 renderer.domElement.addEventListener('touchstart', (event) => {
-    if (event.touches.length === 1) {
-        isPointerDown = true;
-        pointerDownPos.set(event.touches[0].clientX, event.touches[0].clientY);
-    } else {
-        isPointerDown = false;
-    }
+    isPointerDown = event.touches.length === 1;
+    if (isPointerDown) pointerDownPos.set(event.touches[0].clientX, event.touches[0].clientY);
 });
+
 renderer.domElement.addEventListener('touchend', (event) => {
     if (!isPointerDown) return;
     isPointerDown = false;
-    const touch = event.changedTouches[0];
-    if (Math.hypot(touch.clientX - pointerDownPos.x, touch.clientY - pointerDownPos.y) < DRAG_THRESHOLD) {
-        handleClick(touch);
-    }
+
+    const [touch] = event.changedTouches;
+    if (isTap(touch.clientX, touch.clientY)) handleClick(touch);
 });
 
-// переключение этажей
+
+// ПЕРЕКЛЮЧЕНИЕ ЭТАЖЕЙ
+
+
 export function setFloor(floor) {
-    if (floor === activeFloor) return; // этот этаж уже активен или грузится — повторный клик игнорируем
+    if (floor === activeFloor) return;
     activeFloor = floor;
 
     setCurrentFloor(floor);
 
     floorNumbers.forEach((span) => {
-        const isActive = parseInt(span.dataset.floor, 10) === floor;
+        const isActive = Number(span.dataset.floor) === floor;
         span.classList.toggle('active', isActive);
-        span.setAttribute('aria-current', isActive ? 'true' : 'false');
+        span.setAttribute('aria-current', String(isActive));
     });
 
     const hasModel = Boolean(FLOOR_MODELS[floor]);
@@ -525,41 +524,37 @@ export function setFloor(floor) {
     showClickInfo(null);
 
     if (hasModel) {
-        // модель грузится заново; расписание подтянется в ее колбэке
+
         loadFloorModel(floor);
-    } else {
-        resetAllRoomsToWhite(true);
-        setHighlightedMeshes([]);
-        setSelectedMesh(null);
-        setActiveHighlightedMesh(null);
+        return;
     }
+
+    resetAllRoomsToWhite(true);
+    setHighlightedMeshes([]);
+    setSelectedMesh(null);
+    setActiveHighlightedMesh(null);
 }
 
 floorNumbers.forEach((span) => {
-    span.addEventListener('click', () => setFloor(parseInt(span.dataset.floor, 10)));
+    const floor = Number(span.dataset.floor);
+
+    span.addEventListener('click', () => setFloor(floor));
     span.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            setFloor(parseInt(span.dataset.floor, 10));
-        }
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        setFloor(floor);
     });
 });
 
-// основной цикл анимации
+// РЕНДЕР
+
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
 }
 
-// Обработка изменения размеров контейнера.
-//
-// Раньше здесь вызывался controls.handleResize() — такого метода у
-// OrbitControls нет, и обработчик падал с ошибкой на каждом ресайзе.
-// Из-за этого же не пересчитывались границы видимой области камеры:
-// ортокамера, в отличие от перспективной, не выводит их из размера
-// холста сама, и модель растягивалась при смене размера окна.
-// Высоту области оставляем прежней, а ширину заново считаем из пропорций.
+
 const resizeObserver = new ResizeObserver(() => {
     const width = container.clientWidth;
     const height = container.clientHeight;
@@ -575,8 +570,6 @@ const resizeObserver = new ResizeObserver(() => {
 });
 resizeObserver.observe(container);
 
-// кнопка Сбросить вид: возвращает камеру в исходное положение,
-// если пользователь увёл карту зумом или перетаскиванием
 document.getElementById('reset-view').addEventListener('click', () => {
     if (loadedModel) fitCameraToModel(loadedModel);
 });

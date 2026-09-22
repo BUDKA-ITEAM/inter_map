@@ -19,19 +19,8 @@ export const DIAGONAL_MARGIN = 2.0;
 export const FRUSTUM_MARGIN = 1.0;
 export const FIXED_AZIMUTH = 0;
 export const FIXED_POLAR = 0.45;
-
-// Настройки api. заменить ссылку на норм https, на сервере нужно разрешить домен сайта в ALLOWED_ORIGINS (cors)
-// Локально работаем с сервером на своей машине, на боевом сайте —
-// с публичным адресом. Второй нужно подставить: он должен быть на https,
-// иначе браузер заблокирует запрос со страницы, открытой по https.
-// Боевой адрес: сюда впишется https-адрес api, когда он появится.
 export const API_PRODUCTION_URL = 'https://ЗАМЕНИТЬ-НА-АДРЕС-API';
-// Адрес для разработки: сервис поднят на соседней машине и виден
-// через Radmin VPN. Поменяйте, если сервис переедет.
 export const API_DEV_URL = 'http://26.70.191.230:8080';
-// Локальной считаем не только localhost, но и страницу, открытую по адресу
-// машины в локальной сети (Live Server на 192.168.*, заход с телефона и т.п.):
-// раньше в таком случае подставлялся боевой адрес-заглушка и запрос уходил в никуда.
 export const isLocalHost = ['localhost', '127.0.0.1', '', '[::1]'].includes(location.hostname)
     || location.protocol === 'file:'
     || /^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\.|^26\./.test(location.hostname);
@@ -40,12 +29,8 @@ export const LESSONS_ENDPOINT = '/api/lessons';
 export const TEACHERS_ENDPOINT = '/api/teachers';
 export const WEEK_SCHEDULE_PAGE_URL = 'week_schedule.html';
 
-// Сколько уроков тянем, когда собираем список групп. Отдельного
-// эндпоинта для групп у api нет, поэтому берём широкую выборку уроков
-// без фильтра по датам: расписание в базе может быть за любую неделю.
 export const GROUPS_SCAN_LIMIT = 2000;
 
-// описание кабинетов по идентификаторам в модели
 export const roomConfigFloor2 = {
     //2ndfloor
     '6419': { number: '', name: 'Служебная лестница', showPanel: true },
@@ -170,11 +155,6 @@ export const floorRoomConfigs = {
     6: roomConfigFloor6,
 };
 
-// Запрос к api с ограничением по времени.
-//
-// Без таймаута повисший запрос молчит бесконечно, и на экране навсегда
-// остаётся «Загружаем…». AbortController обрывает его через заданное
-// число секунд, а текст ошибки потом показывается пользователю.
 export const API_TIMEOUT_MS = 15000;
 
 // палитра цветов и параметры анимации
@@ -189,6 +169,11 @@ export const COLOR_SELECTED = 0xd8d3c4;
 export const COLOR_WHITE_DARK = 0x8d939b;
 export const COLOR_SELECTED_DARK = 0x7a7568;
 export const ANIMATION_DURATION = 350;
+export const MAX_PIXEL_RATIO = 2;
+export const DARK_LIGHTNESS_THRESHOLD = 0.4;
+export const CAMERA_DISTANCE_PADDING = 10;
+export const FAR_PLANE_FACTOR = 10;
+export const FAR_PLANE_PADDING = 1000;
 
 export const statusColors = {
     past: { normal: 0xf1e2d9, bright: 0xe6cdbd },
@@ -204,11 +189,12 @@ export const statusColorsDark = {
 
 export const DRAG_THRESHOLD = 5;
 
-// пороги жестов свайпа для открытия сайдбара
 export const SWIPE_EDGE_THRESHOLD = 24;
 export const SWIPE_MIN_DISTANCE = 60;
 
-// пороги жестов свайпа для шторки расписания
+export const HORIZONTAL_GESTURE_RATIO = 1.5;
+export const VERTICAL_GESTURE_RATIO = 1.5;
+
 export const SHEET_EDGE_THRESHOLD = 32;
 export const SHEET_MIN_DISTANCE = 60;
 
@@ -217,5 +203,10 @@ export const TEACHER_STORAGE_KEY = 'intermap.selectedTeacher';
 export const SCHEDULE_MODE_STORAGE_KEY = 'intermap.scheduleMode';
 export const THEME_STORAGE_KEY = 'intermap.theme';
 export const DEBUG_STORAGE_KEY = 'intermap.debug';
+export const SWITCH_COUNT_STORAGE_KEY = 'intermap.themeSwitches.v2';
 export const DEBUG_UNLOCK_TAPS = 20;
 export const DEBUG_VIDEO_TAPS = 30;
+export const EXTRAS_UNLOCK_SWITCHES = 20;
+export const MOBILE_BREAKPOINT = 768;
+
+export const WEEKDAY_TITLES = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];

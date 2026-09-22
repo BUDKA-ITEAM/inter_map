@@ -1,6 +1,3 @@
-// Точка входа: импортирует все модули (за счёт чего выполняются их побочные
-// эффекты — регистрация обработчиков событий) и запускает инициализацию
-// в порядке, воспроизводящем поведение исходного app.js.
 import './state.js';
 import './three.js';
 import './schedule.js';
@@ -10,19 +7,20 @@ import './teachers.js';
 import './ui.js';
 
 import { setFloor } from './three.js';
-import { getDateString } from './schedule.js';
+import { getDateString, scheduleToggle } from './schedule.js';
 import { initGroupPicker } from './groups.js';
 import { initTeacherPicker } from './teachers.js';
 import { initTheme, initDebugMode, initExtrasUnlock } from './ui.js';
 import { dateInput, currentDate, currentFloor, setCurrentDate } from './state.js';
-import { scheduleToggle } from './schedule.js';
 
 initTheme();
 initDebugMode();
 initExtrasUnlock();
+
 setCurrentDate(getDateString(new Date()));
 dateInput.value = currentDate;
 setFloor(currentFloor);
+
 initGroupPicker();
 initTeacherPicker();
 

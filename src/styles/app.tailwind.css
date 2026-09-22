@@ -6,7 +6,10 @@
 
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
+@import "./components.css";
+
 @source "../front/index.html";
+@source "../styles/components.css";
 @source "../front/*.js";
 
 @source not inline("hidden visible container active open");

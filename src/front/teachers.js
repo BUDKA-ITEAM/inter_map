@@ -1,9 +1,11 @@
-import { TEACHERS_ENDPOINT, TEACHER_STORAGE_KEY, SCHEDULE_MODE_STORAGE_KEY } from './config.js';
+// Выбор преподавателя и переключатель «по группе / по преподавателю».
+import {
+    TEACHERS_ENDPOINT, TEACHER_STORAGE_KEY, SCHEDULE_MODE_STORAGE_KEY
+} from './config.js';
 import { teacherSelect, scheduleMode, setScheduleMode, setCurrentTeacher } from './state.js';
-import { fetchFromApi, applySelectionIfNeeded, applySelection, scheduleToggle } from './schedule.js';
+import { readStored, writeStored } from './storage.js';
+import { fetchFromApi, applySelection, applySelectionIfNeeded, scheduleToggle } from './schedule.js';
 import { FALLBACK_LESSONS } from './fallbackSchedule.js';
-
-let teacherCatalog = [];
 
 const groupPicker = document.getElementById('group-picker');
 const teacherPicker = document.getElementById('teacher-picker');
@@ -17,6 +19,8 @@ const teacherCurrentName = document.getElementById('teacher-current-name');
 const teacherChangeBtn = document.getElementById('teacher-change-btn');
 const teacherStatus = document.getElementById('teacher-status');
 
+let teacherCatalog = [];
+
 function showTeacherState(state) {
     teacherPickBtn.hidden = state !== 'empty';
     teacherPickerPanel.hidden = state !== 'picking';
@@ -29,25 +33,23 @@ function setTeacherStatus(text, isError = false) {
 }
 
 function fallbackTeachers() {
-    const names = new Set();
-    FALLBACK_LESSONS.forEach((lesson) => {
-        if (lesson.teacher_name) names.add(lesson.teacher_name);
-    });
+    const names = new Set(FALLBACK_LESSONS.map(({ teacher_name: name }) => name).filter(Boolean));
     return [...names]
         .sort((a, b) => a.localeCompare(b, 'ru'))
         .map((name) => ({ id: name, name }));
 }
 
-async function loadTeacherCatalog() {
+
+async function fetchTeacherCatalog() {
     const response = await fetchFromApi(TEACHERS_ENDPOINT, new URLSearchParams());
-    const teachers = Array.isArray(response) ? response : [];
-    const parsed = teachers
-        .filter((item) => item && typeof item.name === 'string' && item.name.trim())
-        .map((item) => ({ id: String(item.id ?? item.name), name: item.name.trim() }));
 
-    if (!parsed.length) return fallbackTeachers();
+    const teachers = response
+        .filter(({ name }) => typeof name === 'string' && name.trim())
+        .map(({ id, name }) => ({ id: String(id ?? name), name: name.trim() }));
 
-    return parsed.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+    return teachers.length
+        ? teachers.sort((a, b) => a.name.localeCompare(b.name, 'ru'))
+        : fallbackTeachers();
 }
 
 function fillTeachers() {
@@ -57,10 +59,10 @@ function fillTeachers() {
     placeholder.textContent = teacherCatalog.length ? 'Выберите преподавателя' : 'Список пуст';
     teacherSelect.appendChild(placeholder);
 
-    teacherCatalog.forEach((teacher) => {
+    teacherCatalog.forEach(({ id, name }) => {
         const option = document.createElement('option');
-        option.value = teacher.id;
-        option.textContent = teacher.name;
+        option.value = id;
+        option.textContent = name;
         teacherSelect.appendChild(option);
     });
 
@@ -71,10 +73,7 @@ function fillTeachers() {
 function confirmTeacher(teacher) {
     setCurrentTeacher(teacher);
     teacherCurrentName.textContent = teacher.name;
-    try {
-        localStorage.setItem(TEACHER_STORAGE_KEY, teacher.id);
-    } catch (error) {
-    }
+    writeStored(TEACHER_STORAGE_KEY, teacher.id);
     setTeacherStatus('');
     showTeacherState('chosen');
     if (scheduleMode === 'teacher' && scheduleToggle.checked) applySelection();
@@ -89,10 +88,7 @@ export function setScheduleModeUI(mode) {
     groupPicker.hidden = teacherMode;
     teacherPicker.hidden = !teacherMode;
 
-    try {
-        localStorage.setItem(SCHEDULE_MODE_STORAGE_KEY, teacherMode ? 'teacher' : 'group');
-    } catch (error) {
-    }
+    writeStored(SCHEDULE_MODE_STORAGE_KEY, teacherMode ? 'teacher' : 'group');
 }
 
 function switchMode(mode) {
@@ -107,7 +103,7 @@ modeTeacherBtn.addEventListener('click', () => switchMode('teacher'));
 teacherPickBtn.addEventListener('click', () => showTeacherState('picking'));
 
 teacherChangeBtn.addEventListener('click', () => {
-    const current = teacherCatalog.find((item) => item.name === teacherCurrentName.textContent);
+    const current = teacherCatalog.find(({ name }) => name === teacherCurrentName.textContent);
     teacherSelect.value = current ? current.id : '';
     teacherConfirmBtn.disabled = !teacherSelect.value;
     showTeacherState('picking');
@@ -118,48 +114,40 @@ teacherSelect.addEventListener('change', () => {
 });
 
 teacherConfirmBtn.addEventListener('click', () => {
-    const teacher = teacherCatalog.find((item) => item.id === teacherSelect.value);
+    const teacher = teacherCatalog.find(({ id }) => id === teacherSelect.value);
     if (teacher) confirmTeacher(teacher);
 });
 
+function restoreSavedTeacher() {
+    const savedId = readStored(TEACHER_STORAGE_KEY);
+    const teacher = teacherCatalog.find(({ id }) => id === savedId);
+    if (!teacher) return;
+
+    teacherSelect.value = teacher.id;
+    confirmTeacher(teacher);
+}
+
 export async function initTeacherPicker() {
-    let savedMode = null;
-    try {
-        savedMode = localStorage.getItem(SCHEDULE_MODE_STORAGE_KEY);
-    } catch (error) {
-        savedMode = null;
-    }
-    setScheduleModeUI(savedMode === 'teacher' ? 'teacher' : 'group');
+    setScheduleModeUI(readStored(SCHEDULE_MODE_STORAGE_KEY) === 'teacher' ? 'teacher' : 'group');
 
     showTeacherState('empty');
     teacherPickBtn.disabled = true;
     setTeacherStatus('Загружаем список преподавателей…');
 
     try {
-        teacherCatalog = await loadTeacherCatalog();
-        fillTeachers();
-        teacherPickBtn.disabled = !teacherCatalog.length;
-        setTeacherStatus(teacherCatalog.length
-            ? `Преподавателей в расписании: ${teacherCatalog.length}`
-            : 'Список преподавателей пуст');
+        teacherCatalog = await fetchTeacherCatalog();
     } catch (error) {
-        console.error('Не удалось загрузить список преподавателей:', error);
         setTeacherStatus(`Не удалось загрузить список преподавателей: ${error.message}`, true);
         return;
     }
 
-    let savedTeacherId = null;
-    try {
-        savedTeacherId = localStorage.getItem(TEACHER_STORAGE_KEY);
-    } catch (error) {
-        savedTeacherId = null;
-    }
+    fillTeachers();
+    teacherPickBtn.disabled = !teacherCatalog.length;
+    setTeacherStatus(teacherCatalog.length
+        ? `Преподавателей в расписании: ${teacherCatalog.length}`
+        : 'Список преподавателей пуст');
 
-    const savedTeacher = teacherCatalog.find((item) => item.id === savedTeacherId);
-    if (savedTeacher) {
-        teacherSelect.value = savedTeacher.id;
-        confirmTeacher(savedTeacher);
-    }
+    restoreSavedTeacher();
 
     if (scheduleMode === 'teacher' && scheduleToggle.checked) applySelectionIfNeeded();
 }

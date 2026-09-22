@@ -1,19 +1,24 @@
-// Общие элементы интерфейса: сайдбар, свайп для его открытия на мобильных,
-// ссылка на страницу недельного расписания, звук заглушки этажа, сохранение
-// темы оформления. В конце файла — закомментированный код старого режима
-// отладки (не удалён по требованию — см. план рефакторинга).
-import { THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS, SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE } from './config.js';
+// Сайдбар настроек, правая шторка расписания, свайпы между ними,
+// тема оформления и скрытый режим отладки.
+import {
+    THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS,
+    SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE, MOBILE_BREAKPOINT,
+    EXTRAS_UNLOCK_SWITCHES, SWITCH_COUNT_STORAGE_KEY, HORIZONTAL_GESTURE_RATIO
+} from './config.js';
 import { sidebarToggle, sidebar, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
+import { readStored, writeStored } from './storage.js';
 import { applyThemeBackground } from './three.js';
 
 const scheduleDrawer = document.getElementById('schedule-drawer');
 const scheduleDrawerToggle = document.getElementById('schedule-drawer-toggle');
+const themeToggle = document.getElementById('theme-toggle');
+const stubVideo = document.querySelector('.stub-video');
+const debugConfirm = document.getElementById('debug-confirm');
 
-function isNarrowScreen() {
-    return window.matchMedia('(max-width: 768px)').matches;
+export function isNarrowScreen() {
+    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
 }
 
-// управление сайдбаром
 export function setSidebarOpen(open) {
     sidebar.classList.toggle('open', open);
     sidebar.setAttribute('aria-hidden', String(!open));
@@ -29,14 +34,13 @@ export function setScheduleDrawerOpen(open) {
 }
 
 sidebarToggle.addEventListener('click', () => setSidebarOpen(!sidebar.classList.contains('open')));
-
 scheduleDrawerToggle.addEventListener('click', () => setScheduleDrawerOpen(true));
 
 document.getElementById('open-schedule-drawer').addEventListener('click', () => setScheduleDrawerOpen(true));
-
 document.getElementById('schedule-drawer-close').addEventListener('click', () => setScheduleDrawerOpen(false));
-
 document.getElementById('schedule-drawer-scrim').addEventListener('click', () => setScheduleDrawerOpen(false));
+document.getElementById('sidebar-scrim').addEventListener('click', () => setSidebarOpen(false));
+document.getElementById('sidebar-close').addEventListener('click', () => setSidebarOpen(false));
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && scheduleDrawer.classList.contains('open')) setScheduleDrawerOpen(false);
@@ -45,26 +49,51 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('pointerdown', (event) => {
     if (!scheduleDrawer.classList.contains('open')) return;
     if (scheduleDrawer.contains(event.target)) return;
-    if (event.target.closest('#schedule-drawer-toggle')) return;
-    if (event.target.closest('#open-schedule-drawer')) return;
+    if (event.target.closest('#schedule-drawer-toggle, #open-schedule-drawer')) return;
     setScheduleDrawerOpen(false);
 });
 
-// Кнопки «Применить» больше нет: группу применяет открытие расписания,
-// см. applySelectionIfNeeded в schedule.js.
-
-let swipeStartX = null;
-let swipeStartY = null;
-let isSwipeGesture = false;
-let swipeFromLeftEdge = false;
-let swipeFromRightEdge = false;
+// Горизонтальные свайпы: от левого края — настройки, от правого — расписание.
+// Открытую шторку закрывает обратный свайп, начатый в любой точке экрана.
+const swipe = {
+    startX: 0,
+    startY: 0,
+    active: false,
+    fromLeftEdge: false,
+    fromRightEdge: false
+};
 
 function resetSwipe() {
-    swipeStartX = null;
-    swipeStartY = null;
-    isSwipeGesture = false;
-    swipeFromLeftEdge = false;
-    swipeFromRightEdge = false;
+    swipe.active = false;
+    swipe.fromLeftEdge = false;
+    swipe.fromRightEdge = false;
+}
+
+function handleSwipe(deltaX) {
+    const sidebarOpen = sidebar.classList.contains('open');
+    const drawerOpen = scheduleDrawer.classList.contains('open');
+
+    if (deltaX > 0) {
+        if (drawerOpen) {
+            setScheduleDrawerOpen(false);
+            return true;
+        }
+        if (swipe.fromLeftEdge && !sidebarOpen) {
+            setSidebarOpen(true);
+            return true;
+        }
+        return false;
+    }
+
+    if (sidebarOpen) {
+        setSidebarOpen(false);
+        return true;
+    }
+    if (swipe.fromRightEdge && !drawerOpen) {
+        setScheduleDrawerOpen(true);
+        return true;
+    }
+    return false;
 }
 
 document.addEventListener('touchstart', (event) => {
@@ -73,218 +102,139 @@ document.addEventListener('touchstart', (event) => {
         return;
     }
 
-    const touch = event.touches[0];
-    const fromLeft = touch.clientX <= SWIPE_EDGE_THRESHOLD;
-    const fromRight = touch.clientX >= window.innerWidth - SWIPE_EDGE_THRESHOLD;
+    const [touch] = event.touches;
+    const fromLeftEdge = touch.clientX <= SWIPE_EDGE_THRESHOLD;
+    const fromRightEdge = touch.clientX >= window.innerWidth - SWIPE_EDGE_THRESHOLD;
     const anyOpen = sidebar.classList.contains('open') || scheduleDrawer.classList.contains('open');
 
-    if (!fromLeft && !fromRight && !anyOpen) {
+    if (!fromLeftEdge && !fromRightEdge && !anyOpen) {
         resetSwipe();
         return;
     }
 
-    swipeStartX = touch.clientX;
-    swipeStartY = touch.clientY;
-    isSwipeGesture = true;
-    swipeFromLeftEdge = fromLeft;
-    swipeFromRightEdge = fromRight;
+    swipe.startX = touch.clientX;
+    swipe.startY = touch.clientY;
+    swipe.active = true;
+    swipe.fromLeftEdge = fromLeftEdge;
+    swipe.fromRightEdge = fromRightEdge;
 }, { passive: true });
 
 document.addEventListener('touchmove', (event) => {
-    if (!isSwipeGesture || swipeStartX === null || swipeStartY === null) return;
+    if (!swipe.active) return;
 
-    const touch = event.touches[0];
-    const deltaX = touch.clientX - swipeStartX;
-    const deltaY = touch.clientY - swipeStartY;
+    const [touch] = event.touches;
+    const deltaX = touch.clientX - swipe.startX;
+    const deltaY = touch.clientY - swipe.startY;
 
-    if (Math.abs(deltaX) < SWIPE_MIN_DISTANCE || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) return;
+    const longEnough = Math.abs(deltaX) >= SWIPE_MIN_DISTANCE;
+    const horizontal = Math.abs(deltaX) >= Math.abs(deltaY) * HORIZONTAL_GESTURE_RATIO;
+    if (!longEnough || !horizontal) return;
 
-    const sidebarOpen = sidebar.classList.contains('open');
-    const drawerOpen = scheduleDrawer.classList.contains('open');
-    let handled = false;
-
-    if (deltaX > 0) {
-        if (drawerOpen) {
-            setScheduleDrawerOpen(false);
-            handled = true;
-        } else if (swipeFromLeftEdge && !sidebarOpen) {
-            setSidebarOpen(true);
-            handled = true;
-        }
-    } else if (sidebarOpen) {
-        setSidebarOpen(false);
-        handled = true;
-    } else if (swipeFromRightEdge && !drawerOpen) {
-        setScheduleDrawerOpen(true);
-        handled = true;
-    }
-
-    if (!handled) return;
+    if (!handleSwipe(deltaX)) return;
     resetSwipe();
     event.preventDefault();
 }, { passive: false });
 
 document.addEventListener('touchend', resetSwipe);
 
-// Нажатие по затемнению позади шторки закрывает её — привычное
-// поведение мобильных панелей. На десктопе затемнения не видно
-// и нажатий оно не ловит, поэтому обработчик там не срабатывает.
-document.getElementById('sidebar-scrim').addEventListener('click', () => {
-    setSidebarOpen(false);
-});
-
-// закрытие сайдбара кнопкой-крестиком (показывается на мобильных)
-document.getElementById('sidebar-close').addEventListener('click', () => {
-    setSidebarOpen(false);
-});
-
 // важнейшая функция //
-const stubVideo = document.querySelector('.stub-video');
-if (stubVideo) {
-    stubOverlay.addEventListener('click', () => {
-        stubVideo.muted = !stubVideo.muted;
-        if (stubVideo.paused) stubVideo.play();
-    });
-}
-
-// сохранение и восстановление темы оформления
-const themeToggle = document.getElementById('theme-toggle');
+stubOverlay.addEventListener('click', () => {
+    stubVideo.muted = !stubVideo.muted;
+    if (stubVideo.paused) stubVideo.play();
+});
 
 export function initTheme() {
-    let saved = null;
-    try {
-        saved = localStorage.getItem(THEME_STORAGE_KEY);
-    } catch (error) {
-        saved = null; // приватный режим — не восстанавливаем
-    }
-    if (saved === 'dark') {
-        themeToggle.checked = true;
-    }
+    if (readStored(THEME_STORAGE_KEY) === 'dark') themeToggle.checked = true;
     applyThemeBackground();
-    // saved === 'light' / null / хранилище недоступно — оставляем поведение по умолчанию
 }
 
 themeToggle.addEventListener('change', () => {
     applyThemeBackground();
-    try {
-        localStorage.setItem(THEME_STORAGE_KEY, themeToggle.checked ? 'dark' : 'light');
-    } catch (error) {
-        // приватный режим — не запоминаем выбор
-    }
+    writeStored(THEME_STORAGE_KEY, themeToggle.checked ? 'dark' : 'light');
 });
 
+// ---------------------------------------------------------------------------
+// РЕЖИМ ОТЛАДКИ: серия нажатий по номеру второго этажа
+// ---------------------------------------------------------------------------
 
-// РЕЖИМ ОТЛАДКИ
-let debugTaps = 0;
+const DEBUG_FLOOR = '2';
 
 function setDebugMode(enabled) {
     document.documentElement.dataset.debug = enabled ? 'on' : 'off';
-    try {
-        localStorage.setItem(DEBUG_STORAGE_KEY, enabled ? 'on' : 'off');
-    } catch (error) {
-    }
-    if (clickInfoDiv) {
-        clickInfoDiv.textContent = enabled ? 'Режим отладки включён' : '';
-    }
+    writeStored(DEBUG_STORAGE_KEY, enabled ? 'on' : 'off');
+    clickInfoDiv.textContent = enabled ? 'Режим отладки включён' : '';
 }
 
-floorNumbers.forEach((span) => {
-    span.addEventListener('click', () => {
-        if (span.dataset.floor !== '2') {
-            debugTaps = 0;
-            return;
-        }
-
-        debugTaps += 1;
-        if (debugTaps < DEBUG_UNLOCK_TAPS) return;
-
-        debugTaps = 0;
-        setDebugMode(document.documentElement.dataset.debug !== 'on');
-    });
-});
+function isDebugMode() {
+    return document.documentElement.dataset.debug === 'on';
+}
 
 export function initDebugMode() {
-    let saved = null;
-    try {
-        saved = localStorage.getItem(DEBUG_STORAGE_KEY);
-    } catch (error) {
-        saved = null;
-    }
-    document.documentElement.dataset.debug = saved === 'on' ? 'on' : 'off';
+    document.documentElement.dataset.debug = readStored(DEBUG_STORAGE_KEY) === 'on' ? 'on' : 'off';
 }
 
-let videoTaps = 0;
-
 function playDebugVideo() {
-    if (!stubVideo) return;
     stubOverlay.classList.add('visible');
     stubVideo.currentTime = 0;
     stubVideo.muted = false;
     stubVideo.play().catch(() => {});
 }
 
-floorNumbers.forEach((span) => {
-    span.addEventListener('click', () => {
-        if (span.dataset.floor !== '2') {
-            videoTaps = 0;
-            return;
-        }
 
-        videoTaps += 1;
-        if (videoTaps < DEBUG_VIDEO_TAPS) return;
+function countFloorTaps(limit, onReached) {
+    let taps = 0;
 
-        videoTaps = 0;
-        if (document.documentElement.dataset.debug !== 'on') return;
-        if (debugConfirm) debugConfirm.hidden = false;
-        else playDebugVideo();
-    });
-});
+    floorNumbers.forEach((span) => {
+        span.addEventListener('click', () => {
+            if (span.dataset.floor !== DEBUG_FLOOR) {
+                taps = 0;
+                return;
+            }
 
-const debugConfirm = document.getElementById('debug-confirm');
-const debugConfirmYes = document.getElementById('debug-confirm-yes');
-const debugConfirmNo = document.getElementById('debug-confirm-no');
+            taps += 1;
+            if (taps < limit) return;
 
-if (debugConfirmYes && debugConfirmNo) {
-    debugConfirmYes.addEventListener('click', () => {
-        debugConfirm.hidden = true;
-        playDebugVideo();
-    });
-
-    debugConfirmNo.addEventListener('click', () => {
-        debugConfirm.hidden = true;
+            taps = 0;
+            onReached();
+        });
     });
 }
 
+countFloorTaps(DEBUG_UNLOCK_TAPS, () => setDebugMode(!isDebugMode()));
+
+countFloorTaps(DEBUG_VIDEO_TAPS, () => {
+    if (isDebugMode()) debugConfirm.hidden = false;
+});
+
+document.getElementById('debug-confirm-yes').addEventListener('click', () => {
+    debugConfirm.hidden = true;
+    playDebugVideo();
+});
+
+document.getElementById('debug-confirm-no').addEventListener('click', () => {
+    debugConfirm.hidden = true;
+});
+
+
+
 let themeSwitches = 0;
-
-const EXTRAS_UNLOCK_SWITCHES = 20;
-const SWITCH_COUNT_KEY = 'intermap.themeSwitches.v2';
-
 let extrasRequested = false;
 
-function unlockExtrasIfEarned() {
+async function unlockExtrasIfEarned() {
     if (extrasRequested || themeSwitches < EXTRAS_UNLOCK_SWITCHES) return;
     extrasRequested = true;
-    import('./extras.js').then((module) => module.mount());
+    const extras = await import('./extras.js');
+    extras.mount();
 }
 
 themeToggle.addEventListener('change', () => {
     themeSwitches += 1;
-    try {
-        localStorage.setItem(SWITCH_COUNT_KEY, String(themeSwitches));
-    } catch (error) {
-    }
+    writeStored(SWITCH_COUNT_STORAGE_KEY, String(themeSwitches));
     unlockExtrasIfEarned();
 });
 
 export function initExtrasUnlock() {
-    let saved = null;
-    try {
-        saved = localStorage.getItem(SWITCH_COUNT_KEY);
-    } catch (error) {
-        saved = null;
-    }
-    const parsed = Number.parseInt(saved ?? '', 10);
-    themeSwitches = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    const saved = Number.parseInt(readStored(SWITCH_COUNT_STORAGE_KEY) ?? '', 10);
+    themeSwitches = Number.isFinite(saved) && saved > 0 ? saved : 0;
     unlockExtrasIfEarned();
 }
