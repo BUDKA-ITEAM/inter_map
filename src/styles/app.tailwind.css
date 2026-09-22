@@ -36,6 +36,8 @@
 
 @custom-variant sidebar-open (:root:has(#sidebar.open) &);
 
+@custom-variant drawer-open (:root:has(#schedule-drawer.open) &);
+
 @custom-variant legend-open (:root:has(#legend-toggle:checked) &);
 
 @custom-variant legend-closed (:root:not(:has(#legend-toggle:checked)) &);

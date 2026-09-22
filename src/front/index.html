@@ -38,6 +38,19 @@
                    tab:sidebar-shown:hidden max-tab:sidebar-open:hidden
                    short:top-1 short:left-1"><svg class="size-5 shrink-0 [stroke-width:1.75]" aria-hidden="true" focusable="false"><use href="img/icons.svg#menu"/></svg><span class="label text-[13px] font-medium opacity-0 transition-opacity duration-150 ease-[ease]">Настройки</span></button>
 
+    <button id="schedule-drawer-toggle" aria-label="Открыть расписание" aria-expanded="false" aria-controls="schedule-drawer"
+            class="fixed top-3 right-3 z-20 flex items-center justify-end gap-2
+                   w-[46px] h-[46px] px-[13px] py-0 overflow-hidden whitespace-nowrap
+                   bg-surface border border-border-strong rounded-control shadow-card
+                   text-ink cursor-pointer
+                   transition-[width,background-color,border-color,color] duration-250 ease-[var(--ease)]
+                   active:bg-surface-active
+                   focus-visible:w-[152px] focus-visible:bg-accent focus-visible:border-accent focus-visible:text-on-accent
+                   focus-visible:[&_.label]:opacity-100 focus-visible:[&_.label]:delay-80
+                   mouse:hover:w-[152px] mouse:hover:bg-accent mouse:hover:border-accent mouse:hover:text-on-accent
+                   mouse:hover:[&_.label]:opacity-100 mouse:hover:[&_.label]:delay-80
+                   drawer-open:hidden
+                   short:top-1 short:right-1"><span class="label text-[13px] font-medium opacity-0 transition-opacity duration-150 ease-[ease]">Расписание</span><svg class="size-5 shrink-0 [stroke-width:1.75]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg></button>
     <aside id="sidebar" aria-label="Настройки расписания"
            class="fixed z-15 flex flex-col gap-6 box-border overflow-y-auto
                   top-[var(--sidebar-inset)] left-[var(--sidebar-inset)]
@@ -79,7 +92,100 @@
                              mouse:hover:shadow-card" aria-current="page">На день</span>
                 <!-- <button id="week-details-btn" type="button" class="flex-1 inline-flex items-center justify-center min-h-10 py-[7px] px-2 rounded-control bg-transparent border-none text-ink-secondary text-[13px] font-medium text-center cursor-pointer select-none transition-colors duration-150 ease-[ease] mouse:hover:bg-surface-hover mouse:hover:text-ink" aria-label="Открыть расписание на неделю">На неделю</button> -->
             </div>
+            <button id="open-schedule-drawer" type="button"
+                    class="w-full inline-flex items-center justify-center gap-2
+                           min-h-11 py-[10px] px-4 rounded-control
+                           text-[13px] font-semibold cursor-pointer
+                           bg-surface text-ink border border-border-strong
+                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
+                           active:scale-[0.98]
+                           mouse:hover:bg-surface-hover mouse:hover:border-accent
+                           max-tab:min-h-12">
+                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Открыть расписание
+            </button>
         </div>
+
+
+        <div class="flex flex-col gap-[10px]">
+            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
+                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#contrast"/></svg>Оформление
+            </span>
+            <label for="theme-toggle"
+                   class="relative flex items-center gap-3 m-0 py-[2px] px-0
+                          text-[13px] font-normal normal-case tracking-normal text-ink cursor-pointer">
+                <input type="checkbox" id="theme-toggle" role="switch"
+                       class="peer absolute top-0 left-0 w-[46px] h-[26px] m-0 opacity-0 cursor-pointer">
+                <span aria-hidden="true"
+                      class="relative flex-none w-[46px] h-[26px] rounded-full
+                             bg-surface-active border border-border
+                             transition-[background-color,border-color] duration-250 ease-[ease]
+                             peer-checked:bg-accent peer-checked:border-accent
+                             peer-focus-visible:outline-[1.5px] peer-focus-visible:outline-focus-ring
+                             peer-focus-visible:outline-offset-2
+                             peer-checked:[&_.thumb]:translate-x-5
+                             peer-checked:[&_.moon]:opacity-0
+                             peer-checked:[&_.moon]:rotate-90
+                             peer-checked:[&_.moon]:scale-50
+                             peer-checked:[&_.sun]:opacity-100
+                             peer-checked:[&_.sun]:rotate-0
+                             peer-checked:[&_.sun]:scale-100">
+                    <span class="thumb absolute top-[2px] left-[2px] w-[22px] h-[22px] rounded-full
+                                 bg-surface shadow-card ring-1 ring-border-strong
+                                 transition-[translate,background-color] duration-250 ease-[var(--ease)]">
+                        <span class="moon absolute inset-0 flex items-center justify-center text-ink
+                                     transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)]"><svg class="size-[15px] [stroke-width:2.6]" aria-hidden="true" focusable="false"><use href="img/icons.svg#moon"/></svg></span>
+                        <span class="sun absolute inset-0 flex items-center justify-center text-ink
+                                     opacity-0 rotate-[-90deg] scale-50
+                                     transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)]"><svg class="size-[15px] [stroke-width:2.6]" aria-hidden="true" focusable="false"><use href="img/icons.svg#sun"/></svg></span>
+                    </span>
+                </span>
+                <span class="text-ink">Тёмная тема</span>
+            </label>
+        </div>
+
+
+
+        <div class="mt-auto flex flex-col gap-3 max-tab:mt-2">
+            <button id="sidebar-close" type="button" aria-label="Закрыть меню"
+                    class="inline-flex items-center justify-center gap-2 mt-0 w-full min-h-11 p-[10px] rounded-control
+                           bg-danger text-on-danger border border-danger
+                           text-[13px] font-medium leading-none cursor-pointer
+                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
+                           active:scale-[0.98]
+                           mouse:hover:bg-danger-hover mouse:hover:border-danger-hover
+                           max-tab:min-h-12">
+                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Закрыть
+            </button>
+        </div>
+    </aside>
+
+    <div id="sidebar-scrim" aria-hidden="true"
+         class="fixed inset-0 z-14 bg-scrim opacity-0 pointer-events-none
+                transition-opacity duration-[var(--duration-drawer-out)] ease-[var(--ease-drawer)]
+                max-tab:sidebar-open:opacity-100 max-tab:sidebar-open:pointer-events-auto
+                max-tab:sidebar-open:duration-[var(--duration-drawer-in)]"></div>
+
+    <aside id="schedule-drawer" aria-label="Расписание" aria-hidden="true"
+           class="fixed z-15 flex flex-col gap-6 box-border overflow-y-auto
+                  top-[var(--sidebar-inset)] right-[var(--sidebar-inset)]
+                  w-[var(--sidebar-width)] h-[calc(100%_-_var(--sidebar-inset)*2)]
+                  bg-surface border border-border rounded-panel shadow-card p-5
+                  [transition:transform_var(--duration-drawer-out)_var(--ease-drawer),visibility_0s_linear_var(--duration-drawer-out)]
+                  [&:not(.open)]:[transform:translateX(calc(100%_+_var(--sidebar-inset)_+_4px))]
+                  [&:not(.open)]:invisible
+                  [&.open]:[transition:transform_var(--duration-drawer-in)_var(--ease-drawer),visibility_0s]
+                  max-tab:top-0 max-tab:right-0 max-tab:w-[min(288px,86vw)] max-tab:h-full
+                  max-tab:border-y-0 max-tab:border-r-0 max-tab:border-l max-tab:border-l-border
+                  max-tab:rounded-none max-tab:shadow-none max-tab:pt-[56px]
+                  max-tab:[&:not(.open)]:[transform:translateX(100%)]
+                  max-tab:[&.open]:shadow-sheet
+                  [&.open>*]:animate-[sidebar-item-in_var(--duration-base)_var(--ease-drawer)_both]
+                  [&.open>*:nth-child(1)]:[animation-delay:0.06s]
+                  [&.open>*:nth-child(2)]:[animation-delay:0.10s]
+                  [&.open>*:nth-child(3)]:[animation-delay:0.14s]
+                  [&.open>*:nth-child(4)]:[animation-delay:0.18s]">
+        <h3 class="m-0 text-[18px] font-semibold tracking-[-0.01em] text-ink">Расписание</h3>
+
         <div class="flex flex-col gap-[10px]" id="group-picker">
             <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
                 <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группа
@@ -244,46 +350,6 @@
             </div>
         </div>
 
-
-        <div class="flex flex-col gap-[10px]">
-            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
-                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#contrast"/></svg>Оформление
-            </span>
-            <label for="theme-toggle"
-                   class="relative flex items-center gap-3 m-0 py-[2px] px-0
-                          text-[13px] font-normal normal-case tracking-normal text-ink cursor-pointer">
-                <input type="checkbox" id="theme-toggle" role="switch"
-                       class="peer absolute top-0 left-0 w-[46px] h-[26px] m-0 opacity-0 cursor-pointer">
-                <span aria-hidden="true"
-                      class="relative flex-none w-[46px] h-[26px] rounded-full
-                             bg-surface-active border border-border
-                             transition-[background-color,border-color] duration-250 ease-[ease]
-                             peer-checked:bg-accent peer-checked:border-accent
-                             peer-focus-visible:outline-[1.5px] peer-focus-visible:outline-focus-ring
-                             peer-focus-visible:outline-offset-2
-                             peer-checked:[&_.thumb]:translate-x-5
-                             peer-checked:[&_.moon]:opacity-0
-                             peer-checked:[&_.moon]:rotate-90
-                             peer-checked:[&_.moon]:scale-50
-                             peer-checked:[&_.sun]:opacity-100
-                             peer-checked:[&_.sun]:rotate-0
-                             peer-checked:[&_.sun]:scale-100">
-                    <span class="thumb absolute top-[2px] left-[2px] w-[22px] h-[22px] rounded-full
-                                 bg-surface shadow-card ring-1 ring-border-strong
-                                 transition-[translate,background-color] duration-250 ease-[var(--ease)]">
-                        <span class="moon absolute inset-0 flex items-center justify-center text-ink
-                                     transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)]"><svg class="size-[15px] [stroke-width:2.6]" aria-hidden="true" focusable="false"><use href="img/icons.svg#moon"/></svg></span>
-                        <span class="sun absolute inset-0 flex items-center justify-center text-ink
-                                     opacity-0 rotate-[-90deg] scale-50
-                                     transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)]"><svg class="size-[15px] [stroke-width:2.6]" aria-hidden="true" focusable="false"><use href="img/icons.svg#sun"/></svg></span>
-                    </span>
-                </span>
-                <span class="text-ink">Тёмная тема</span>
-            </label>
-        </div>
-
-
-
         <div class="mt-auto flex flex-col gap-3 max-tab:mt-2">
             <div class="sidebar-action relative flex">
                 <input type="checkbox" id="schedule-toggle"
@@ -305,8 +371,7 @@
                     <span class="hide items-center gap-2"><svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-down"/></svg>Скрыть расписание</span>
                 </label>
             </div>
-
-            <button id="sidebar-close" type="button" aria-label="Закрыть меню"
+            <button id="schedule-drawer-close" type="button" aria-label="Закрыть расписание"
                     class="inline-flex items-center justify-center gap-2 mt-0 w-full min-h-11 p-[10px] rounded-control
                            bg-danger text-on-danger border border-danger
                            text-[13px] font-medium leading-none cursor-pointer
@@ -319,11 +384,11 @@
         </div>
     </aside>
 
-    <div id="sidebar-scrim" aria-hidden="true"
+    <div id="schedule-drawer-scrim" aria-hidden="true"
          class="fixed inset-0 z-14 bg-scrim opacity-0 pointer-events-none
                 transition-opacity duration-[var(--duration-drawer-out)] ease-[var(--ease-drawer)]
-                max-tab:sidebar-open:opacity-100 max-tab:sidebar-open:pointer-events-auto
-                max-tab:sidebar-open:duration-[var(--duration-drawer-in)]"></div>
+                max-tab:drawer-open:opacity-100 max-tab:drawer-open:pointer-events-auto
+                max-tab:drawer-open:duration-[var(--duration-drawer-in)]"></div>
 
     <!-- основной контент -->
     <div id="app-wrapper"
@@ -351,6 +416,7 @@
                                 [&>canvas]:cursor-pointer [&>canvas:active]:cursor-grabbing
                                 sheet-open:pointer-events-none
                                 max-tab:sidebar-open:pointer-events-none
+                                max-tab:drawer-open:pointer-events-none
                                 max-tab:h-auto max-tab:min-h-[180px] max-tab:max-h-none
                                 max-phone:h-[55vh] max-phone:min-h-[200px]
                                 short:h-[70vh] short:min-h-[200px]">

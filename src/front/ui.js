@@ -6,14 +6,49 @@ import { WEEK_SCHEDULE_PAGE_URL, THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNL
 import { sidebarToggle, sidebar, weekDetailsBtn, currentGroup, currentFloor, stubOverlay, clickInfoDiv, floorNumbers } from './state.js';
 import { applyThemeBackground } from './three.js';
 
+const scheduleDrawer = document.getElementById('schedule-drawer');
+const scheduleDrawerToggle = document.getElementById('schedule-drawer-toggle');
+
+function isNarrowScreen() {
+    return window.matchMedia('(max-width: 768px)').matches;
+}
+
 // управление сайдбаром
 export function setSidebarOpen(open) {
     sidebar.classList.toggle('open', open);
     sidebar.setAttribute('aria-hidden', String(!open));
     sidebarToggle.setAttribute('aria-expanded', String(open));
+    if (open && isNarrowScreen()) setScheduleDrawerOpen(false);
+}
+
+export function setScheduleDrawerOpen(open) {
+    scheduleDrawer.classList.toggle('open', open);
+    scheduleDrawer.setAttribute('aria-hidden', String(!open));
+    scheduleDrawerToggle.setAttribute('aria-expanded', String(open));
+    if (open && isNarrowScreen()) setSidebarOpen(false);
 }
 
 sidebarToggle.addEventListener('click', () => setSidebarOpen(!sidebar.classList.contains('open')));
+
+scheduleDrawerToggle.addEventListener('click', () => setScheduleDrawerOpen(true));
+
+document.getElementById('open-schedule-drawer').addEventListener('click', () => setScheduleDrawerOpen(true));
+
+document.getElementById('schedule-drawer-close').addEventListener('click', () => setScheduleDrawerOpen(false));
+
+document.getElementById('schedule-drawer-scrim').addEventListener('click', () => setScheduleDrawerOpen(false));
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && scheduleDrawer.classList.contains('open')) setScheduleDrawerOpen(false);
+});
+
+document.addEventListener('pointerdown', (event) => {
+    if (!scheduleDrawer.classList.contains('open')) return;
+    if (scheduleDrawer.contains(event.target)) return;
+    if (event.target.closest('#schedule-drawer-toggle')) return;
+    if (event.target.closest('#open-schedule-drawer')) return;
+    setScheduleDrawerOpen(false);
+});
 
 // Кнопки «Применить» больше нет: группу применяет открытие расписания,
 // см. applySelectedGroupIfNeeded в schedule.js.
@@ -33,24 +68,41 @@ if (weekDetailsBtn) {
     });
 }
 
-// свайп от левого края для открытия сайдбара на мобильных
 let swipeStartX = null;
 let swipeStartY = null;
 let isSwipeGesture = false;
+let swipeFromLeftEdge = false;
+let swipeFromRightEdge = false;
+
+function resetSwipe() {
+    swipeStartX = null;
+    swipeStartY = null;
+    isSwipeGesture = false;
+    swipeFromLeftEdge = false;
+    swipeFromRightEdge = false;
+}
 
 document.addEventListener('touchstart', (event) => {
-    if (event.touches.length !== 1) return;
+    if (event.touches.length !== 1) {
+        resetSwipe();
+        return;
+    }
 
     const touch = event.touches[0];
-    if (touch.clientX <= SWIPE_EDGE_THRESHOLD) {
-        swipeStartX = touch.clientX;
-        swipeStartY = touch.clientY;
-        isSwipeGesture = true;
-    } else {
-        swipeStartX = null;
-        swipeStartY = null;
-        isSwipeGesture = false;
+    const fromLeft = touch.clientX <= SWIPE_EDGE_THRESHOLD;
+    const fromRight = touch.clientX >= window.innerWidth - SWIPE_EDGE_THRESHOLD;
+    const anyOpen = sidebar.classList.contains('open') || scheduleDrawer.classList.contains('open');
+
+    if (!fromLeft && !fromRight && !anyOpen) {
+        resetSwipe();
+        return;
     }
+
+    swipeStartX = touch.clientX;
+    swipeStartY = touch.clientY;
+    isSwipeGesture = true;
+    swipeFromLeftEdge = fromLeft;
+    swipeFromRightEdge = fromRight;
 }, { passive: true });
 
 document.addEventListener('touchmove', (event) => {
@@ -60,22 +112,34 @@ document.addEventListener('touchmove', (event) => {
     const deltaX = touch.clientX - swipeStartX;
     const deltaY = touch.clientY - swipeStartY;
 
-    if (deltaX > SWIPE_MIN_DISTANCE && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
-        if (!sidebar.classList.contains('open')) {
+    if (Math.abs(deltaX) < SWIPE_MIN_DISTANCE || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) return;
+
+    const sidebarOpen = sidebar.classList.contains('open');
+    const drawerOpen = scheduleDrawer.classList.contains('open');
+    let handled = false;
+
+    if (deltaX > 0) {
+        if (drawerOpen) {
+            setScheduleDrawerOpen(false);
+            handled = true;
+        } else if (swipeFromLeftEdge && !sidebarOpen) {
             setSidebarOpen(true);
+            handled = true;
         }
-        isSwipeGesture = false;
-        swipeStartX = null;
-        swipeStartY = null;
-        event.preventDefault();
+    } else if (sidebarOpen) {
+        setSidebarOpen(false);
+        handled = true;
+    } else if (swipeFromRightEdge && !drawerOpen) {
+        setScheduleDrawerOpen(true);
+        handled = true;
     }
+
+    if (!handled) return;
+    resetSwipe();
+    event.preventDefault();
 }, { passive: false });
 
-document.addEventListener('touchend', () => {
-    isSwipeGesture = false;
-    swipeStartX = null;
-    swipeStartY = null;
-});
+document.addEventListener('touchend', resetSwipe);
 
 // Нажатие по затемнению позади шторки закрывает её — привычное
 // поведение мобильных панелей. На десктопе затемнения не видно

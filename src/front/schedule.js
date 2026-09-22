@@ -30,7 +30,7 @@ import {
 
 import { FALLBACK_LESSONS } from './fallbackSchedule.js';
 import { showRoomPanel, hideRoomPanel } from './roomPanel.js';
-import { setSidebarOpen } from './ui.js';
+import { setSidebarOpen, setScheduleDrawerOpen } from './ui.js';
 import { splitGroupField } from './groups.js';
 
 // Раньше здесь был toISOString(), который переводит время в UTC. Из-за
@@ -350,6 +350,7 @@ export function applySelectedGroupIfNeeded() {
 // поэтому вместе с расписанием закрываем сайдбар. На широком экране он
 // карту не перекрывает, там закрывать нечего.
 function closeSidebarOnNarrowScreen() {
+    setScheduleDrawerOpen(false);
     if (window.matchMedia('(max-width: 768px)').matches) {
         setSidebarOpen(false);
     }
@@ -414,6 +415,9 @@ document.addEventListener('pointerdown', (event) => {
     if (!scheduleToggle.checked) return;
     if (schedulePanel.contains(event.target)) return;
     if (event.target.closest('.sidebar-action')) return;
+    if (event.target.closest('#schedule-drawer')) return;
+    if (event.target.closest('#schedule-drawer-toggle')) return;
+    if (event.target.closest('#open-schedule-drawer')) return;
     setScheduleOpen(false);
 });
 
