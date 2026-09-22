@@ -186,6 +186,38 @@
                   [&.open>*:nth-child(4)]:[animation-delay:0.18s]">
         <h3 class="m-0 text-[18px] font-semibold tracking-[-0.01em] text-ink">Расписание</h3>
 
+        <div class="flex flex-col gap-[10px]">
+            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary" id="schedule-mode-label">
+                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Показывать по
+            </span>
+            <div class="flex gap-[2px] p-[3px] rounded-control bg-surface-active" role="group" aria-labelledby="schedule-mode-label">
+                <button id="mode-group-btn" type="button" aria-pressed="true"
+                        class="flex-1 inline-flex items-center justify-center gap-[6px]
+                               min-h-9 py-[7px] px-2 rounded-[8px] border border-transparent
+                               bg-transparent text-ink-secondary
+                               text-[12px] font-medium text-center cursor-pointer select-none
+                               transition-[background-color,color,border-color] duration-150 ease-[ease]
+                               aria-pressed:bg-surface aria-pressed:text-ink
+                               aria-pressed:font-semibold aria-pressed:border-border aria-pressed:shadow-card
+                               mouse:hover:text-ink
+                               max-tab:min-h-10 max-tab:text-[13px]">
+                    <svg class="size-[14px] shrink-0 [stroke-width:2.3]" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группе
+                </button>
+                <button id="mode-teacher-btn" type="button" aria-pressed="false"
+                        class="flex-1 inline-flex items-center justify-center gap-[6px]
+                               min-h-9 py-[7px] px-2 rounded-[8px] border border-transparent
+                               bg-transparent text-ink-secondary
+                               text-[12px] font-medium text-center cursor-pointer select-none
+                               transition-[background-color,color,border-color] duration-150 ease-[ease]
+                               aria-pressed:bg-surface aria-pressed:text-ink
+                               aria-pressed:font-semibold aria-pressed:border-border aria-pressed:shadow-card
+                               mouse:hover:text-ink
+                               max-tab:min-h-10 max-tab:text-[13px]">
+                    <svg class="size-[14px] shrink-0 [stroke-width:2.3]" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Преподавателю
+                </button>
+            </div>
+        </div>
+
         <div class="flex flex-col gap-[10px]" id="group-picker">
             <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
                 <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Группа
@@ -295,6 +327,93 @@
 
 
             <p id="group-status" role="status" aria-live="polite"
+               class="m-0 text-[12px] leading-[1.4] text-ink-tertiary
+                      empty:hidden
+                      [&.is-error:not(:empty)]:flex [&.is-error]:items-start [&.is-error]:gap-[6px]
+                      [&.is-error]:text-danger
+                      [&.is-error]:before:mt-[2px] [&.is-error]:before:size-[13px]
+                      [&.is-error]:before:shrink-0 [&.is-error]:before:bg-danger
+                      [&.is-error]:before:[mask:var(--icon-alert)_center/contain_no-repeat]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[10px]" id="teacher-picker" hidden>
+            <span class="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">
+                <svg class="size-4 shrink-0 text-ink [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Преподаватель
+            </span>
+
+            <button id="teacher-pick-btn" type="button"
+                    class="w-full inline-flex items-center justify-center gap-2
+                           min-h-11 py-[10px] px-4 rounded-control
+                           text-[13px] font-semibold cursor-pointer
+                           bg-accent text-on-accent border border-accent
+                           transition-[background-color,border-color,scale] duration-150 ease-[ease]
+                           active:enabled:scale-[0.98]
+                           disabled:bg-surface-active disabled:text-ink-tertiary
+                           disabled:border-border disabled:cursor-not-allowed
+                           mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
+                           max-tab:min-h-12 max-tab:text-[14px]">
+                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Выбрать преподавателя
+            </button>
+
+            <div id="teacher-picker-panel" class="flex flex-col gap-[6px]" hidden>
+                <label for="teacher-select"
+                       class="block m-0 text-[12px] font-medium normal-case tracking-normal text-ink-secondary">Преподаватель</label>
+                <span class="select-wrap mb-1 relative block
+                             after:absolute after:top-1/2 after:right-3
+                             after:size-[14px] after:-translate-y-1/2 after:bg-ink-secondary
+                             after:[mask:var(--icon-chevron)_center/contain_no-repeat]
+                             after:pointer-events-none after:transition-colors after:duration-150 after:ease-[ease]
+                             focus-within:after:bg-tag-orange
+                             has-[select:disabled]:after:opacity-50">
+                    <select id="teacher-select" disabled
+                            class="w-full min-h-11 py-[10px] pr-[38px] pl-3 mb-0 box-border
+                                   border border-border rounded-control
+                                   bg-surface text-ink text-[13px] font-medium [font-family:inherit]
+                                   cursor-pointer appearance-none [-webkit-appearance:none] shadow-card
+                                   transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
+                                   focus-visible:outline-none focus-visible:border-tag-orange
+                                   focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
+                                   disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none
+                                   mouse:hover:enabled:border-border-strong
+                                   max-tab:min-h-12 max-tab:text-[14px]">
+                        <option value="">Загружаем список…</option>
+                    </select>
+                </span>
+
+                <button id="teacher-confirm-btn" type="button" disabled
+                        class="w-full inline-flex items-center justify-center gap-2
+                               min-h-11 py-3 px-4 rounded-control
+                               text-[13px] font-semibold cursor-pointer
+                               bg-accent text-on-accent border border-accent
+                               transition-[background-color,border-color,scale] duration-150 ease-[ease]
+                               active:enabled:scale-[0.98]
+                               disabled:bg-surface-active disabled:text-ink-tertiary
+                               disabled:border-border disabled:cursor-not-allowed
+                               mouse:hover:enabled:bg-accent-hover mouse:hover:enabled:border-accent-hover
+                               max-tab:min-h-12 max-tab:text-[14px]">
+                    <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Выбрать преподавателя
+                </button>
+            </div>
+
+            <div id="teacher-current" hidden
+                 class="flex items-center justify-between flex-wrap gap-2
+                        py-2 pr-[10px] pl-3 bg-accent-soft border border-border rounded-control">
+                <svg class="size-4 shrink-0 [stroke-width:2.1]" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>
+                <span id="teacher-current-name"
+                      class="flex-auto min-w-0 [overflow-wrap:anywhere] text-[14px] font-semibold text-ink"></span>
+                <button id="teacher-change-btn" type="button"
+                        class="w-auto flex-none ml-auto inline-flex items-center gap-[5px]
+                               py-[6px] px-[10px] rounded-full
+                               bg-transparent text-ink-secondary border border-border-strong
+                               text-[11px] font-medium cursor-pointer
+                               transition-colors duration-150 ease-[ease]
+                               mouse:hover:bg-surface mouse:hover:text-ink
+                               max-tab:py-2 max-tab:px-3 max-tab:text-[12px]">
+                    <svg class="size-[13px] shrink-0 text-ink [stroke-width:2.5]" aria-hidden="true" focusable="false"><use href="img/icons.svg#pencil"/></svg>Изменить
+                </button>
+            </div>
+
+            <p id="teacher-status" role="status" aria-live="polite"
                class="m-0 text-[12px] leading-[1.4] text-ink-tertiary
                       empty:hidden
                       [&.is-error:not(:empty)]:flex [&.is-error]:items-start [&.is-error]:gap-[6px]
@@ -647,6 +766,12 @@
                     [&_.pair-teacher]:before:size-[12px] [&_.pair-teacher]:before:shrink-0
                     [&_.pair-teacher]:before:bg-ink-secondary
                     [&_.pair-teacher]:before:[mask:var(--icon-teacher)_center/contain_no-repeat]
+                    [&_.pair-group]:flex [&_.pair-group]:items-center [&_.pair-group]:gap-[5px]
+                    [&_.pair-group]:text-[11px] [&_.pair-group]:text-ink-tertiary
+                    [&_.pair-group]:mt-2
+                    [&_.pair-group]:before:size-[12px] [&_.pair-group]:before:shrink-0
+                    [&_.pair-group]:before:bg-ink-secondary
+                    [&_.pair-group]:before:[mask:var(--icon-group)_center/contain_no-repeat]
 
                     [&>.pairs-loading]:col-span-full [&>.pairs-loading]:w-full
                     [&>.pairs-loading]:flex [&>.pairs-loading]:flex-col

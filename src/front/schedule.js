@@ -12,6 +12,8 @@ import {
 import {
     pairsContainer, dateInput, prevDayBtn, nextDayBtn, groupSelect, roomPanel, roomPanelBack,
     currentGroup, setCurrentGroup,
+    currentTeacher, setCurrentTeacher,
+    scheduleMode,
     setCurrentSchedule,
     currentDate, setCurrentDate,
     currentFloor,
@@ -82,7 +84,8 @@ function lessonToPair(lesson) {
         time: `${trimSeconds(lesson.time_start)} - ${trimSeconds(lesson.time_end)}`,
         name: lesson.subject,
         roomId: lesson.room_number,
-        teacher: lesson.teacher_name
+        teacher: lesson.teacher_name,
+        group: lesson.group
     };
 }
 
@@ -105,6 +108,27 @@ export async function fetchSchedule(group, dateStr = currentDate) {
     const lessons = await fetchFromApi(LESSONS_ENDPOINT, params);
     return lessons
         .filter((lesson) => splitGroupField(lesson.group).includes(group))
+        .map(lessonToPair);
+}
+
+function matchesTeacher(lesson, teacher) {
+    if (lesson.teacher_id && teacher.id) return lesson.teacher_id === teacher.id;
+    return lesson.teacher_name === teacher.name;
+}
+
+export async function fetchTeacherSchedule(teacher, dateStr = currentDate) {
+    if (!FLOOR_MODELS[currentFloor]) return [];
+
+    const params = new URLSearchParams({
+        teacher_id: teacher.id,
+        date_from: dateStr,
+        date_to: dateStr,
+        limit: String(GROUPS_SCAN_LIMIT)
+    });
+
+    const lessons = await fetchFromApi(LESSONS_ENDPOINT, params);
+    return lessons
+        .filter((lesson) => matchesTeacher(lesson, teacher))
         .map(lessonToPair);
 }
 
@@ -140,7 +164,9 @@ export function updatePairsUI(schedule) {
             <div class="pair-time">${pair.time}</div>
             <div class="pair-name">${pair.name}</div>
             <div class="pair-room">Каб. ${pair.roomId}</div>
-            <div class="pair-teacher">${pair.teacher || 'Преподаватель не указан'}</div>
+            ${scheduleMode === 'teacher'
+                ? `<div class="pair-group">${pair.group || 'Группа не указана'}</div>`
+                : `<div class="pair-teacher">${pair.teacher || 'Преподаватель не указан'}</div>`}
         `;
         pairsContainer.appendChild(card);
     });
@@ -256,18 +282,21 @@ function applyPendingRoom(consume) {
     collapseScheduleForRoom();
 }
 
-export async function applyGroup(selectedGroup) {
-    setCurrentGroup(selectedGroup);
+let appliedKey = null;
+
+async function loadInto(key, loader) {
+    appliedKey = key;
     showPairsLoading('Загружаем расписание…');
     applyPendingRoom(false);
 
     try {
-        const schedule = await fetchSchedule(selectedGroup, currentDate);
+        const schedule = await loader();
         setCurrentSchedule(schedule);
         updatePairsUI(schedule);
         highlightRoomsForSchedule(schedule);
     } catch (error) {
         console.error('Не удалось загрузить расписание:', error);
+        appliedKey = null;
         setCurrentSchedule([]);
         showPairsMessage(`Не удалось загрузить расписание: ${error.message}`, true);
         highlightRoomsForSchedule([]);
@@ -276,16 +305,47 @@ export async function applyGroup(selectedGroup) {
     applyPendingRoom(true);
 }
 
+export async function applyGroup(selectedGroup) {
+    setCurrentGroup(selectedGroup);
+    await loadInto(`group:${selectedGroup}`, () => fetchSchedule(selectedGroup, currentDate));
+}
+
+export async function applyTeacher(teacher) {
+    setCurrentTeacher(teacher);
+    await loadInto(`teacher:${teacher.id}`, () => fetchTeacherSchedule(teacher, currentDate));
+}
+
+function selectedGroupName() {
+    return groupSelect.value || currentGroup;
+}
+
+export function hasSelection() {
+    return Boolean(scheduleMode === 'teacher' ? currentTeacher : selectedGroupName());
+}
+
+function clearScheduleView() {
+    appliedKey = null;
+    setCurrentSchedule([]);
+    updatePairsUI([]);
+    resetAllRoomsToWhite(true);
+    hideRoomPanel();
+}
+
+export function applySelection() {
+    if (scheduleMode === 'teacher') {
+        if (currentTeacher) return applyTeacher(currentTeacher);
+    } else {
+        const group = selectedGroupName();
+        if (group) return applyGroup(group);
+    }
+    clearScheduleView();
+    return Promise.resolve();
+}
+
 // обновление интерфейса при смене даты
 function refreshForDateChange() {
-    if (currentGroup) {
-        applyGroup(currentGroup);
-    } else {
-        setCurrentSchedule([]);
-        updatePairsUI([]);
-        resetAllRoomsToWhite(true);
-        hideRoomPanel();
-    }
+    appliedKey = null;
+    applySelection();
 }
 
 // обработчики смены даты
@@ -336,13 +396,15 @@ let sheetFromBottomEdge = false;
 // Благодаря этому на телефоне достаточно одного нажатия: выбрал группу —
 // нажал «Показать расписание». Отдельное «Применить» больше не нужно,
 // но продолжает работать как раньше.
-export function applySelectedGroupIfNeeded() {
-    const selectedGroup = groupSelect.value;
-    if (selectedGroup && selectedGroup !== currentGroup) {
-        applyGroup(selectedGroup);
-        // группа сменилась — карточка старого кабинета уже неактуальна
-        hideRoomPanel();
-    }
+export function applySelectionIfNeeded() {
+    const group = selectedGroupName();
+    const desired = scheduleMode === 'teacher'
+        ? (currentTeacher ? `teacher:${currentTeacher.id}` : null)
+        : (group ? `group:${group}` : null);
+
+    if (desired === appliedKey) return;
+    applySelection();
+    hideRoomPanel();
 }
 
 // На телефоне сайдбар выезжает поверх карты. Если оставить его открытым,
@@ -362,7 +424,7 @@ function setScheduleOpen(open) {
     if (scheduleToggle.checked === open) return;
     scheduleToggle.checked = open;
     if (open) {
-        applySelectedGroupIfNeeded();
+        applySelectionIfNeeded();
         closeSidebarOnNarrowScreen();
     }
     // карта перестаёт реагировать на жесты, пока шторка открыта:
@@ -425,7 +487,7 @@ document.addEventListener('pointerdown', (event) => {
 // минуя setScheduleOpen. Поэтому повторяем здесь те же три действия.
 scheduleToggle.addEventListener('change', () => {
     if (scheduleToggle.checked) {
-        applySelectedGroupIfNeeded();
+        applySelectionIfNeeded();
         closeSidebarOnNarrowScreen();
     }
     controls.enabled = !scheduleToggle.checked;

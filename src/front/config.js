@@ -37,6 +37,7 @@ export const isLocalHost = ['localhost', '127.0.0.1', '', '[::1]'].includes(loca
     || /^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\.|^26\./.test(location.hostname);
 export const API_BASE_URL = isLocalHost ? API_DEV_URL : API_PRODUCTION_URL;
 export const LESSONS_ENDPOINT = '/api/lessons';
+export const TEACHERS_ENDPOINT = '/api/teachers';
 export const WEEK_SCHEDULE_PAGE_URL = 'week_schedule.html';
 
 // Сколько уроков тянем, когда собираем список групп. Отдельного
@@ -212,6 +213,8 @@ export const SHEET_EDGE_THRESHOLD = 32;
 export const SHEET_MIN_DISTANCE = 60;
 
 export const GROUP_STORAGE_KEY = 'intermap.selectedGroup';
+export const TEACHER_STORAGE_KEY = 'intermap.selectedTeacher';
+export const SCHEDULE_MODE_STORAGE_KEY = 'intermap.scheduleMode';
 export const THEME_STORAGE_KEY = 'intermap.theme';
 export const DEBUG_STORAGE_KEY = 'intermap.debug';
 export const DEBUG_UNLOCK_TAPS = 20;

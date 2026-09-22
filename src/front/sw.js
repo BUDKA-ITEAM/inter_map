@@ -1,4 +1,4 @@
-const SHELL_VERSION = 'v2';
+const SHELL_VERSION = 'v3';
 const ASSET_VERSION = 'v1';
 const SHELL_CACHE = `shell-${SHELL_VERSION}`;
 const ASSET_CACHE = `assets-${ASSET_VERSION}`;
@@ -13,6 +13,7 @@ const SHELL = [
     './schedule.js',
     './roomPanel.js',
     './groups.js',
+    './teachers.js',
     './ui.js',
     './config.js',
     './fallbackSchedule.js',

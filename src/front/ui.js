@@ -51,7 +51,7 @@ document.addEventListener('pointerdown', (event) => {
 });
 
 // Кнопки «Применить» больше нет: группу применяет открытие расписания,
-// см. applySelectedGroupIfNeeded в schedule.js.
+// см. applySelectionIfNeeded в schedule.js.
 
 // Переход на страницу недельного расписания.
 //

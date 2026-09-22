@@ -9,6 +9,7 @@ export const clickInfoDiv = document.getElementById('click-info');
 export const sidebarToggle = document.getElementById('sidebar-toggle');
 export const sidebar = document.getElementById('sidebar');
 export const groupSelect = document.getElementById('group-select');
+export const teacherSelect = document.getElementById('teacher-select');
 export const pairsContainer = document.getElementById('pairs-container');
 export const roomPanel = document.getElementById('room-panel');
 export const roomPanelClose = document.getElementById('room-panel-close');
@@ -25,6 +26,12 @@ export const floorNumbers = document.querySelectorAll('.floor-numbers span');
 // глобальное состояние приложения
 export let currentGroup = null;
 export function setCurrentGroup(value) { currentGroup = value; }
+
+export let currentTeacher = null;
+export function setCurrentTeacher(value) { currentTeacher = value; }
+
+export let scheduleMode = 'group';
+export function setScheduleMode(value) { scheduleMode = value; }
 
 export let currentSchedule = [];
 export function setCurrentSchedule(value) { currentSchedule = value; }

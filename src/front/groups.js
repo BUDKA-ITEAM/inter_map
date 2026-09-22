@@ -1,12 +1,12 @@
 // Выбор группы (направление -> группа -> подтверждение), каталог групп из api,
 // сохранение выбранной группы в localStorage.
 //
-// Циклическая зависимость с schedule.js: fetchFromApi/applySelectedGroupIfNeeded/
+// Циклическая зависимость с schedule.js: fetchFromApi/applySelection/
 // scheduleToggle используются только внутри тел функций, не на верхнем уровне
 // модуля, поэтому порядок вычисления модулей не важен.
 import { LESSONS_ENDPOINT, GROUPS_SCAN_LIMIT, GROUP_STORAGE_KEY } from './config.js';
-import { groupSelect } from './state.js';
-import { fetchFromApi, applySelectedGroupIfNeeded, scheduleToggle } from './schedule.js';
+import { groupSelect, scheduleMode } from './state.js';
+import { fetchFromApi, applySelection, scheduleToggle } from './schedule.js';
 
 // Каталог направлений и групп. Пустой до ответа api: заполняется в
 // loadGroupCatalog() ниже.
@@ -121,7 +121,7 @@ function confirmGroup(name) {
     }
     setGroupStatus('');
     showGroupState('chosen');
-    if (scheduleToggle.checked) applySelectedGroupIfNeeded();
+    if (scheduleMode !== 'teacher' && scheduleToggle.checked) applySelection();
 }
 
 groupPickBtn.addEventListener('click', () => showGroupState('picking'));

@@ -28,13 +28,13 @@ import {
     highlightedMeshes, setHighlightedMeshes,
     selectedMesh, setSelectedMesh,
     activeHighlightedMesh, setActiveHighlightedMesh,
-    currentGroup, setCurrentFloor,
+    setCurrentFloor,
     setCurrentSchedule
 } from './state.js';
 
 import { GLB_SIZES } from './glbSizes.js';
 import { showRoomPanel, hideRoomPanel } from './roomPanel.js';
-import { applyGroup, updatePairsUI } from './schedule.js';
+import { applySelection, hasSelection, updatePairsUI } from './schedule.js';
 
 // инициализация three.js сцены
 const scene = new THREE.Scene();
@@ -65,7 +65,7 @@ export function applyThemeBackground() {
 
     if (!roomMeshes.length) return;
     applyDecorColors();
-    if (currentGroup) applyGroup(currentGroup);
+    if (hasSelection()) applySelection();
     else resetAllRoomsToWhite(true);
 }
 
@@ -258,7 +258,7 @@ export function loadFloorModel(floor) {
             }
 
             // подсветка пар на новом этаже
-            if (currentGroup) applyGroup(currentGroup);
+            if (hasSelection()) applySelection();
         },
         (event) => {
             if (token !== loadToken) return;

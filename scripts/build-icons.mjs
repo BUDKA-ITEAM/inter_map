@@ -27,6 +27,7 @@ const SPRITE = [
     'moon',
     'pencil',
     'sun',
+    'user',
     'users',
     'x',
 ];
@@ -37,6 +38,7 @@ const MASKS = [
     'map-pin',
     'triangle-alert',
     'user',
+    'users',
 ];
 
 async function body(name) {
