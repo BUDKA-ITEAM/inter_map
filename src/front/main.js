@@ -5,24 +5,32 @@ import './roomPanel.js';
 import './groups.js';
 import './teachers.js';
 import './ui.js';
+import './startMode.js';
+import './roleBanner.js';
 
-import { setFloor } from './three.js';
-import { getDateString, scheduleToggle } from './schedule.js';
+import { setScheduleDate, scheduleToggle } from './schedule.js';
+import { getDateString } from './dates.js';
+import { initDateBar } from './dateBar.js';
 import { initGroupPicker } from './groups.js';
 import { initTeacherPicker } from './teachers.js';
 import { initTheme, initDebugMode, initExtrasUnlock } from './ui.js';
-import { dateInput, currentDate, currentFloor, setCurrentDate } from './state.js';
+import { initStartMode, openScheduleStart } from './startMode.js';
+import { initRoleBanner } from './roleBanner.js';
+import { currentDate, setCurrentDate } from './state.js';
 
 initTheme();
 initDebugMode();
 initExtrasUnlock();
 
 setCurrentDate(getDateString(new Date()));
-dateInput.value = currentDate;
-setFloor(currentFloor);
+initDateBar(currentDate, setScheduleDate);
 
+initRoleBanner();
 initGroupPicker();
 initTeacherPicker();
+
+await initStartMode();
+openScheduleStart();
 
 if (new URLSearchParams(window.location.search).get('schedule') === '1') {
     scheduleToggle.checked = true;

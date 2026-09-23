@@ -60,8 +60,9 @@
     --sidebar-inset: var(--space-4);
     --content-max: 1100px;
     --floor-column-width: 52px;
-    --sheet-top-gap: 76px;
+    --sheet-top-gap: 88px;
     --mobile-top-bar: 62px;
+    --swipe-gutter: 24px;
 
     --icon-chevron: url("img/icons/chevron-down.svg");
     --icon-teacher: url("img/icons/user.svg");

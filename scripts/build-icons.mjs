@@ -22,6 +22,7 @@ const SPRITE = [
     'contrast',
     'info',
     'loader-circle',
+    'map',
     'maximize',
     'menu',
     'moon',

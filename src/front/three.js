@@ -1,10 +1,3 @@
-// Сцена three.js: загрузка планов этажей, подсветка кабинетов, клики по карте.
-//
-// Файл называется three.js, но импортирует пакет 'three' по bare specifier
-// из importmap — конфликта имён нет, это разные механизмы резолва.
-//
-// Циклическая зависимость с schedule.js и roomPanel.js разрешена тем, что
-// импортированные оттуда функции вызываются только внутри тел функций.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -32,10 +25,6 @@ import {
 import { GLB_SIZES } from './glbSizes.js';
 import { showRoomPanel, hideRoomPanel } from './roomPanel.js';
 import { applySelection, hasSelection, updatePairsUI } from './schedule.js';
-
-// ---------------------------------------------------------------------------
-// СЦЕНА
-// ---------------------------------------------------------------------------
 
 const scene = new THREE.Scene();
 
@@ -85,9 +74,7 @@ const loader = new GLTFLoader();
 let loadedModel = null;
 let animationStarted = false;
 
-// ---------------------------------------------------------------------------
 // ТЕМА
-// ---------------------------------------------------------------------------
 
 const sceneBackground = new THREE.Color();
 const sceneBackgroundHSL = { h: 0, s: 0, l: 0 };

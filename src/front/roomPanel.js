@@ -2,7 +2,8 @@ import {
     roomPanel, roomPanelClose, roomPanelTitle, roomPanelContent,
     currentSchedule, currentDate, setScheduleCollapsedForRoom
 } from './state.js';
-import { getPairStatus, shortDate } from './schedule.js';
+import { getPairStatus } from './schedule.js';
+import { shortDate } from './dates.js';
 import { resetActiveSelection, renderer } from './three.js';
 
 function renderPairItem(pair) {

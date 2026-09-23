@@ -277,11 +277,20 @@
 }
 
 @media (width < 769px) {
-    :root:has(#sidebar.open) .edge-btn-left { display: none; }
+    :root:has(#sidebar.open) .edge-btn,
+    :root:has(#schedule-drawer.open) .edge-btn {
+        display: none;
+    }
+}
+
+@media (width < 769px) {
+    .edge-btn { width: auto; }
+    .edge-btn .label { @apply opacity-100; }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
-    .edge-btn { @apply top-1; }
+    .edge-btn { @apply top-1; width: auto; }
+    .edge-btn .label { @apply opacity-100; }
     .edge-btn-left { @apply left-1; }
     .edge-btn-right { @apply right-1; }
 }
@@ -320,36 +329,8 @@
     font-weight: 500;
 }
 
-.date-input {
-    @apply w-full min-h-11 border border-border rounded-control bg-surface text-ink
-           text-center shadow-card
-           transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
-           focus-visible:outline-none focus-visible:border-tag-orange
-           focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
-           mouse:hover:border-border-strong mouse:hover:bg-surface-hover;
-    padding: 11px 12px;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.date-input::-webkit-calendar-picker-indicator {
-    @apply rounded-md opacity-70 cursor-pointer
-           transition-[opacity,background-color] duration-150 ease-[ease];
-    padding: 3px;
-}
-
-.date-input::-webkit-calendar-picker-indicator:hover {
-    @apply opacity-100 bg-surface-hover;
-}
-
-:root[data-theme="dark"] .date-input::-webkit-calendar-picker-indicator,
-:root:has(#theme-toggle:checked) .date-input::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(0.9);
-}
-
 @media (width < 769px) {
-    .select, .date-input { @apply min-h-12; font-size: 14px; }
+    .select { @apply min-h-12; font-size: 14px; }
 }
 
 /* ---------- выбранная группа и преподаватель ---------- */
@@ -468,7 +449,7 @@
 /* ---------- карта ---------- */
 
 .map-card {
-    @apply flex-auto w-full relative overflow-hidden touch-none min-h-0
+    @apply flex-auto relative overflow-hidden touch-none min-h-0
            border border-border rounded-card bg-model-bg;
 }
 
@@ -481,11 +462,19 @@
     :root:has(#sidebar.open) .map-card,
     :root:has(#schedule-drawer.open) .map-card { @apply pointer-events-none; }
 
-    .map-card { @apply h-auto max-h-none; min-height: 180px; }
+    .map-card {
+        @apply h-auto max-h-none;
+        min-height: 180px;
+        margin-inline: calc(var(--swipe-gutter) - var(--space-2));
+    }
 }
 
 @media (width < 481px) {
-    .map-card { height: 55vh; min-height: 200px; }
+    .map-card {
+        height: 55vh;
+        min-height: 200px;
+        margin-inline: calc(var(--swipe-gutter) - var(--space-1));
+    }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
@@ -716,6 +705,7 @@
 @media (width < 769px) {
     .sheet {
         @apply left-0 right-0;
+        --sheet-top-gap: 128px;
         max-width: none;
         padding-inline: 12px;
         padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
@@ -723,7 +713,7 @@
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
-    .sheet { --sheet-top-gap: 56px; padding: 4px 12px 12px; }
+    .sheet { --sheet-top-gap: 70px; padding: 4px 12px 12px; }
 }
 
 /* ---------- список пар ---------- */
@@ -1047,7 +1037,7 @@
     min-width: 0;
 }
 
-.map-footer { display: none; @apply shrink-0 items-center justify-center pt-1; }
+.map-footer { display: none; @apply shrink-0 items-center justify-center gap-2 pt-1; }
 
 .map-reset {
     @apply inline-flex items-center justify-center gap-2 min-h-11
@@ -1057,6 +1047,15 @@
     padding-inline: 24px;
     font-size: 13px;
     font-weight: 500;
+}
+
+.map-schedule { display: none; }
+
+:root:has(#group-current:not([hidden])) .map-schedule,
+:root:has(#teacher-current:not([hidden])) .map-schedule { @apply inline-flex; }
+
+@media (width < 421px) {
+    .map-reset { padding-inline: 14px; font-size: 12px; }
 }
 
 @media (width < 769px) {
@@ -1082,6 +1081,244 @@
     .app-body { @apply overflow-y-auto h-auto; }
     .app-wrapper { @apply h-auto min-h-screen px-1 pb-1; }
     .content-row { @apply gap-1; }
+}
+
+/* ---------- баннер роли ---------- */
+
+.role-banner {
+    @apply flex flex-col gap-1.5 p-4 border-2 border-accent rounded-card bg-accent-soft;
+}
+
+.role-banner-label {
+    @apply flex items-center gap-1.5 uppercase text-ink-secondary tracking-[0.08em];
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.role-banner-role {
+    @apply m-0 text-ink tracking-[-0.01em];
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.role-banner-meta {
+    @apply m-0 text-ink-secondary;
+    font-size: 13px;
+}
+
+.role-banner-group { @apply text-ink; font-weight: 600; }
+
+.role-banner .btn { @apply mt-1.5; }
+
+.role-banner .status-text:empty { display: none; }
+
+/* ---------- панель даты над картой ---------- */
+
+.date-bar {
+    @apply shrink-0 flex items-center gap-1.5 p-1.5
+           bg-surface border border-border rounded-control shadow-card;
+}
+
+@media (width >= 769px) {
+    .date-bar { margin-inline-end: 58px; }
+}
+
+.date-pick { @apply relative shrink-0 flex; }
+
+.date-pick-face {
+    @apply inline-flex items-center justify-center gap-1.5 min-h-11 cursor-pointer
+           rounded-control bg-surface-active text-ink border border-border
+           transition-[background-color,border-color] duration-150 ease-[ease]
+           focus-visible:outline-[1.5px] focus-visible:outline-focus-ring focus-visible:outline-offset-2
+           mouse:hover:border-border-strong;
+    padding-inline: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.date-pick-face[aria-expanded="true"] { @apply bg-accent text-on-accent border-accent; }
+
+.date-pick-face svg { @apply size-4 shrink-0 text-ink-secondary; stroke-width: 2; }
+
+.date-pick-face[aria-expanded="true"] svg { @apply text-on-accent; }
+
+/* ---------- месячный календарь ---------- */
+
+.calendar {
+    @apply absolute left-0 z-12 flex flex-col gap-2 p-3
+           bg-surface border border-border-strong rounded-card shadow-sheet
+           animate-[panel-in_var(--duration-base)_var(--ease)];
+    top: calc(100% + var(--space-2));
+    width: 296px;
+}
+
+.calendar-head { @apply flex items-center justify-between gap-2; }
+
+.calendar-title {
+    @apply text-ink;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.calendar-nav {
+    @apply inline-flex items-center justify-center size-9 shrink-0 cursor-pointer
+           rounded-control bg-transparent text-ink-secondary border border-transparent
+           transition-[background-color,border-color,color] duration-150 ease-[ease]
+           active:bg-surface-active
+           mouse:hover:bg-surface-hover mouse:hover:border-border mouse:hover:text-ink;
+}
+
+.calendar-nav svg { @apply size-4.5; stroke-width: 2; }
+
+.calendar-weekdays,
+.calendar-grid {
+    @apply grid gap-0.5;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-weekdays span {
+    @apply flex items-center justify-center uppercase text-ink-secondary;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.calendar-day {
+    @apply flex items-center justify-center size-9.5 cursor-pointer
+           rounded-control bg-transparent text-ink border border-transparent
+           transition-[background-color,border-color,color] duration-150 ease-[ease]
+           active:bg-surface-active
+           mouse:hover:bg-surface-hover mouse:hover:border-border;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.calendar-day.is-outside { @apply text-ink-secondary opacity-45; }
+
+.calendar-day.is-today { @apply border-border-strong font-semibold; }
+
+.calendar-day.is-selected {
+    @apply bg-accent text-on-accent border-accent font-semibold opacity-100
+           mouse:hover:bg-accent-hover mouse:hover:border-accent-hover;
+}
+
+.calendar-today { @apply self-center; }
+
+@media (width < 421px) {
+    .calendar { width: min(296px, calc(100vw - var(--space-5))); }
+    .calendar-day { @apply size-9; }
+}
+
+.date-strip {
+    @apply flex-1 flex gap-1 overflow-x-auto overscroll-x-contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.date-strip::-webkit-scrollbar { display: none; }
+
+.day-chip {
+    @apply flex flex-col items-center justify-center gap-0.5 shrink-0 min-h-11 w-11
+           rounded-control bg-transparent text-ink border border-transparent cursor-pointer
+           transition-[background-color,border-color,color] duration-150 ease-[ease]
+           active:bg-surface-active
+           mouse:hover:bg-surface-hover mouse:hover:border-border;
+    scroll-snap-align: center;
+}
+
+.day-chip-weekday {
+    @apply uppercase text-ink-secondary transition-colors duration-150 ease-[ease];
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.day-chip-number {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.day-chip.is-today { @apply border-border-strong; }
+
+.day-chip.is-selected {
+    @apply bg-accent text-on-accent border-accent
+           mouse:hover:bg-accent-hover mouse:hover:border-accent-hover;
+}
+
+.day-chip.is-selected .day-chip-weekday { @apply text-on-accent; }
+
+
+/* ---------- стартовый вопрос про карту ---------- */
+
+.intro {
+    @apply fixed inset-0 z-40 flex items-center justify-center p-4 bg-bg;
+    transition: opacity var(--duration-base) var(--ease), visibility 0s var(--duration-base);
+}
+
+:root:not([data-start-mode="ask"]) .intro {
+    @apply opacity-0 pointer-events-none;
+    visibility: hidden;
+}
+
+.intro-card {
+    @apply w-full flex flex-col gap-4 p-6
+           bg-surface border border-border rounded-card shadow-sheet;
+    max-width: 420px;
+}
+
+.intro-title {
+    @apply m-0 text-ink tracking-[-0.01em];
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.intro-text {
+    @apply m-0 text-ink-secondary;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.intro-actions { @apply flex flex-col gap-2.5; }
+
+.intro-btn {
+    @apply inline-flex items-center justify-center gap-2 w-full cursor-pointer
+           bg-surface text-ink border border-border rounded-control
+           transition-[background-color,border-color,scale] duration-150 ease-[ease]
+           active:scale-[0.98] active:bg-surface-active
+           mouse:hover:bg-surface-hover mouse:hover:border-border-strong;
+    min-height: 52px;
+    padding-inline: 16px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.intro-btn-primary {
+    @apply bg-accent text-on-accent border-accent font-semibold
+           mouse:hover:bg-accent-hover mouse:hover:border-accent-hover;
+}
+
+.intro-icon { @apply size-5 shrink-0; stroke-width: 1.9; }
+
+/* ---------- режим без карты ---------- */
+
+:root[data-start-mode="schedule"] .content-row,
+:root[data-start-mode="schedule"] .map-footer,
+:root[data-start-mode="schedule"] .sheet-grabber,
+:root[data-start-mode="schedule"] .sheet-close {
+    display: none;
+}
+
+:root[data-start-mode="schedule"] .sheet {
+    @apply static z-auto flex-auto mx-0 rounded-card border-b;
+    animation: none;
+    max-width: none;
+    max-height: none;
+}
+
+@media (width < 769px) {
+    :root[data-start-mode="schedule"]:has(#sidebar.open) .sheet,
+    :root[data-start-mode="schedule"]:has(#schedule-drawer.open) .sheet {
+        display: none;
+    }
 }
 
 /* ---------- кнопки диалога отладки ---------- */
