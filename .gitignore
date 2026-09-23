@@ -3,15 +3,16 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
-.env
+api/.env
 
 # ОС и редакторы
 .DS_Store
 Thumbs.db
 .idea/
 requirements.txt
+test.txt
 
-/docker-compose.yml
+api/docker-compose.yml
 /dockerfile
 /Dockerfile
 

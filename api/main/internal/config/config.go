@@ -13,6 +13,9 @@ type Config struct {
 	Port                 string
 	AllowedOrigins       []string
 	CacheRefreshInterval time.Duration
+	JWTSecret            string
+	AdminUsername        string
+	AdminPassword        string
 }
 
 func Load() *Config {
@@ -54,5 +57,8 @@ func Load() *Config {
 		Port:                 port,
 		AllowedOrigins:       origins,
 		CacheRefreshInterval: time.Duration(refreshMinutes) * time.Minute,
+		JWTSecret:            os.Getenv("JWT_SECRET"),
+		AdminUsername:        os.Getenv("ADMIN_USERNAME"),
+		AdminPassword:        os.Getenv("ADMIN_PASSWORD"),
 	}
 }

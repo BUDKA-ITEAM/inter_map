@@ -25,8 +25,22 @@ services:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/college_schedule?sslmode=disable
       ALLOWED_ORIGINS: http://localhost:5500, http://127.0.0.1:5500, https://budka-iteam.github.io/inter_map/
       PORT: 8080
+      JWT_SECRET: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImV4cCI6MTc5MDE2MTE0OX0.zQznmkRnTskraBuG_t6CLh498RBlpdZDwg3Dsh_wLDo"
+      ADMIN_USERNAME: "stray228"
+      ADMIN_PASSWORD: "1488"
     ports:
       - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+  parser:
+    build:
+      context: ../parser
+      dockerfile: Dockerfile
+    environment:
+      COLLEGE_SCHEDULE_DB_DSN: postgres://postgres:postgres@postgres:5432/college_schedule?sslmode=disable
+      PARSE_INTERVAL_HOURS: "6"
     depends_on:
       postgres:
         condition: service_healthy

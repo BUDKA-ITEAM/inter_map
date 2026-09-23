@@ -82,7 +82,7 @@ func (c *LessonCache) refresh(ctx context.Context) {
 	log.Printf("cache refreshed: %d lessons", len(fresh))
 }
 
-func splitGroupField(value string) []string {
+func SplitGroupField(value string) []string {
 	parts := strings.FieldsFunc(value, func(r rune) bool {
 		return r == ',' || unicode.IsSpace(r)
 	})
@@ -97,7 +97,7 @@ func splitGroupField(value string) []string {
 }
 
 func containsGroup(field, target string) bool {
-	for _, g := range splitGroupField(field) {
+	for _, g := range SplitGroupField(field) {
 		if g == target {
 			return true
 		}
@@ -167,4 +167,15 @@ func (c *LessonCache) IsStale(threshold time.Duration) bool {
 		return true
 	}
 	return time.Since(c.updated) > threshold
+}
+
+func (c *LessonCache) FindByID(lessonID int) (models.Lesson, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	for _, l := range c.lessons {
+		if l.LessonID == lessonID {
+			return l, true
+		}
+	}
+	return models.Lesson{}, false
 }
