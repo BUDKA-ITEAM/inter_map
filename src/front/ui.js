@@ -1,5 +1,3 @@
-// Сайдбар настроек, правая шторка расписания, свайпы между ними,
-// тема оформления и скрытый режим отладки.
 import {
     THEME_STORAGE_KEY, DEBUG_STORAGE_KEY, DEBUG_UNLOCK_TAPS, DEBUG_VIDEO_TAPS,
     SWIPE_EDGE_THRESHOLD, SWIPE_MIN_DISTANCE, MOBILE_BREAKPOINT,
@@ -53,8 +51,6 @@ document.addEventListener('pointerdown', (event) => {
     setScheduleDrawerOpen(false);
 });
 
-// Горизонтальные свайпы: от левого края — настройки, от правого — расписание.
-// Открытую шторку закрывает обратный свайп, начатый в любой точке экрана.
 const swipe = {
     startX: 0,
     startY: 0,
@@ -137,7 +133,6 @@ document.addEventListener('touchmove', (event) => {
 
 document.addEventListener('touchend', resetSwipe);
 
-// важнейшая функция //
 stubOverlay.addEventListener('click', () => {
     stubVideo.muted = !stubVideo.muted;
     if (stubVideo.paused) stubVideo.play();
@@ -152,10 +147,6 @@ themeToggle.addEventListener('change', () => {
     applyThemeBackground();
     writeStored(THEME_STORAGE_KEY, themeToggle.checked ? 'dark' : 'light');
 });
-
-// ---------------------------------------------------------------------------
-// РЕЖИМ ОТЛАДКИ: серия нажатий по номеру второго этажа
-// ---------------------------------------------------------------------------
 
 const DEBUG_FLOOR = '2';
 

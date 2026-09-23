@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="white">
+<html lang="ru" data-theme="white" data-start-mode="ask">
 <head>
     <meta charset="UTF-8">
+    <script>
+        try {
+            const saved = localStorage.getItem('intermap.startMode');
+            if (saved === 'map' || saved === 'schedule') document.documentElement.dataset.startMode = saved;
+        } catch {}
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light dark">
     <title>Навигатор по этажам</title>
@@ -30,6 +36,19 @@
     <aside id="sidebar" class="drawer drawer-left" aria-label="Настройки расписания">
         <h3 class="drawer-title">Настройки</h3>
 
+        <div id="role-banner" class="role-banner">
+            <span class="role-banner-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Вы
+            </span>
+            <p class="role-banner-role"><span id="role-name"></span></p>
+            <p class="role-banner-meta">из группы <span id="role-group" class="role-banner-group"></span></p>
+            <p id="role-email" class="role-banner-meta" hidden></p>
+            <button id="role-tools-btn" type="button" class="btn btn-primary" hidden>
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Перейти к функционалу
+            </button>
+            <p id="role-status" class="status-text" role="status" aria-live="polite"></p>
+        </div>
+
         <div class="drawer-section">
             <span class="section-label" id="view-switch-label">
                 <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
@@ -43,6 +62,17 @@
             <button id="open-schedule-drawer" type="button" class="btn btn-neutral">
                 <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Открыть расписание
             </button>
+        </div>
+
+        <div class="drawer-section">
+            <span class="section-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg>Карта
+            </span>
+            <label for="map-toggle" class="switch-row">
+                <input type="checkbox" id="map-toggle" class="switch-input" role="switch">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                <span>Показывать план этажей</span>
+            </label>
         </div>
 
         <div class="drawer-section">
@@ -165,20 +195,6 @@
             <p id="teacher-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 
-        <div class="drawer-section">
-            <span class="section-label" id="date-panel-label">
-                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-days"/></svg>Дата
-            </span>
-
-            <div id="date-panel" class="flex flex-col gap-2" role="group" aria-labelledby="date-panel-label">
-                <input type="date" id="date-input" class="date-input" aria-label="Дата">
-                <div class="flex gap-2">
-                    <button id="prev-day" type="button" class="btn-nav"><svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-left"/></svg>Назад</button>
-                    <button id="next-day" type="button" class="btn-nav">Вперёд<svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-right"/></svg></button>
-                </div>
-            </div>
-        </div>
-
         <div class="drawer-actions">
             <div class="sheet-switch">
                 <input type="checkbox" id="schedule-toggle" class="sheet-switch-input">
@@ -198,6 +214,33 @@
     <!-- основной контент -->
     <div id="app-wrapper" class="app-wrapper">
         <div id="main-container" class="main-container">
+            <div id="date-bar" class="date-bar" role="group" aria-label="Дата расписания">
+                <span class="date-pick">
+                    <button id="date-pick-btn" type="button" class="date-pick-face"
+                            aria-haspopup="dialog" aria-expanded="false" aria-label="Выбрать дату">
+                        <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-days"/></svg><span id="date-pick-label" class="date-pick-label"></span>
+                    </button>
+
+                    <div id="calendar" class="calendar" role="dialog" aria-label="Выбор даты" hidden>
+                        <div class="calendar-head">
+                            <button id="calendar-prev" type="button" class="calendar-nav" aria-label="Предыдущий месяц">
+                                <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-left"/></svg>
+                            </button>
+                            <span id="calendar-title" class="calendar-title" aria-live="polite"></span>
+                            <button id="calendar-next" type="button" class="calendar-nav" aria-label="Следующий месяц">
+                                <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#chevron-right"/></svg>
+                            </button>
+                        </div>
+                        <div class="calendar-weekdays" aria-hidden="true">
+                            <span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span>
+                        </div>
+                        <div id="calendar-grid" class="calendar-grid"></div>
+                        <button id="calendar-today" type="button" class="btn-pill calendar-today">Сегодня</button>
+                    </div>
+                </span>
+                <div id="date-strip" class="date-strip" role="group" aria-label="Дни"></div>
+            </div>
+
             <div id="content-row" class="content-row">
                 <div id="map-column" class="map-column">
                     <div id="model-container" class="map-card" aria-label="Интерактивный план этажа">
@@ -260,20 +303,38 @@
                 <button id="reset-view" type="button" class="map-reset">
                     <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#maximize"/></svg>Сбросить вид
                 </button>
+                <label for="schedule-toggle" id="map-schedule-btn" class="map-reset map-schedule">
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Показать расписание
+                </label>
+            </div>
+
+            <div id="schedule-panel" class="sheet" role="region" aria-labelledby="schedule-panel-title">
+                <span class="sheet-grabber" aria-hidden="true"></span>
+                <div class="sheet-head">
+                    <h2 id="schedule-panel-title" class="sheet-title">
+                        <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
+                    </h2>
+                    <label for="schedule-toggle" class="sheet-close" aria-label="Закрыть расписание"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg></label>
+                </div>
+                <div id="pairs-container" class="pairs" aria-live="polite">
+                    <div class="no-pairs">Выберите группу, чтобы увидеть пары</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="schedule-panel" class="sheet" role="region" aria-labelledby="schedule-panel-title">
-        <span class="sheet-grabber" aria-hidden="true"></span>
-        <div class="sheet-head">
-            <h2 id="schedule-panel-title" class="sheet-title">
-                <svg aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
-            </h2>
-            <label for="schedule-toggle" class="sheet-close" aria-label="Закрыть расписание"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg></label>
-        </div>
-        <div id="pairs-container" class="pairs" aria-live="polite">
-            <div class="no-pairs">Выберите группу, чтобы увидеть пары</div>
+    <div id="intro" class="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+        <div class="intro-card">
+            <h1 id="intro-title" class="intro-title">Нужна ли вам карта?</h1>
+            <p class="intro-text">План этажей подсвечивает кабинеты по занятости. Если нужно только расписание, карту можно пропустить - и включить позже в настройках.</p>
+            <div class="intro-actions">
+                <button id="intro-schedule" type="button" class="intro-btn">
+                    <svg class="intro-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Нет, покажите расписание
+                </button>
+                <button id="intro-map" type="button" class="intro-btn intro-btn-primary">
+                    <svg class="intro-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg>Да, покажите карту
+                </button>
+            </div>
         </div>
     </div>
 

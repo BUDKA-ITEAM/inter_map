@@ -2,6 +2,7 @@ import { LESSONS_ENDPOINT, GROUPS_SCAN_LIMIT, GROUP_STORAGE_KEY } from './config
 import { groupSelect, scheduleMode } from './state.js';
 import { readStored, writeStored } from './storage.js';
 import { fetchFromApi, applySelection, scheduleToggle } from './schedule.js';
+import { showPickedGroup } from './roleBanner.js';
 
 const groupPickBtn = document.getElementById('group-pick-btn');
 const groupPickerPanel = document.getElementById('group-picker-panel');
@@ -88,6 +89,7 @@ function fillGroups(directionId) {
 
 function confirmGroup(name) {
     groupCurrentName.textContent = name;
+    showPickedGroup(name);
     writeStored(GROUP_STORAGE_KEY, name);
     setGroupStatus('');
     showGroupState('chosen');
@@ -120,6 +122,10 @@ groupSelect.addEventListener('change', () => {
 groupConfirmBtn.addEventListener('click', () => {
     if (groupSelect.value) confirmGroup(groupSelect.value);
 });
+
+export function openGroupPicker() {
+    showGroupState('picking');
+}
 
 function restoreSavedGroup() {
     const savedGroup = readStored(GROUP_STORAGE_KEY);

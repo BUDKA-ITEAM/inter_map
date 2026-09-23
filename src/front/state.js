@@ -11,9 +11,6 @@ export const roomPanelClose = document.getElementById('room-panel-close');
 export const roomPanelBack = document.getElementById('room-panel-back');
 export const roomPanelTitle = document.getElementById('room-panel-title');
 export const roomPanelContent = document.getElementById('room-panel-content');
-export const dateInput = document.getElementById('date-input');
-export const prevDayBtn = document.getElementById('prev-day');
-export const nextDayBtn = document.getElementById('next-day');
 export const stubOverlay = document.getElementById('stub-overlay');
 export const floorNumbers = document.querySelectorAll('.floor-numbers span');
 

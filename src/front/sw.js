@@ -1,4 +1,4 @@
-const SHELL_VERSION = 'v4';
+const SHELL_VERSION = 'v8';
 const ASSET_VERSION = 'v1';
 const SHELL_CACHE = `shell-${SHELL_VERSION}`;
 const ASSET_CACHE = `assets-${ASSET_VERSION}`;
@@ -15,6 +15,12 @@ const SHELL = [
     './groups.js',
     './teachers.js',
     './ui.js',
+    './storage.js',
+    './startMode.js',
+    './dates.js',
+    './dateBar.js',
+    './session.js',
+    './roleBanner.js',
     './config.js',
     './fallbackSchedule.js',
     './glbSizes.js',

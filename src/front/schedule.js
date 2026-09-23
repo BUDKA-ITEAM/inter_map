@@ -10,7 +10,7 @@ import {
 } from './config.js';
 
 import {
-    pairsContainer, dateInput, prevDayBtn, nextDayBtn, groupSelect, roomPanel, roomPanelBack,
+    pairsContainer, groupSelect, roomPanel, roomPanelBack,
     currentGroup, setCurrentGroup,
     currentTeacher, setCurrentTeacher,
     scheduleMode,
@@ -23,6 +23,9 @@ import {
     roomMeshes,
     scheduleCollapsedForRoom, setScheduleCollapsedForRoom
 } from './state.js';
+
+import { getDateString, parseDateString, shortDate } from './dates.js';
+import { markSelectedDate } from './dateBar.js';
 
 import {
     animateMeshColor, resetAllRoomsToWhite, getStatusColor, resetActiveSelection,
@@ -40,25 +43,6 @@ import { splitGroupField } from './groups.js';
 
 // toISOString() переводит время в UTC: ночью в Москве приложение открывалось
 // на вчерашнем дне, а вечером в западных поясах — на завтрашнем.
-export function getDateString(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
-// new Date('2026-09-22') читается как UTC-полночь и в западных поясах
-// сдвигает день назад, поэтому собираем дату по частям.
-export function parseDateString(value) {
-    const [year, month, day] = value.split('-').map(Number);
-    return new Date(year, month - 1, day);
-}
-
-export function shortDate(dateStr) {
-    const [, month, day] = dateStr.split('-');
-    return `${day}.${month}`;
-}
-
 function weekDaysFor(dateStr) {
     const monday = parseDateString(dateStr);
     monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
@@ -267,9 +251,7 @@ function showPairsMessage(text, isError = false) {
     pairsContainer.appendChild(message);
 }
 
-// ---------------------------------------------------------------------------
 // ПОДСВЕТКА КАБИНЕТОВ
-// ---------------------------------------------------------------------------
 
 function highlightRoomsForSchedule(schedule) {
     resetActiveSelection();
@@ -331,8 +313,6 @@ function highlightRoomByRoomId(roomId) {
     showRoomPanel(mesh.userData.roomNumber || '', mesh.userData.roomName);
 }
 
-// Кабинет с другого этажа подсвечиваем в два приёма: сначала запускаем
-// загрузку этажа, потом повторяем подсветку, когда модель уже на сцене.
 function applyPendingRoom(consume) {
     if (!pendingRoomId) return;
 
@@ -353,13 +333,14 @@ pairsContainer.addEventListener('keydown', (event) => {
 });
 
 pairsContainer.addEventListener('click', (event) => {
+    if (isScheduleOnly()) return;
+
     const card = event.target.closest('.pair-card');
     if (card?.dataset.roomId) highlightRoomByRoomId(card.dataset.roomId);
 });
 
-// ---------------------------------------------------------------------------
+
 // ЗАГРУЗКА ВЫБРАННОГО РАСПИСАНИЯ
-// ---------------------------------------------------------------------------
 
 let appliedKey = null;
 
@@ -371,8 +352,6 @@ export function hasSelection() {
     return Boolean(scheduleMode === 'teacher' ? currentTeacher : selectedGroupName());
 }
 
-// Ключ меняется вместе с выбором, видом и датой — по нему видно,
-// нужно ли перезапрашивать данные при открытии шторки.
 function selectionKey() {
     const base = scheduleMode === 'teacher'
         ? currentTeacher && `teacher:${currentTeacher.id}`
@@ -449,6 +428,8 @@ export async function applySelection() {
         clearScheduleView();
         return;
     }
+
+    if (isScheduleOnly()) closeDrawersForSheet();
     await loadSelection();
 }
 
@@ -458,44 +439,21 @@ export function applySelectionIfNeeded() {
     hideRoomPanel();
 }
 
-// ---------------------------------------------------------------------------
 // ВЫБОР ДАТЫ
-// ---------------------------------------------------------------------------
 
-function shiftCurrentDate(days) {
-    const date = parseDateString(currentDate);
-    date.setDate(date.getDate() + days);
-    setCurrentDate(getDateString(date));
-    dateInput.value = currentDate;
+export function setScheduleDate(value) {
+    setCurrentDate(value);
+    markSelectedDate(value);
     applySelection();
 }
 
-dateInput.addEventListener('change', () => {
-    if (!dateInput.value) {
-        dateInput.value = currentDate;
-        return;
-    }
-    setCurrentDate(dateInput.value);
-    applySelection();
-});
-
-prevDayBtn.addEventListener('click', () => shiftCurrentDate(-1));
-nextDayBtn.addEventListener('click', () => shiftCurrentDate(1));
-
-// ---------------------------------------------------------------------------
 // ШТОРКА РАСПИСАНИЯ
-//
-// Открыта она или нет — хранит скрытый чекбокс #schedule-toggle: показом
-// занимается css по :has, здесь мы только переключаем галочку.
-// ---------------------------------------------------------------------------
 
 export const scheduleToggle = document.getElementById('schedule-toggle');
 const schedulePanel = document.getElementById('schedule-panel');
 const dayViewBtn = document.getElementById('day-view-btn');
 const weekViewBtn = document.getElementById('week-details-btn');
 
-// Кнопки вида не открывают шторку, а ведут в правую панель с выбором
-// группы и даты — оттуда расписание показывают отдельной кнопкой.
 function switchView(mode) {
     if (viewMode !== mode) {
         setViewMode(mode);
@@ -503,20 +461,24 @@ function switchView(mode) {
         weekViewBtn.setAttribute('aria-pressed', String(mode === 'week'));
         if (scheduleToggle.checked && hasSelection()) applySelection();
     }
-    setScheduleDrawerOpen(true);
+
+    if (!isScheduleOnly()) setScheduleDrawerOpen(true);
 }
 
 dayViewBtn.addEventListener('click', () => switchView('day'));
 weekViewBtn.addEventListener('click', () => switchView('week'));
 
-// На телефоне панели выезжают поверх карты: нажатие на пару подсветит
-// кабинет, но самого кабинета видно не будет.
 function closeDrawersForSheet() {
     setScheduleDrawerOpen(false);
     if (isNarrowScreen()) setSidebarOpen(false);
 }
 
+function isScheduleOnly() {
+    return document.documentElement.dataset.startMode === 'schedule';
+}
+
 function setScheduleOpen(open) {
+    if (!open && isScheduleOnly()) return;
     if (scheduleToggle.checked === open) return;
 
     scheduleToggle.checked = open;
@@ -524,8 +486,7 @@ function setScheduleOpen(open) {
         applySelectionIfNeeded();
         closeDrawersForSheet();
     }
-    // пока шторка открыта, карта не реагирует на жесты:
-    // за визуальную часть отвечает css, за three.js — controls
+
     controls.enabled = !open;
 }
 
@@ -546,7 +507,8 @@ const IGNORED_OUTSIDE_CLICKS = [
     '#schedule-drawer-toggle',
     '#open-schedule-drawer',
     '#day-view-btn',
-    '#week-details-btn'
+    '#week-details-btn',
+    '#map-schedule-btn'
 ].join(', ');
 
 document.addEventListener('pointerdown', (event) => {
@@ -556,9 +518,7 @@ document.addEventListener('pointerdown', (event) => {
     setScheduleOpen(false);
 });
 
-// ---------------------------------------------------------------------------
 // СВАЙПЫ ПО ШТОРКЕ
-// ---------------------------------------------------------------------------
 
 const sheetSwipe = { startX: 0, startY: 0, active: false, fromBottomEdge: false };
 
@@ -593,8 +553,6 @@ document.addEventListener('touchmove', (event) => {
         return;
     }
 
-    // вниз закрываем, только если список прокручен в самое начало,
-    // иначе жест принадлежит прокрутке списка пар
     const closing = !up && scheduleToggle.checked && schedulePanel.contains(event.target);
     if (closing && pairsContainer.scrollTop <= 0) {
         setScheduleOpen(false);
@@ -606,13 +564,6 @@ document.addEventListener('touchend', () => {
     sheetSwipe.active = false;
     sheetSwipe.fromBottomEdge = false;
 });
-
-// ---------------------------------------------------------------------------
-// ПЕРЕХОД «ПАРА → КАБИНЕТ → НАЗАД»
-//
-// На телефоне открытое расписание занимает пол-экрана и вместе с карточкой
-// кабинета не оставляет места карте, поэтому список сворачивается.
-// ---------------------------------------------------------------------------
 
 function collapseScheduleForRoom() {
     if (!scheduleToggle.checked) return;
@@ -629,6 +580,7 @@ function collapseScheduleForRoom() {
 // Обработчик добавлен вторым: сначала срабатывает тот, что открывает
 // карточку кабинета, и только потом сворачивается расписание.
 pairsContainer.addEventListener('click', (event) => {
+    if (isScheduleOnly()) return;
     if (event.target.closest('.pair-card')) collapseScheduleForRoom();
 });
 

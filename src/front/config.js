@@ -1,5 +1,4 @@
 // Константы и статичные конфиги: зум, модели этажей, api, кабинеты, цвета, пороги жестов, ключи localStorage.
-
 // определение мобильного устройства для настройки зума
 export const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || window.matchMedia('(pointer: coarse)').matches;
@@ -27,6 +26,7 @@ export const isLocalHost = ['localhost', '127.0.0.1', '', '[::1]'].includes(loca
 export const API_BASE_URL = isLocalHost ? API_DEV_URL : API_PRODUCTION_URL;
 export const LESSONS_ENDPOINT = '/api/lessons';
 export const TEACHERS_ENDPOINT = '/api/teachers';
+export const SESSION_ENDPOINT = '/api/me';
 export const WEEK_SCHEDULE_PAGE_URL = 'week_schedule.html';
 
 export const GROUPS_SCAN_LIMIT = 2000;
@@ -202,6 +202,7 @@ export const GROUP_STORAGE_KEY = 'intermap.selectedGroup';
 export const TEACHER_STORAGE_KEY = 'intermap.selectedTeacher';
 export const SCHEDULE_MODE_STORAGE_KEY = 'intermap.scheduleMode';
 export const THEME_STORAGE_KEY = 'intermap.theme';
+export const START_MODE_STORAGE_KEY = 'intermap.startMode';
 export const DEBUG_STORAGE_KEY = 'intermap.debug';
 export const SWITCH_COUNT_STORAGE_KEY = 'intermap.themeSwitches.v2';
 export const DEBUG_UNLOCK_TAPS = 20;
@@ -210,3 +211,19 @@ export const EXTRAS_UNLOCK_SWITCHES = 20;
 export const MOBILE_BREAKPOINT = 768;
 
 export const WEEKDAY_TITLES = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+export const ROLE_TITLES = {
+    student: 'Ученик',
+    headman: 'Староста',
+    curator: 'Куратор'
+};
+
+export const ROLES_WITH_TOOLS = ['headman', 'curator'];
+
+export const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+export const MONTH_TITLES = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+];
+export const CALENDAR_WEEKS = 6;
+export const DATE_STRIP_PAST_DAYS = 7;
+export const DATE_STRIP_FUTURE_DAYS = 27;
