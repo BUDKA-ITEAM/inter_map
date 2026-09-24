@@ -48,7 +48,7 @@ func main() {
 	lessonCache := cache.NewLessonCache(pool)
 	lessonCache.StartRefreshLoop(ctx, cfg.CacheRefreshInterval)
 
-	scheduleH := &handlers.ScheduleHandler{Cache: lessonCache} // было sceduleH — опечатка заодно поправлена
+	scheduleH := &handlers.ScheduleHandler{Cache: lessonCache}
 	healthH := &handlers.HealthHandler{
 		DB:         pool,
 		Cache:      lessonCache,
@@ -76,11 +76,22 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(appmw.RequireAuth(jwtSecret))
 		r.Get("/api/auth/me", authH.Me)
+		r.Get("/api/attendance", attendanceH.List)
 
 		r.Group(func(r chi.Router) {
 			r.Use(appmw.RequireRole("monitor", "curator"))
 			r.Post("/api/attendance", attendanceH.Mark)
 		})
+	})
+
+	adminH := &handlers.AdminHandler{DB: pool}
+
+	r.Group(func(r chi.Router) {
+		r.Use(appmw.RequireAuth(jwtSecret))
+		r.Use(appmw.RequireRole("admin"))
+		r.Get("/api/admin/role-requests", adminH.ListRoleRequests)
+		r.Post("/api/admin/role-requests/{id}/approve", adminH.ApproveRoleRequest)
+		r.Post("/api/admin/role-requests/{id}/reject", adminH.RejectRoleRequest)
 	})
 
 	srv := &http.Server{

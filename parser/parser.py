@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 import psycopg2
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
 
 # ------------------------- Конфигурация -------------------------
@@ -27,11 +28,29 @@ REQUEST_TIMEOUT_SECONDS = 15
 REQUEST_DELAY_SECONDS = 0.5
 MAX_RETRIES = 5
 
-DB_DSN = os.environ.get(
-    "COLLEGE_SCHEDULE_DB_DSN",
-    "dbname=college_schedule user=postgres "
-    "password=postgres host=localhost port=5432",
-)
+load_dotenv()
+
+
+def build_dsn() -> str:
+    """
+    Приоритет:
+      1) COLLEGE_SCHEDULE_DB_DSN — если задан, используем как есть;
+      2) сборка из DB_HOST / DB_PORT / DB_NAME / DB_USER / DB_PASSWORD.
+    """
+    dsn = os.environ.get("COLLEGE_SCHEDULE_DB_DSN")
+    if dsn:
+        return dsn
+
+    host = os.environ.get("DB_HOST", "localhost")
+    port = os.environ.get("DB_PORT", "5432")
+    name = os.environ["DB_NAME"]
+    user = os.environ["DB_USER"]
+    pwd = os.environ["DB_PASSWORD"]
+
+    return f"dbname={name} user={user} password={pwd} host={host} port={port}"
+
+
+DB_DSN = build_dsn()
 
 DEBUG_DIR = Path(__file__).with_name("debug")
 DEBUG_DIR.mkdir(exist_ok=True)

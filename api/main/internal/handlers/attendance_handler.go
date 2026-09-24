@@ -3,7 +3,10 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"inter_map/api/internal/auth"
 	"inter_map/api/internal/cache"
@@ -111,4 +114,117 @@ func containsString(list []string, target string) bool {
 		}
 	}
 	return false
+}
+
+type attendanceRecord struct {
+	ID        int       `json:"id"`
+	LessonID  int       `json:"lesson_id"`
+	StudentID int       `json:"student_id"`
+	Username  string    `json:"username"`
+	FullName  string    `json:"full_name"`
+	Status    string    `json:"status"`
+	MarkedBy  int       `json:"marked_by"`
+	MarkedAt  time.Time `json:"marked_at"`
+}
+
+func (h *AttendanceHandler) List(w http.ResponseWriter, r *http.Request) {
+	claims, ok := appmw.ClaimsFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	query := `
+		SELECT a.id, a.lesson_id, a.student_id, u.username, u.full_name, a.status, a.marked_by, a.marked_at
+		FROM attendance a
+		JOIN users u ON u.id = a.student_id
+		WHERE 1=1`
+	var args []any
+	argN := 1
+
+	switch claims.Role {
+	case "student":
+		query += fmt.Sprintf(` AND a.student_id = $%d`, argN)
+		args = append(args, claims.UserID)
+		argN++
+	case "monitor":
+		query += fmt.Sprintf(` AND u."group" = $%d`, argN)
+		args = append(args, claims.Group)
+		argN++
+	case "curator":
+		groups, err := h.curatorGroups(r.Context(), claims.UserID)
+		if err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+		if len(groups) == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode([]attendanceRecord{})
+			return
+		}
+		query += fmt.Sprintf(` AND u."group" = ANY($%d)`, argN)
+		args = append(args, groups)
+		argN++
+	case "admin":
+		// без ограничения по группе
+	default:
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
+	if lessonIDStr := r.URL.Query().Get("lesson_id"); lessonIDStr != "" {
+		lessonID, err := strconv.Atoi(lessonIDStr)
+		if err != nil {
+			http.Error(w, "invalid lesson_id", http.StatusBadRequest)
+			return
+		}
+		query += fmt.Sprintf(` AND a.lesson_id = $%d`, argN)
+		args = append(args, lessonID)
+		argN++
+	}
+
+	query += ` ORDER BY a.marked_at DESC`
+
+	rows, err := h.DB.Query(r.Context(), query, args...)
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	result := make([]attendanceRecord, 0)
+	for rows.Next() {
+		var rec attendanceRecord
+		if err := rows.Scan(&rec.ID, &rec.LessonID, &rec.StudentID, &rec.Username,
+			&rec.FullName, &rec.Status, &rec.MarkedBy, &rec.MarkedAt); err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+		result = append(result, rec)
+	}
+	if err := rows.Err(); err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
+func (h *AttendanceHandler) curatorGroups(ctx context.Context, curatorID int) ([]string, error) {
+	rows, err := h.DB.Query(ctx, `SELECT "group" FROM curator_groups WHERE curator_id = $1`, curatorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var groups []string
+	for rows.Next() {
+		var g string
+		if err := rows.Scan(&g); err != nil {
+			return nil, err
+		}
+		groups = append(groups, g)
+	}
+	return groups, rows.Err()
 }
