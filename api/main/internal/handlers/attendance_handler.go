@@ -84,26 +84,39 @@ func (h *AttendanceHandler) Mark(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// monitor — только своя группа; curator — любая из групп в curator_groups
+// authorizedForGroups — есть ли доступ хотя бы к одной из групп занятия
 func authorizedForGroups(ctx context.Context, claims *auth.Claims, db *pgxpool.Pool, lessonGroups []string) bool {
+	groups, err := authorizedGroupsSubset(ctx, claims, db, lessonGroups)
+	return err == nil && len(groups) > 0
+}
+
+// authorizedGroupsSubset — какие именно из групп занятия доступны пользователю
+func authorizedGroupsSubset(ctx context.Context, claims *auth.Claims, db *pgxpool.Pool, lessonGroups []string) ([]string, error) {
 	switch claims.Role {
 	case "monitor":
-		return containsString(lessonGroups, claims.Group)
+		if containsString(lessonGroups, claims.Group) {
+			return []string{claims.Group}, nil
+		}
+		return nil, nil
 	case "curator":
 		rows, err := db.Query(ctx, `SELECT "group" FROM curator_groups WHERE curator_id = $1`, claims.UserID)
 		if err != nil {
-			return false
+			return nil, err
 		}
 		defer rows.Close()
+		var result []string
 		for rows.Next() {
 			var g string
-			if rows.Scan(&g) == nil && containsString(lessonGroups, g) {
-				return true
+			if err := rows.Scan(&g); err != nil {
+				return nil, err
+			}
+			if containsString(lessonGroups, g) {
+				result = append(result, g)
 			}
 		}
-		return false
+		return result, rows.Err()
 	default:
-		return false
+		return nil, nil
 	}
 }
 

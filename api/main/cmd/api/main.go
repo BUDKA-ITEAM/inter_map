@@ -8,8 +8,10 @@ import (
 	"inter_map/api/internal/db"
 	"inter_map/api/internal/handlers"
 	appmw "inter_map/api/internal/middleware"
+	"inter_map/api/internal/telegram"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -45,6 +47,15 @@ func main() {
 		log.Printf("admin bootstrap failed: %v", err)
 	}
 
+	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
+	var bot *telegram.Bot
+	if botToken != "" {
+		bot = telegram.NewBot(botToken)
+		telegram.NewLinker(bot, pool).StartPolling(ctx)
+	} else {
+		log.Println("warning: TELEGRAM_BOT_TOKEN not set — Telegram features disabled")
+	}
+
 	lessonCache := cache.NewLessonCache(pool)
 	lessonCache.StartRefreshLoop(ctx, cfg.CacheRefreshInterval)
 
@@ -56,6 +67,8 @@ func main() {
 	}
 	authH := &handlers.AuthHandler{DB: pool, Secret: jwtSecret}
 	attendanceH := &handlers.AttendanceHandler{DB: pool, Cache: lessonCache}
+	telegramH := &handlers.TelegramHandler{DB: pool, BotUsername: os.Getenv("TELEGRAM_BOT_USERNAME")}
+	exportH := &handlers.ExportHandler{DB: pool, Cache: lessonCache, Bot: bot}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -77,10 +90,12 @@ func main() {
 		r.Use(appmw.RequireAuth(jwtSecret))
 		r.Get("/api/auth/me", authH.Me)
 		r.Get("/api/attendance", attendanceH.List)
+		r.Post("/api/telegram/link-code", telegramH.GenerateLinkCode)
 
 		r.Group(func(r chi.Router) {
 			r.Use(appmw.RequireRole("monitor", "curator"))
 			r.Post("/api/attendance", attendanceH.Mark)
+			r.Post("/api/attendance/export", exportH.ExportToCurator)
 		})
 	})
 

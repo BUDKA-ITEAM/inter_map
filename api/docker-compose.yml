@@ -28,6 +28,8 @@ services:
       JWT_SECRET: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImV4cCI6MTc5MDE2MTE0OX0.zQznmkRnTskraBuG_t6CLh498RBlpdZDwg3Dsh_wLDo"
       ADMIN_USERNAME: "stray228"
       ADMIN_PASSWORD: "1488"
+      TELEGRAM_BOT_USERNAME: "to_test_developmentbot"
+      TELEGRAM_BOT_TOKEN: "8378126880:AAEs-MzJqTdCUxi_gXlkWMSyiqd68pwT3RQ"
     ports:
       - "8080:8080"
     depends_on:
