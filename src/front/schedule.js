@@ -333,7 +333,7 @@ pairsContainer.addEventListener('keydown', (event) => {
 });
 
 pairsContainer.addEventListener('click', (event) => {
-    if (isScheduleOnly()) return;
+    if (mapHidden()) return;
 
     const card = event.target.closest('.pair-card');
     if (card?.dataset.roomId) highlightRoomByRoomId(card.dataset.roomId);
@@ -429,7 +429,7 @@ export async function applySelection() {
         return;
     }
 
-    if (isScheduleOnly()) closeDrawersForSheet();
+    if (mapHidden()) closeDrawersForSheet();
     await loadSelection();
 }
 
@@ -472,12 +472,12 @@ function closeDrawersForSheet() {
     if (isNarrowScreen()) setSidebarOpen(false);
 }
 
-function isScheduleOnly() {
-    return document.documentElement.dataset.startMode === 'schedule';
+function mapHidden() {
+    return document.documentElement.dataset.map === 'off';
 }
 
 function setScheduleOpen(open) {
-    if (!open && isScheduleOnly()) return;
+    if (!open && mapHidden()) return;
     if (scheduleToggle.checked === open) return;
 
     scheduleToggle.checked = open;
@@ -577,7 +577,7 @@ function collapseScheduleForRoom() {
 // Обработчик добавлен вторым: сначала срабатывает тот, что открывает
 // карточку кабинета, и только потом сворачивается расписание.
 pairsContainer.addEventListener('click', (event) => {
-    if (isScheduleOnly()) return;
+    if (mapHidden()) return;
     if (event.target.closest('.pair-card')) collapseScheduleForRoom();
 });
 

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="white" data-start-mode="ask">
+<html lang="ru" data-theme="white" data-map="on">
 <head>
     <meta charset="UTF-8">
     <script>
+        const root = document.documentElement;
+        let savedMap = null;
         try {
-            const saved = localStorage.getItem('intermap.startMode');
-            if (saved === 'map' || saved === 'schedule') document.documentElement.dataset.startMode = saved;
+            savedMap = localStorage.getItem('intermap.map');
         } catch {}
+        if (savedMap === 'on' || savedMap === 'off') root.dataset.map = savedMap;
+        else root.dataset.intro = 'pending';
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light dark">

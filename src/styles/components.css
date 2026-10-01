@@ -675,7 +675,7 @@
     padding: 8px 16px 16px;
 }
 
-:root:has(#schedule-toggle:checked) .sheet {
+:root[data-map="on"]:has(#schedule-toggle:checked) .sheet {
     @apply flex animate-[schedule-in_var(--duration-base)_var(--ease)];
 }
 
@@ -1022,13 +1022,27 @@
 }
 
 .main-container {
-    @apply flex-1 h-full flex flex-col gap-3;
+    @apply flex-1 h-full grid gap-3;
+    grid-template-areas: "date" "map" "switch" "actions";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     max-width: var(--content-max);
     min-width: 0;
 }
 
+:root[data-map="off"] .main-container {
+    grid-template-areas: "switch" "date" "sheet";
+    grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.date-bar { grid-area: date; }
+.content-row { grid-area: map; }
+.map-switch { grid-area: switch; }
+.map-footer { grid-area: actions; }
+.sheet { grid-area: sheet; }
+
 .content-row {
-    @apply flex-1 flex items-stretch gap-3;
+    @apply flex items-stretch gap-3;
     min-height: 0;
 }
 
@@ -1037,7 +1051,7 @@
     min-width: 0;
 }
 
-.map-footer { display: none; @apply shrink-0 items-center justify-center gap-2 pt-1; }
+.map-footer { display: none; @apply items-center justify-center gap-2; }
 
 .map-reset {
     @apply inline-flex items-center justify-center gap-2 min-h-11
@@ -1049,13 +1063,11 @@
     font-weight: 500;
 }
 
-.map-switch { @apply shrink-0 flex items-center justify-center pt-1; }
+.map-switch { @apply flex items-center justify-center; }
 
 .map-switch-row { @apply gap-2.5; font-size: 13px; }
 
-:root[data-start-mode="schedule"] .map-switch { @apply order-first pt-0 pb-1; }
-
-:root[data-start-mode="schedule"] .map-switch-row {
+:root[data-map="off"] .map-switch-row {
     @apply py-1.5 px-3 bg-surface border border-border rounded-control;
 }
 
@@ -1078,7 +1090,7 @@
     }
 
     .main-container { @apply max-w-full gap-2; }
-    .content-row { @apply flex-auto flex-col gap-2; }
+    .content-row { @apply flex-col gap-2; }
     .map-column { @apply flex-auto gap-2; min-height: 0; }
     .map-footer { @apply flex; }
 }
@@ -1264,7 +1276,7 @@
     transition: opacity var(--duration-base) var(--ease), visibility 0s var(--duration-base);
 }
 
-:root:not([data-start-mode="ask"]) .intro {
+:root:not([data-intro="pending"]) .intro {
     @apply opacity-0 pointer-events-none;
     visibility: hidden;
 }
@@ -1310,23 +1322,22 @@
 
 /* ---------- режим без карты ---------- */
 
-:root[data-start-mode="schedule"] .content-row,
-:root[data-start-mode="schedule"] .map-footer,
-:root[data-start-mode="schedule"] .sheet-grabber,
-:root[data-start-mode="schedule"] .sheet-close {
+:root[data-map="off"] .content-row,
+:root[data-map="off"] .map-footer,
+:root[data-map="off"] .sheet-grabber,
+:root[data-map="off"] .sheet-close {
     display: none;
 }
 
-:root[data-start-mode="schedule"] .sheet {
-    @apply static z-auto flex-auto mx-0 rounded-card border-b;
-    animation: none;
+:root[data-map="off"] .sheet {
+    @apply static z-auto flex mx-0 rounded-card border-b;
     max-width: none;
     max-height: none;
 }
 
 @media (width < 769px) {
-    :root[data-start-mode="schedule"]:has(#sidebar.open) .sheet,
-    :root[data-start-mode="schedule"]:has(#schedule-drawer.open) .sheet {
+    :root[data-map="off"]:has(#sidebar.open) .sheet,
+    :root[data-map="off"]:has(#schedule-drawer.open) .sheet {
         display: none;
     }
 }
