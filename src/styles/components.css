@@ -1049,6 +1049,16 @@
     font-weight: 500;
 }
 
+.map-switch { @apply shrink-0 flex items-center justify-center pt-1; }
+
+.map-switch-row { @apply gap-2.5; font-size: 13px; }
+
+:root[data-start-mode="schedule"] .map-switch { @apply order-first pt-0 pb-1; }
+
+:root[data-start-mode="schedule"] .map-switch-row {
+    @apply py-1.5 px-3 bg-surface border border-border rounded-control;
+}
+
 .map-schedule { display: none; }
 
 :root:has(#group-current:not([hidden])) .map-schedule,

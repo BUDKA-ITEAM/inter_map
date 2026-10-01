@@ -50,29 +50,12 @@
         </div>
 
         <div class="drawer-section">
-            <span class="section-label" id="view-switch-label">
+            <span class="section-label">
                 <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
             </span>
-            <div class="view-switch" role="group" aria-labelledby="view-switch-label">
-                <button id="day-view-btn" type="button" class="view-btn view-btn-day"
-                        aria-pressed="true" aria-label="Расписание на день">На день</button>
-                <button id="week-details-btn" type="button" class="view-btn view-btn-week"
-                        aria-pressed="false" aria-label="Расписание на неделю">На неделю</button>
-            </div>
             <button id="open-schedule-drawer" type="button" class="btn btn-neutral">
                 <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Открыть расписание
             </button>
-        </div>
-
-        <div class="drawer-section">
-            <span class="section-label">
-                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg>Карта
-            </span>
-            <label for="map-toggle" class="switch-row">
-                <input type="checkbox" id="map-toggle" class="switch-input" role="switch">
-                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
-                <span>Показывать план этажей</span>
-            </label>
         </div>
 
         <div class="drawer-section">
@@ -195,6 +178,18 @@
             <p id="teacher-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 
+        <div class="drawer-section">
+            <span class="section-label" id="view-switch-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-days"/></svg>Период
+            </span>
+            <div class="view-switch" role="group" aria-labelledby="view-switch-label">
+                <button id="day-view-btn" type="button" class="view-btn view-btn-day"
+                        aria-pressed="true" aria-label="Расписание на день">На день</button>
+                <button id="week-details-btn" type="button" class="view-btn view-btn-week"
+                        aria-pressed="false" aria-label="Расписание на неделю">На неделю</button>
+            </div>
+        </div>
+
         <div class="drawer-actions">
             <div class="sheet-switch">
                 <input type="checkbox" id="schedule-toggle" class="sheet-switch-input">
@@ -297,6 +292,18 @@
                         <span data-floor="6" role="button" tabindex="0">6</span>
                     </div>
                 </nav>
+            </div>
+
+            <div id="map-switch" class="map-switch">
+                <label for="map-toggle" class="switch-row map-switch-row">
+                    <input type="checkbox" id="map-toggle" class="switch-input" role="switch" aria-label="Показывать план этажей">
+                    <span class="switch-track" aria-hidden="true">
+                        <span class="switch-thumb">
+                            <span class="switch-icon"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg></span>
+                        </span>
+                    </span>
+                    <span class="map-switch-text">Показывать план этажей</span>
+                </label>
             </div>
 
             <div id="map-footer" class="map-footer">

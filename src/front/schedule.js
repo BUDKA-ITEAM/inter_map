@@ -455,14 +455,13 @@ const dayViewBtn = document.getElementById('day-view-btn');
 const weekViewBtn = document.getElementById('week-details-btn');
 
 function switchView(mode) {
-    if (viewMode !== mode) {
-        setViewMode(mode);
-        dayViewBtn.setAttribute('aria-pressed', String(mode === 'day'));
-        weekViewBtn.setAttribute('aria-pressed', String(mode === 'week'));
-        if (scheduleToggle.checked && hasSelection()) applySelection();
-    }
+    if (viewMode === mode) return;
 
-    if (!isScheduleOnly()) setScheduleDrawerOpen(true);
+    setViewMode(mode);
+    dayViewBtn.setAttribute('aria-pressed', String(mode === 'day'));
+    weekViewBtn.setAttribute('aria-pressed', String(mode === 'week'));
+
+    if (scheduleToggle.checked && hasSelection()) applySelection();
 }
 
 dayViewBtn.addEventListener('click', () => switchView('day'));
@@ -506,8 +505,6 @@ const IGNORED_OUTSIDE_CLICKS = [
     '#schedule-drawer',
     '#schedule-drawer-toggle',
     '#open-schedule-drawer',
-    '#day-view-btn',
-    '#week-details-btn',
     '#map-schedule-btn'
 ].join(', ');
 
