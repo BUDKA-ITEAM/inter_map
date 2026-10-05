@@ -25,6 +25,13 @@ function request(path, options) {
     });
 }
 
+export function authorizedRequest(path, options) {
+    return request(path, {
+        ...options,
+        headers: { ...options.headers, Authorization: `Bearer ${readToken()}` }
+    });
+}
+
 function toSession(data) {
     const { user_id: userId, username, full_name: fullName, role, group, groups } = data;
 
@@ -46,9 +53,7 @@ export async function fetchSession() {
     const token = readToken();
     if (!token) return GUEST_SESSION;
 
-    const response = await request(SESSION_ENDPOINT, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await authorizedRequest(SESSION_ENDPOINT, { method: 'GET' });
 
     if (response.status === 401) {
         clearSession();

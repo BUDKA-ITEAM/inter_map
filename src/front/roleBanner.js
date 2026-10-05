@@ -1,5 +1,6 @@
 import { ROLE_TITLES, ROLES_WITH_TOOLS } from './config.js';
 import { GUEST_SESSION, fetchSession, login, clearSession } from './session.js';
+import { openAttendance } from './attendance.js';
 
 const roleName = document.getElementById('role-name');
 const roleGroup = document.getElementById('role-group');
@@ -40,10 +41,7 @@ function showBanner(state) {
     roleToolsBtn.hidden = !signedIn || !ROLES_WITH_TOOLS.includes(session.role);
 }
 
-// сюда подключаются будущие экраны старосты и куратора, остается развести по ней конкретные разделы
-roleToolsBtn.addEventListener('click', () => {
-    setStatus(`Раздел «${ROLE_TITLES[session.role]}» пока не подключён`);
-});
+roleToolsBtn.addEventListener('click', () => openAttendance(session));
 
 loginOpenBtn.addEventListener('click', () => {
     setStatus('');

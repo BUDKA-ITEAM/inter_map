@@ -28,6 +28,7 @@ export const LESSONS_ENDPOINT = '/api/lessons';
 export const TEACHERS_ENDPOINT = '/api/teachers';
 export const SESSION_ENDPOINT = '/api/auth/me';
 export const LOGIN_ENDPOINT = '/api/auth/login';
+export const ATTENDANCE_ENDPOINT = '/api/attendance';
 export const WEEK_SCHEDULE_PAGE_URL = 'week_schedule.html';
 
 export const GROUPS_SCAN_LIMIT = 2000;
@@ -221,6 +222,12 @@ export const ROLE_TITLES = {
 
 export const ROLES_WITH_TOOLS = ['monitor', 'curator', 'admin'];
 export const TOKEN_STORAGE_KEY = 'intermap.token';
+
+export const ATTENDANCE_STATUSES = [
+    { id: 'present', title: 'Был' },
+    { id: 'absent', title: 'Не был' },
+    { id: 'excused', title: 'Опоздал' }
+];
 
 export const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 export const MONTH_TITLES = [

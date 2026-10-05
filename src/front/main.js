@@ -7,6 +7,8 @@ import './teachers.js';
 import './ui.js';
 import './mapMode.js';
 import './roleBanner.js';
+import './attendance.js';
+import './demoMode.js';
 
 import { setScheduleDate, scheduleToggle } from './schedule.js';
 import { getDateString } from './dates.js';

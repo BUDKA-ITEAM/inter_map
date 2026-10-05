@@ -51,6 +51,10 @@
                 <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Войти
             </button>
 
+            <button id="demo-monitor-btn" type="button" class="btn btn-neutral">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Войти как староста
+            </button>
+
             <form id="login-form" class="login-form" hidden>
                 <label for="login-email" class="field-label">Почта</label>
                 <input type="email" id="login-email" class="text-input" autocomplete="username"
@@ -370,6 +374,25 @@
                     <svg class="intro-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg>Да, покажите карту
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="attendance" class="attendance" role="dialog" aria-modal="true" aria-labelledby="attendance-title" hidden>
+        <div class="attendance-card">
+            <div class="attendance-head">
+                <h2 id="attendance-title" class="attendance-title">Посещаемость</h2>
+                <button id="attendance-close" type="button" class="btn-icon" aria-label="Закрыть">
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>
+                </button>
+            </div>
+
+            <label for="attendance-lesson" class="field-label">Пара</label>
+            <span class="select-wrap">
+                <select id="attendance-lesson" class="select"></select>
+            </span>
+
+            <div id="attendance-list" class="attendance-list"></div>
+            <p id="attendance-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
     </div>
 

@@ -385,8 +385,8 @@
     @apply relative flex items-center gap-3 m-0 text-ink cursor-pointer;
     --switch-width: 46px;
     --switch-height: 26px;
-    --switch-thumb: 22px;
-    --switch-icon: 15px;
+    --switch-gap: 3px;
+    --switch-icon: 14px;
     padding-block: 2px;
     font-size: 13px;
 }
@@ -413,10 +413,10 @@
 .switch-thumb {
     @apply absolute rounded-full bg-surface shadow-card ring-1 ring-border-strong
            transition-[translate,background-color] duration-250 ease-[var(--ease)];
-    width: var(--switch-thumb);
-    height: var(--switch-thumb);
-    top: 2px;
-    left: 2px;
+    width: calc(var(--switch-height) - var(--switch-gap) * 2);
+    height: calc(var(--switch-height) - var(--switch-gap) * 2);
+    top: calc(var(--switch-gap) - 1px);
+    left: calc(var(--switch-gap) - 1px);
 }
 
 .switch-icon {
@@ -429,7 +429,7 @@
 .switch-icon-sun { @apply opacity-0 rotate-[-90deg] scale-50; }
 
 .switch-input:checked ~ .switch-track .switch-thumb {
-    translate: calc(var(--switch-width) - var(--switch-thumb) - 4px);
+    translate: calc(var(--switch-width) - var(--switch-height));
 }
 .switch-input:checked ~ .switch-track .switch-icon-moon { @apply opacity-0 rotate-90 scale-50; }
 .switch-input:checked ~ .switch-track .switch-icon-sun { @apply opacity-100 rotate-0 scale-100; }
@@ -1091,8 +1091,7 @@
 :root[data-map="off"] .map-switch-row {
     --switch-width: 38px;
     --switch-height: 22px;
-    --switch-thumb: 18px;
-    --switch-icon: 12px;
+    --switch-icon: 11px;
 }
 
 :root[data-map="on"] .when-map-off,
@@ -1167,7 +1166,72 @@
 
 .logout-btn { @apply self-start mt-1.5; }
 
+:root:has(#logout-btn:not([hidden])) #demo-monitor-btn,
+:root:has(#login-form:not([hidden])) #demo-monitor-btn {
+    display: none;
+}
+
 .role-banner .status-text:empty { display: none; }
+
+/* ---------- посещаемость ---------- */
+
+.attendance {
+    @apply fixed inset-0 z-30 flex items-center justify-center p-4 bg-scrim;
+}
+
+.attendance[hidden] { display: none; }
+
+.attendance-card {
+    @apply w-full flex flex-col gap-2 p-4
+           bg-surface border border-border rounded-card shadow-sheet
+           animate-[panel-in_var(--duration-base)_var(--ease)];
+    max-width: 420px;
+    max-height: min(82dvh, 640px);
+}
+
+.attendance-head { @apply flex items-center justify-between gap-2; }
+
+.attendance-title {
+    @apply m-0 text-ink tracking-[-0.01em];
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.attendance-list {
+    @apply flex-1 flex flex-col gap-2 overflow-y-auto overscroll-contain;
+    padding-block: 2px;
+}
+
+.attendance-row {
+    @apply flex flex-col gap-1.5 p-2.5 border border-border rounded-control;
+}
+
+.attendance-name {
+    @apply text-ink;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.attendance-marks {
+    @apply grid gap-1;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.attendance-mark {
+    @apply inline-flex items-center justify-center min-h-9 cursor-pointer
+           rounded-control bg-surface text-ink-secondary border border-border
+           transition-[background-color,border-color,color] duration-150 ease-[ease]
+           active:bg-surface-active
+           mouse:hover:bg-surface-hover mouse:hover:text-ink;
+    padding-inline: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.attendance-mark[aria-pressed="true"] {
+    @apply bg-accent text-on-accent border-accent font-semibold
+           mouse:hover:bg-accent-hover mouse:hover:text-on-accent;
+}
 
 /* ---------- панель даты над картой ---------- */
 

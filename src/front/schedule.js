@@ -96,6 +96,7 @@ function trimSeconds(time) {
 function lessonToPair(lesson, dayDate = null) {
     const { time_start: start, time_end: end, subject, room_number: room } = lesson;
     return {
+        id: lesson.lesson_id,
         time: `${trimSeconds(start)} - ${trimSeconds(end)}`,
         name: subject,
         roomId: room,
