@@ -370,21 +370,25 @@
 
 .switch-row {
     @apply relative flex items-center gap-3 m-0 text-ink cursor-pointer;
+    --switch-width: 46px;
+    --switch-height: 26px;
+    --switch-thumb: 22px;
+    --switch-icon: 15px;
     padding-block: 2px;
     font-size: 13px;
 }
 
 .switch-input {
     @apply absolute top-0 left-0 m-0 opacity-0 cursor-pointer;
-    width: 46px;
-    height: 26px;
+    width: var(--switch-width);
+    height: var(--switch-height);
 }
 
 .switch-track {
     @apply relative flex-none rounded-full bg-surface-active border border-border
            transition-[background-color,border-color] duration-250 ease-[ease];
-    width: 46px;
-    height: 26px;
+    width: var(--switch-width);
+    height: var(--switch-height);
 }
 
 .switch-input:checked ~ .switch-track { @apply bg-accent border-accent; }
@@ -394,8 +398,10 @@
 }
 
 .switch-thumb {
-    @apply absolute size-5.5 rounded-full bg-surface shadow-card ring-1 ring-border-strong
+    @apply absolute rounded-full bg-surface shadow-card ring-1 ring-border-strong
            transition-[translate,background-color] duration-250 ease-[var(--ease)];
+    width: var(--switch-thumb);
+    height: var(--switch-thumb);
     top: 2px;
     left: 2px;
 }
@@ -405,11 +411,13 @@
            transition-[opacity,rotate,scale] duration-250 ease-[var(--ease)];
 }
 
-.switch-icon svg { width: 15px; height: 15px; stroke-width: 2.6; }
+.switch-icon svg { width: var(--switch-icon); height: var(--switch-icon); stroke-width: 2.6; }
 
 .switch-icon-sun { @apply opacity-0 rotate-[-90deg] scale-50; }
 
-.switch-input:checked ~ .switch-track .switch-thumb { @apply translate-x-5; }
+.switch-input:checked ~ .switch-track .switch-thumb {
+    translate: calc(var(--switch-width) - var(--switch-thumb) - 4px);
+}
 .switch-input:checked ~ .switch-track .switch-icon-moon { @apply opacity-0 rotate-90 scale-50; }
 .switch-input:checked ~ .switch-track .switch-icon-sun { @apply opacity-100 rotate-0 scale-100; }
 
@@ -1023,7 +1031,7 @@
 
 .main-container {
     @apply flex-1 h-full grid gap-3;
-    grid-template-areas: "date" "map" "switch" "actions";
+    grid-template-areas: "date" "map" "actions" "switch";
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr) auto auto;
     max-width: var(--content-max);
@@ -1031,8 +1039,8 @@
 }
 
 :root[data-map="off"] .main-container {
-    grid-template-areas: "switch" "date" "sheet";
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "date" "sheet" "switch";
+    grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .date-bar { grid-area: date; }
@@ -1068,8 +1076,14 @@
 .map-switch-row { @apply gap-2.5; font-size: 13px; }
 
 :root[data-map="off"] .map-switch-row {
-    @apply py-1.5 px-3 bg-surface border border-border rounded-control;
+    --switch-width: 38px;
+    --switch-height: 22px;
+    --switch-thumb: 18px;
+    --switch-icon: 12px;
 }
+
+:root[data-map="on"] .when-map-off,
+:root[data-map="off"] .when-map-on { display: none; }
 
 .map-schedule { display: none; }
 
