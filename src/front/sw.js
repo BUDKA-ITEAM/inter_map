@@ -1,4 +1,4 @@
-const SHELL_VERSION = 'v9';
+const SHELL_VERSION = 'v10';
 const ASSET_VERSION = 'v1';
 const SHELL_CACHE = `shell-${SHELL_VERSION}`;
 const ASSET_CACHE = `assets-${ASSET_VERSION}`;

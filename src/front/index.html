@@ -46,9 +46,33 @@
             <p class="role-banner-role"><span id="role-name"></span></p>
             <p class="role-banner-meta">из группы <span id="role-group" class="role-banner-group"></span></p>
             <p id="role-email" class="role-banner-meta" hidden></p>
+
+            <button id="login-open-btn" type="button" class="btn btn-primary" hidden>
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Войти
+            </button>
+
+            <form id="login-form" class="login-form" hidden>
+                <label for="login-email" class="field-label">Почта</label>
+                <input type="email" id="login-email" class="text-input" autocomplete="username"
+                       placeholder="student@college.ru" required>
+
+                <label for="login-password" class="field-label">Пароль</label>
+                <input type="password" id="login-password" class="text-input" autocomplete="current-password" required>
+
+                <button id="login-submit-btn" type="submit" class="btn btn-primary">
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Войти
+                </button>
+                <button id="login-cancel-btn" type="button" class="btn btn-neutral">Отмена</button>
+            </form>
+
             <button id="role-tools-btn" type="button" class="btn btn-primary" hidden>
                 <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Перейти к функционалу
             </button>
+
+            <button id="logout-btn" type="button" class="btn-pill logout-btn" hidden>
+                <svg class="icon-edit" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Выйти
+            </button>
+
             <p id="role-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 

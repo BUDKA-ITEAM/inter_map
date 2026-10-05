@@ -303,6 +303,19 @@
     font-weight: 500;
 }
 
+.text-input {
+    @apply w-full min-h-11 border border-border rounded-control bg-surface text-ink shadow-card
+           transition-[border-color,background-color,box-shadow] duration-150 ease-[ease]
+           focus-visible:outline-none focus-visible:border-tag-orange
+           focus-visible:shadow-[0_0_0_3px_var(--tag-orange-soft)]
+           mouse:hover:border-border-strong;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 14px;
+}
+
+.text-input::placeholder { @apply text-ink-secondary opacity-70; }
+
 .select-wrap { @apply relative block; }
 
 .select-wrap::after {
@@ -1145,6 +1158,14 @@
 .role-banner-group { @apply text-ink; font-weight: 600; }
 
 .role-banner .btn { @apply mt-1.5; }
+
+.login-form { @apply flex flex-col gap-1.5 mt-1.5; }
+
+.login-form .field-label { @apply mt-1; }
+
+.login-form .btn { @apply mt-2; }
+
+.logout-btn { @apply self-start mt-1.5; }
 
 .role-banner .status-text:empty { display: none; }
 
