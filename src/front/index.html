@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="white" data-start-mode="ask">
+<html lang="ru" data-theme="white" data-map="on">
 <head>
     <meta charset="UTF-8">
     <script>
+        const root = document.documentElement;
+        let savedMap = null;
         try {
-            const saved = localStorage.getItem('intermap.startMode');
-            if (saved === 'map' || saved === 'schedule') document.documentElement.dataset.startMode = saved;
+            savedMap = localStorage.getItem('intermap.map');
         } catch {}
+        if (savedMap === 'on' || savedMap === 'off') root.dataset.map = savedMap;
+        else root.dataset.intro = 'pending';
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light dark">
@@ -43,36 +46,47 @@
             <p class="role-banner-role"><span id="role-name"></span></p>
             <p class="role-banner-meta">из группы <span id="role-group" class="role-banner-group"></span></p>
             <p id="role-email" class="role-banner-meta" hidden></p>
+
+            <button id="login-open-btn" type="button" class="btn btn-primary" hidden>
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#user"/></svg>Войти
+            </button>
+
+            <button id="demo-monitor-btn" type="button" class="btn btn-neutral">
+                <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#users"/></svg>Войти как староста
+            </button>
+
+            <form id="login-form" class="login-form" hidden>
+                <label for="login-email" class="field-label">Почта</label>
+                <input type="email" id="login-email" class="text-input" autocomplete="username"
+                       placeholder="student@college.ru" required>
+
+                <label for="login-password" class="field-label">Пароль</label>
+                <input type="password" id="login-password" class="text-input" autocomplete="current-password" required>
+
+                <button id="login-submit-btn" type="submit" class="btn btn-primary">
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Войти
+                </button>
+                <button id="login-cancel-btn" type="button" class="btn btn-neutral">Отмена</button>
+            </form>
+
             <button id="role-tools-btn" type="button" class="btn btn-primary" hidden>
                 <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#circle-check"/></svg>Перейти к функционалу
             </button>
+
+            <button id="logout-btn" type="button" class="btn-pill logout-btn" hidden>
+                <svg class="icon-edit" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>Выйти
+            </button>
+
             <p id="role-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 
         <div class="drawer-section">
-            <span class="section-label" id="view-switch-label">
+            <span class="section-label">
                 <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Расписание
             </span>
-            <div class="view-switch" role="group" aria-labelledby="view-switch-label">
-                <button id="day-view-btn" type="button" class="view-btn view-btn-day"
-                        aria-pressed="true" aria-label="Расписание на день">На день</button>
-                <button id="week-details-btn" type="button" class="view-btn view-btn-week"
-                        aria-pressed="false" aria-label="Расписание на неделю">На неделю</button>
-            </div>
             <button id="open-schedule-drawer" type="button" class="btn btn-neutral">
                 <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Открыть расписание
             </button>
-        </div>
-
-        <div class="drawer-section">
-            <span class="section-label">
-                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg>Карта
-            </span>
-            <label for="map-toggle" class="switch-row">
-                <input type="checkbox" id="map-toggle" class="switch-input" role="switch">
-                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
-                <span>Показывать план этажей</span>
-            </label>
         </div>
 
         <div class="drawer-section">
@@ -195,6 +209,18 @@
             <p id="teacher-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
 
+        <div class="drawer-section">
+            <span class="section-label" id="view-switch-label">
+                <svg class="section-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-days"/></svg>Период
+            </span>
+            <div class="view-switch" role="group" aria-labelledby="view-switch-label">
+                <button id="day-view-btn" type="button" class="view-btn view-btn-day"
+                        aria-pressed="true" aria-label="Расписание на день">На день</button>
+                <button id="week-details-btn" type="button" class="view-btn view-btn-week"
+                        aria-pressed="false" aria-label="Расписание на неделю">На неделю</button>
+            </div>
+        </div>
+
         <div class="drawer-actions">
             <div class="sheet-switch">
                 <input type="checkbox" id="schedule-toggle" class="sheet-switch-input">
@@ -299,6 +325,19 @@
                 </nav>
             </div>
 
+            <div id="map-switch" class="map-switch">
+                <label for="map-toggle" class="switch-row map-switch-row">
+                    <input type="checkbox" id="map-toggle" class="switch-input" role="switch" aria-label="Показывать план этажей">
+                    <span class="switch-track" aria-hidden="true">
+                        <span class="switch-thumb">
+                            <span class="switch-icon"><svg aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg></span>
+                        </span>
+                    </span>
+                    <span class="when-map-on">Показывать план этажей</span>
+                    <span class="when-map-off">Показать план этажей</span>
+                </label>
+            </div>
+
             <div id="map-footer" class="map-footer">
                 <button id="reset-view" type="button" class="map-reset">
                     <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#maximize"/></svg>Сбросить вид
@@ -326,7 +365,7 @@
     <div id="intro" class="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
         <div class="intro-card">
             <h1 id="intro-title" class="intro-title">Нужна ли вам карта?</h1>
-            <p class="intro-text">План этажей подсвечивает кабинеты по занятости. Если нужно только расписание, карту можно пропустить - и включить позже в настройках.</p>
+            <p class="intro-text">Карта этажей. Если нужно только расписание, карту можно пропустить - и включить позже.</p>
             <div class="intro-actions">
                 <button id="intro-schedule" type="button" class="intro-btn">
                     <svg class="intro-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#calendar-range"/></svg>Нет, покажите расписание
@@ -335,6 +374,25 @@
                     <svg class="intro-icon" aria-hidden="true" focusable="false"><use href="img/icons.svg#map"/></svg>Да, покажите карту
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="attendance" class="attendance" role="dialog" aria-modal="true" aria-labelledby="attendance-title" hidden>
+        <div class="attendance-card">
+            <div class="attendance-head">
+                <h2 id="attendance-title" class="attendance-title">Посещаемость</h2>
+                <button id="attendance-close" type="button" class="btn-icon" aria-label="Закрыть">
+                    <svg class="icon-sm" aria-hidden="true" focusable="false"><use href="img/icons.svg#x"/></svg>
+                </button>
+            </div>
+
+            <label for="attendance-lesson" class="field-label">Пара</label>
+            <span class="select-wrap">
+                <select id="attendance-lesson" class="select"></select>
+            </span>
+
+            <div id="attendance-list" class="attendance-list"></div>
+            <p id="attendance-status" class="status-text" role="status" aria-live="polite"></p>
         </div>
     </div>
 

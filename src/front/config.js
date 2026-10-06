@@ -26,7 +26,9 @@ export const isLocalHost = ['localhost', '127.0.0.1', '', '[::1]'].includes(loca
 export const API_BASE_URL = isLocalHost ? API_DEV_URL : API_PRODUCTION_URL;
 export const LESSONS_ENDPOINT = '/api/lessons';
 export const TEACHERS_ENDPOINT = '/api/teachers';
-export const SESSION_ENDPOINT = '/api/me';
+export const SESSION_ENDPOINT = '/api/auth/me';
+export const LOGIN_ENDPOINT = '/api/auth/login';
+export const ATTENDANCE_ENDPOINT = '/api/attendance';
 export const WEEK_SCHEDULE_PAGE_URL = 'week_schedule.html';
 
 export const GROUPS_SCAN_LIMIT = 2000;
@@ -202,7 +204,7 @@ export const GROUP_STORAGE_KEY = 'intermap.selectedGroup';
 export const TEACHER_STORAGE_KEY = 'intermap.selectedTeacher';
 export const SCHEDULE_MODE_STORAGE_KEY = 'intermap.scheduleMode';
 export const THEME_STORAGE_KEY = 'intermap.theme';
-export const START_MODE_STORAGE_KEY = 'intermap.startMode';
+export const MAP_STORAGE_KEY = 'intermap.map';
 export const DEBUG_STORAGE_KEY = 'intermap.debug';
 export const SWITCH_COUNT_STORAGE_KEY = 'intermap.themeSwitches.v2';
 export const DEBUG_UNLOCK_TAPS = 20;
@@ -213,11 +215,19 @@ export const MOBILE_BREAKPOINT = 768;
 export const WEEKDAY_TITLES = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 export const ROLE_TITLES = {
     student: 'Ученик',
-    headman: 'Староста',
-    curator: 'Куратор'
+    monitor: 'Староста',
+    curator: 'Куратор',
+    admin: 'Администратор'
 };
 
-export const ROLES_WITH_TOOLS = ['headman', 'curator'];
+export const ROLES_WITH_TOOLS = ['monitor', 'curator', 'admin'];
+export const TOKEN_STORAGE_KEY = 'intermap.token';
+
+export const ATTENDANCE_STATUSES = [
+    { id: 'present', title: 'Был' },
+    { id: 'absent', title: 'Не был' },
+    { id: 'excused', title: 'Опоздал' }
+];
 
 export const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 export const MONTH_TITLES = [

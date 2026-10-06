@@ -96,6 +96,7 @@ function trimSeconds(time) {
 function lessonToPair(lesson, dayDate = null) {
     const { time_start: start, time_end: end, subject, room_number: room } = lesson;
     return {
+        id: lesson.lesson_id,
         time: `${trimSeconds(start)} - ${trimSeconds(end)}`,
         name: subject,
         roomId: room,
@@ -333,7 +334,7 @@ pairsContainer.addEventListener('keydown', (event) => {
 });
 
 pairsContainer.addEventListener('click', (event) => {
-    if (isScheduleOnly()) return;
+    if (mapHidden()) return;
 
     const card = event.target.closest('.pair-card');
     if (card?.dataset.roomId) highlightRoomByRoomId(card.dataset.roomId);
@@ -429,7 +430,7 @@ export async function applySelection() {
         return;
     }
 
-    if (isScheduleOnly()) closeDrawersForSheet();
+    if (mapHidden()) closeDrawersForSheet();
     await loadSelection();
 }
 
@@ -455,14 +456,13 @@ const dayViewBtn = document.getElementById('day-view-btn');
 const weekViewBtn = document.getElementById('week-details-btn');
 
 function switchView(mode) {
-    if (viewMode !== mode) {
-        setViewMode(mode);
-        dayViewBtn.setAttribute('aria-pressed', String(mode === 'day'));
-        weekViewBtn.setAttribute('aria-pressed', String(mode === 'week'));
-        if (scheduleToggle.checked && hasSelection()) applySelection();
-    }
+    if (viewMode === mode) return;
 
-    if (!isScheduleOnly()) setScheduleDrawerOpen(true);
+    setViewMode(mode);
+    dayViewBtn.setAttribute('aria-pressed', String(mode === 'day'));
+    weekViewBtn.setAttribute('aria-pressed', String(mode === 'week'));
+
+    if (scheduleToggle.checked && hasSelection()) applySelection();
 }
 
 dayViewBtn.addEventListener('click', () => switchView('day'));
@@ -473,12 +473,12 @@ function closeDrawersForSheet() {
     if (isNarrowScreen()) setSidebarOpen(false);
 }
 
-function isScheduleOnly() {
-    return document.documentElement.dataset.startMode === 'schedule';
+function mapHidden() {
+    return document.documentElement.dataset.map === 'off';
 }
 
 function setScheduleOpen(open) {
-    if (!open && isScheduleOnly()) return;
+    if (!open && mapHidden()) return;
     if (scheduleToggle.checked === open) return;
 
     scheduleToggle.checked = open;
@@ -506,8 +506,6 @@ const IGNORED_OUTSIDE_CLICKS = [
     '#schedule-drawer',
     '#schedule-drawer-toggle',
     '#open-schedule-drawer',
-    '#day-view-btn',
-    '#week-details-btn',
     '#map-schedule-btn'
 ].join(', ');
 
@@ -580,7 +578,7 @@ function collapseScheduleForRoom() {
 // Обработчик добавлен вторым: сначала срабатывает тот, что открывает
 // карточку кабинета, и только потом сворачивается расписание.
 pairsContainer.addEventListener('click', (event) => {
-    if (isScheduleOnly()) return;
+    if (mapHidden()) return;
     if (event.target.closest('.pair-card')) collapseScheduleForRoom();
 });
 

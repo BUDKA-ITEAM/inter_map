@@ -5,8 +5,10 @@ import './roomPanel.js';
 import './groups.js';
 import './teachers.js';
 import './ui.js';
-import './startMode.js';
+import './mapMode.js';
 import './roleBanner.js';
+import './attendance.js';
+import './demoMode.js';
 
 import { setScheduleDate, scheduleToggle } from './schedule.js';
 import { getDateString } from './dates.js';
@@ -14,7 +16,7 @@ import { initDateBar } from './dateBar.js';
 import { initGroupPicker } from './groups.js';
 import { initTeacherPicker } from './teachers.js';
 import { initTheme, initDebugMode, initExtrasUnlock } from './ui.js';
-import { initStartMode, openScheduleStart } from './startMode.js';
+import { initMapMode, openScheduleStart } from './mapMode.js';
 import { initRoleBanner } from './roleBanner.js';
 import { currentDate, setCurrentDate } from './state.js';
 
@@ -29,7 +31,7 @@ initRoleBanner();
 initGroupPicker();
 initTeacherPicker();
 
-await initStartMode();
+await initMapMode();
 openScheduleStart();
 
 if (new URLSearchParams(window.location.search).get('schedule') === '1') {
