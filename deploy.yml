@@ -2,8 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]   # срабатывает при пуше в main
-  workflow_dispatch:       # можно запускать вручную
+    branches: [ "main" ]   
+  workflow_dispatch:       
 
 jobs:
   deploy:
@@ -16,8 +16,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./src/front   # папка с вашим сайтом
-          publish_branch: gh-pages   # ветка, куда публикуем
-          force_orphan: true         # полностью перезаписывает ветку
+          publish_dir: ./src/front   
+          publish_branch: gh-pages   
+          force_orphan: true         
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
