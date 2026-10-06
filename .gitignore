@@ -10,7 +10,6 @@ api/.env
 .DS_Store
 Thumbs.db
 .idea/
-requirements.txt
 test.txt
 
 /dockerfile
