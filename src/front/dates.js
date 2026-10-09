@@ -7,10 +7,15 @@ export function getDateString(date) {
 
 export function parseDateString(value) {
     const [year, month, day] = value.split('-').map(Number);
-    return new Date(day, month - 1, year);
+    return new Date(year, month - 1, day);
 }
 
 export function shortDate(dateStr) {
     const [, month, day] = dateStr.split('-');
     return `${day}.${month}`;
+}
+
+export function toApiDate(isoDate) {
+    const [year, month, day] = isoDate.split('-');
+    return `${day}-${month}-${year}`;
 }

@@ -81,10 +81,9 @@ export async function fetchFromApi(path, params) {
 
 function fetchLessons({ from, to, ...extraParams }) {
     const params = new URLSearchParams({
-        ...extraParams,
-        date_from: from,
-        date_to: to,
-        limit: String(GROUPS_SCAN_LIMIT)
+        group,
+        date_from: toApiDate(dateStr),
+        date_to: toApiDate(dateStr)
     });
     return fetchFromApi(LESSONS_ENDPOINT, params);
 }
