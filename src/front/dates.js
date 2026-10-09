@@ -7,7 +7,7 @@ export function getDateString(date) {
 
 export function parseDateString(value) {
     const [year, month, day] = value.split('-').map(Number);
-    return new Date(year, month - 1, day);
+    return new Date(day, month - 1, year);
 }
 
 export function shortDate(dateStr) {
