@@ -18,7 +18,7 @@ export const DIAGONAL_MARGIN = 2.0;
 export const FRUSTUM_MARGIN = 1.0;
 export const FIXED_AZIMUTH = 0;
 export const FIXED_POLAR = 0.45;
-export const API_PRODUCTION_URL = 'intermap-api.duckdns.org';
+export const API_PRODUCTION_URL = 'https://intermap-api.duckdns.org';
 export const API_DEV_URL = 'http://26.70.191.230:8080';
 export const isLocalHost = ['localhost', '127.0.0.1', '', '[::1]'].includes(location.hostname)
     || location.protocol === 'file:'
