@@ -24,7 +24,7 @@ import {
     scheduleCollapsedForRoom, setScheduleCollapsedForRoom
 } from './state.js';
 
-import { getDateString, parseDateString, shortDate } from './dates.js';
+import { getDateString, parseDateString, shortDate, toApiDate } from './dates.js';
 import { markSelectedDate } from './dateBar.js';
 
 import {
@@ -79,12 +79,13 @@ export async function fetchFromApi(path, params) {
     }
 }
 
-function fetchLessons({ from, to, ...extraParams }) {
+function fetchLessons({ from, to, ...extraParams } = {}) {
     const params = new URLSearchParams({
-        group,
-        date_from: toApiDate(dateStr),
-        date_to: toApiDate(dateStr)
+        ...extraParams,
+        limit: String(GROUPS_SCAN_LIMIT)
     });
+    if (from) params.set('date_from', toApiDate(from));
+    if (to) params.set('date_to', toApiDate(to));
     return fetchFromApi(LESSONS_ENDPOINT, params);
 }
 
