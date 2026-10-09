@@ -24,7 +24,20 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	json.NewEncoder(w).Encode(apiError{Error: message})
 }
 
-const dateLayout = "11-09-2001"
+const (
+	apiDateLayout = "02-01-2006" // DD-MM-YYYY
+	isoDateLayout = "2006-01-02" // YYYY-MM-DD
+	listMaxLimit  = 10000
+)
+
+func parseDateParam(v string) (time.Time, bool) {
+	for _, layout := range []string{apiDateLayout, isoDateLayout} {
+		if t, err := time.Parse(layout, v); err == nil {
+			return t, true
+		}
+	}
+	return time.Time{}, false
+}
 
 func (h *ScheduleHandler) List(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
@@ -36,47 +49,50 @@ func (h *ScheduleHandler) List(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, "limit must be positive int")
 			return
 		}
-		if n > 10000 {
-			writeError(w, http.StatusBadRequest, "limit cant be > 10000")
+		if n > listMaxLimit {
+			writeError(w, http.StatusBadRequest, "limit can't be > 10000")
 			return
 		}
 		limit = n
 	}
 
-	dateFrom := q.Get("date_from")
-	if dateFrom != "" {
-		if _, err := time.Parse(dateLayout, dateFrom); err != nil {
-			writeError(w, http.StatusBadRequest, "date_from must be in format DD-MM-YYYY")
+	var fromT, toT time.Time
+	var fromISO, toISO string
+
+	if v := q.Get("date_from"); v != "" {
+		t, ok := parseDateParam(v)
+		if !ok {
+			writeError(w, http.StatusBadRequest, "date_from must be in format DD-MM-YYYY or YYYY-MM-DD")
 			return
 		}
+		fromT, fromISO = t, t.Format(isoDateLayout)
 	}
 
-	dateTo := q.Get("date_to")
-	if dateTo != "" {
-		if _, err := time.Parse(dateLayout, dateTo); err != nil {
-			writeError(w, http.StatusBadRequest, "date_to must be in format DD-MM-YYYY")
+	if v := q.Get("date_to"); v != "" {
+		t, ok := parseDateParam(v)
+		if !ok {
+			writeError(w, http.StatusBadRequest, "date_to must be in format DD-MM-YYYY or YYYY-MM-DD")
 			return
 		}
+		toT, toISO = t, t.Format(isoDateLayout)
 	}
 
-	if dateFrom != "" && dateTo != "" && dateFrom > dateTo {
-		writeError(w, http.StatusBadRequest, "date from cant be earlier than date_to")
+	if fromISO != "" && toISO != "" && fromT.After(toT) {
+		writeError(w, http.StatusBadRequest, "date_from can't be later than date_to")
 		return
 	}
 
 	result := h.Cache.Filter(
 		q.Get("teacher_id"),
 		q.Get("group"),
-		dateFrom,
-		dateTo,
+		fromISO,
+		toISO,
 		limit,
 	)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=30")
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		log.Printf("encode response failed: %v", err)
-	}
+	json.NewEncoder(w).Encode(result)
 }
 
 // гетка для api/groups - список уникальных груп + сортировка
